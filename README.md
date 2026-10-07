@@ -127,37 +127,32 @@ is "conjecture-free query counts, priced".
 
 ## The frontier today
 
-Every task's frontier is open for now. The Stwo reference set all three, then its sheets were
-corrected to 92.4 claimed bits and it stepped down. The next entry to pass on the evaluator host
-sets each task's starting point. The batching-grind entries (`entries/stwo-grind`) pass the judge
-with 96.45 claimed bits on a laptop and wait for the host's next idle window.
+Stwo with 8 bits of proof of work before the batching coefficient (`entries/stwo-grind`), on its
+circuits framework at 107 queries, judged on the evaluator host (16 cpus), 2026-10-07:
 
-The price of a conjecture-free Stwo proof, measured on the evaluator host (16 cpus) at 107
-queries on 2026-10-07 with the reference build (the batching grind adds about 256 hashes per proof):
-
-| Task | prove | peak memory | proof | verify |
-|---|---|---|---|---|
-| hash chain, n = 16,384 | 3.7 s | 7.8 GB | 617 KB | 0.32 s |
-| matrix product, k = 48 | 2.9 s | 3.6 GB | 524 KB | 0.37 s |
-| recursion, inner n = 1,024 | 4.2 s | 9.4 GB | 627 KB | 0.31 s |
+| Task | prove | peak memory | proof | verify | security |
+|---|---|---|---|---|---|
+| hash chain, n = 16,384 | 3.6 s | 7.6 GB | 617 KB | 0.33 s | 96.45 claimed bits |
+| matrix product, k = 48 | 3.0 s | 3.6 GB | 531 KB | 0.37 s | 96.45 claimed bits |
+| recursion, inner n = 1,024 | 4.1 s | 9.3 GB | 628 KB | 0.34 s | 96.45 claimed bits |
 
 At today's conjectured settings (35 queries), the same proofs take about the same time, but are
 2.8x smaller (221, 192 and 233 KB) and verify about 3x faster (0.11 to 0.16 s). For a single
 proof the price of conjecture-free settings is proof size and verify time; prover time pays in
 recursion, where every extra query of the inner proof has to be checked inside the circuit.
 
-Why the reference stepped down: every committed column is lifted to one domain, so all 363
-out-of-domain quotients enter one FRI input, combined by powers of one random coefficient. Under
-the unique-decoding bound the S-two whitepaper uses (eprint 2026/532, Remark 20), that step costs
+Stwo as it is (`entries/stwo-chain`) proves at the same speed, but its sheets stop at 92.4 claimed
+bits, below the floor. Every committed column is lifted to one domain, so all 363 out-of-domain
+quotients enter one FRI input, combined by powers of one random coefficient. Under the
+unique-decoding bound the S-two whitepaper uses (eprint 2026/532, Remark 20), that step costs
 (363 - 1) x 2^23 / 2^124, about 2^-92.5, whatever the query count. The whitepaper's parameters
 assume grinding at this step (Section 5.5); `batching-grind.patch` adds 8 bits of it, and the
 sheets read 96.45.
 
 Other systems: a Plonky3 floor for the hash chain (`entries/plonky3-chain`, the maintainers'
-floor, not the Plonky3 team's best) passes every check but one on a laptop. It proves in about
-2.5 s with 3.2 GB, verifies in 0.05 s and reads 98.55 claimed bits, but its proofs are 5.8 MB,
-because each query opens a row of 11,920 columns: over the 2x size cap. Fitting it under the cap
-is open.
+floor, not the Plonky3 team's best) proves in 2.9 s with 3.2 GB on the host, verifies in
+0.05 s and reads 98.55 claimed bits, but its proofs are 5.8 MB, because each query
+opens a row of 11,920 columns: over the 2x size cap. Fitting it under the cap is open.
 
 ## Open problems
 
