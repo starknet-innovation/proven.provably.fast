@@ -75,6 +75,12 @@
       ? `Frontier: ${frontier.entry} (${frontier.team}), ${bits(frontier)} bits, since ${day(frontier.moved_at)}.`
       : `Frontier open: the next entry to pass on the host sets it.${shown ? " Above: the Stwo reference, measured on the host, whose sheet now reads " + bits(shown) + " bits." : ""}`
         + (waiting.length ? ` Waiting for the host: ${waiting.map((row) => row.entry).join(", ")}.` : "");
+    const conjectured = board.conjectured && board.conjectured[task.id];
+    if (conjectured) {
+      card.append(el("p", { class: "card-sub" },
+        `At today's conjectured settings (${conjectured.settings.n_queries} queries): ${seconds(conjectured.prove_seconds)} to prove, `
+        + `${kb(conjectured.proof_bytes)}, ${seconds(conjectured.verify_seconds)} to verify.`));
+    }
     card.append(el("p", { class: "card-foot" }, foot));
     return card;
   }
