@@ -1,0 +1,32 @@
+{
+ "name": "stwo-grind-chain",
+ "team": "provably.fast maintainers",
+ "system": "Stwo circuits framework at frontier 6e80156f with 8 bits of proof of work before the batching coefficient: circle STARK over M31, BLAKE2s Merkle commitments, 107 queries at rate 1/4",
+ "statement": "blake2s-chain-v0",
+ "prove": [
+  "./chain",
+  "prove",
+  "{statement}"
+ ],
+ "verify": [
+  "./chain",
+  "verify",
+  "{statement}",
+  "{proof}"
+ ],
+ "ledger": "../../reference/ledger-grind-chain.json",
+ "credits": [
+  {
+   "role": "implementer",
+   "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+  },
+  {
+   "role": "sourcer",
+   "who": "S-two whitepaper (eprint 2026/532), Section 5.5: grinding at the batching step"
+  },
+  {
+   "role": "sourcer",
+   "who": "Stwo's circuits framework (StarkWare, Apache-2.0)"
+  }
+ ]
+}

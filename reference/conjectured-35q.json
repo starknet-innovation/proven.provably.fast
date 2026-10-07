@@ -1,0 +1,2 @@
+{"n_queries": 35, "pow_bits": 26, "regime": "conjectured-capacity",
+ "note": "today's settings for Stwo's circuit proof: 35 queries at rate 1/4, 2 bits each if the proximity-gap conjecture holds up to capacity, plus 26 bits of proof of work: 96 conjectured bits"}
