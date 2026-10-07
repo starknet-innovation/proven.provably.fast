@@ -1,0 +1,28 @@
+{
+ "name": "stwo-circuit-matmul",
+ "team": "stwo-circuits-reference",
+ "system": "Stwo circuits framework at frontier 6e80156f: bytes, exact limb sums and range-checked carries in a circle STARK over M31, 107 queries at rate 1/4",
+ "statement": "u32-matmul-v0",
+ "prove": [
+  "../stwo-chain/chain",
+  "matmul-prove",
+  "{statement}"
+ ],
+ "verify": [
+  "../stwo-chain/chain",
+  "matmul-verify",
+  "{statement}",
+  "{proof}"
+ ],
+ "ledger": "../../reference/ledger-matmul.json",
+ "credits": [
+  {
+   "role": "implementer",
+   "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+  },
+  {
+   "role": "sourcer",
+   "who": "Stwo's circuits framework (StarkWare, Apache-2.0)"
+  }
+ ]
+}

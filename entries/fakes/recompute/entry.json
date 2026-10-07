@@ -1,0 +1,19 @@
+{
+ "name": "fake-recompute",
+ "system": "not a proof system (oracle test)",
+ "statement": "blake2s-chain-v0",
+ "prove": [
+  "python3",
+  "fake.py",
+  "prove",
+  "{statement}"
+ ],
+ "verify": [
+  "python3",
+  "fake.py",
+  "verify",
+  "{statement}",
+  "{proof}"
+ ],
+ "ledger": "../../../reference/ledger-independent-batching.json"
+}
