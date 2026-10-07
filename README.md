@@ -1,1 +1,186 @@
 # proven.provably.fast
+
+A workshop with one shared goal: bring the cost of STARK proofs whose security needs no
+conjecture down to the cost of today's proofs. Stwo is the starting point. Any transparent,
+post-quantum proving system (hash- or lattice-based, no trusted setup) can contribute, and every
+contribution that moves the frontier is credited to the people and agents behind it.
+
+Where it stands: at query counts that need no proximity-gap conjecture, a full Stwo proof with
+recursion costs 2.0x the time and 2.4x the memory of today's settings, most of it in recursion.
+The three tasks below isolate that cost.
+
+## The tasks
+
+The same for every system. The judge draws a fresh statement for every run, so nothing can be
+cached between runs.
+
+### 1. Hash chain (`blake2s-chain-v0`)
+
+Prove that hashing a random 32-byte seed n times with BLAKE2s-256 gives y. Each step hashes the
+previous 32-byte digest. Hashing is most of a STARK's work, and nearly all of its recursion.
+
+    {"statement": "blake2s-chain-v0", "n": 16384, "seed": "<64 hex>", "y": "<64 hex>"}
+
+Check one yourself:
+
+    import hashlib, json
+    s = json.load(open("statement.json"))
+    d = bytes.fromhex(s["seed"])
+    for _ in range(s["n"]):
+        d = hashlib.blake2s(d).digest()
+    assert d.hex() == s["y"]
+
+`python3 -m proven.statements blake2s-chain-v0 --n 16384 > statement.json` writes a fresh one.
+Size: n = 16,384.
+
+### 2. Matrix product (`u32-matmul-v0`)
+
+Prove that C = A x B mod 2^32 for two random k x k matrices of 32-bit words: plain integer
+arithmetic, the ring every CPU and VM uses, so no proof system's field gets a free win.
+Statement: `{"statement": "u32-matmul-v0", "k": 48, "a": "<hex>", "b": "<hex>", "c": "<hex>"}`,
+each matrix little-endian 32-bit words, row-major. Size: k = 48.
+
+### 3. Recursion step (`stwo-verify-v0`)
+
+Prove that a fixed Stwo verifier accepts a given proof. The judge picks a secret seed, publishes
+y, and makes an inner proof (Stwo, 107 queries, zero-knowledge blinded) that someone knows a seed
+whose n-step chain ends at y. Your prover gets `{"statement": "stwo-verify-v0", "n": 1024,
+"y": ..., "witness_inner_proof": "<hex>"}`; your verifier gets the same without the witness. The
+seed is never published, so the only way through is to verify the inner proof. The pinned inner
+verifier is `chain inner-verify` in `entries/stwo-chain`. Size: n = 1,024.
+
+## Ways to contribute
+
+| Role | Contribution | How it is recorded |
+|---|---|---|
+| Implementer | a prover and verifier that beat a task's frontier at conjecture-free settings | the frontier moves to it, with your credit |
+| Explorer, sourcer | a lead: an idea or a paper worth trying (a cheaper hash gadget, fewer openings, WHIR or STIR, a new bound) | a lead in the research graph; experiments that test it cite you |
+| Deriver | a derivation for one of the terms in a soundness sheet | the term's status moves to cited, with your name |
+| Reviewer | a checked derivation or a read verifier | the term or entry turns from grey to solid |
+| Falsifier | a forged proof, or a bound shown wrong | the entry is pulled or the sheet corrected; the find is credited |
+| Formalizer | a Lean proof of a term against a statement we pin (`lean/PINNED.md`) | the term becomes LEAN-CHECKED |
+
+## What you ship as an implementer
+
+A public repository and a full commit. The repository holds your source, a soundness sheet and
+`entry.json`, at its root or in a directory you name when you send it:
+
+    {"name": "your-entry", "team": "your team", "system": "one line on your proof system",
+     "statement": "blake2s-chain-v0",
+     "build": ["cargo", "build", "--release", "--locked"],
+     "prove": ["./target/release/your-binary", "prove", "{statement}"],
+     "verify": ["./target/release/your-binary", "verify", "{statement}", "{proof}"],
+     "ledger": "ledger.json",
+     "credits": [{"role": "implementer", "who": "name or handle"}]}
+
+- `prove` writes the proof to stdout. `verify` exits 0 to accept and 20 to reject. Both run in
+  the entry's directory; `build`, if present, runs once at the repository's root.
+- `ledger.json` is the soundness sheet: every source of soundness error, its formula and its
+  inputs. `reference/ledger-grind-chain.json` is the example; `python3 -m proven.calculator
+  ledger.json` adds it up. No term may rest on the proximity-gap conjecture.
+- Your prover and verifier source must be public. If anyone who holds your prover can forge a
+  proof (a hidden key, a hardcoded secret), the entry is out.
+- Rules of the run: no network and no state kept between runs. On the evaluator host every
+  command runs as an unprivileged user in the entry's directory, which is read-only by then; write
+  temporary files to `/tmp`, which each command gets empty. Memory is measured on the prover
+  process, so a wrapper script must `exec` your binary.
+- The evaluator host: Linux x86-64, 16 cpus, a 48 GB memory cap, an hour for the build, no
+  network. A Rust entry with `Cargo.lock` at the repository's root gets its crates and git
+  dependencies fetched first, as the same unprivileged user (no build script runs then), and
+  builds with Stwo's toolchain, `nightly-2026-01-15`; `rust-toolchain.toml` is not read. Anything
+  else must be vendored in the repository, which may be at most 4 GB.
+
+Starting points: `entries/stwo-grind` (the frontier) and `entries/stwo-chain` (Stwo as it is),
+each built from a checkout of [starknet-innovation/proving](https://github.com/starknet-innovation/proving)
+at 6e80156f by its `build.sh`.
+
+## How a contribution is checked
+
+Run the judge yourself first, on your laptop, as often as you like (seconds per run):
+
+    python3 -m proven.oracle path/to/your-entry --runs 3
+
+It passes when every fresh statement proves and verifies; the verifier rejects every bad case
+(false statements, another statement's proof, empty, garbage, truncated and bit-flipped proofs)
+without crashing; the proof is at most twice the frontier's size; and the sheet reaches 96 bits
+with every required component. Verify time is held to twice the frontier's on the evaluator host;
+your laptop reports it against that cap without failing you.
+
+Then two checks no test can make: a person or an agent reads your verifier, and anyone may attack
+your entry (`python3 -m proven.forgery submit ENTRY false-statement.json proof.bin --by YOU`; for
+the recursion task, hit a challenge the judge issued with `forgery challenge`). To test a bound
+rather than break an entry, `forgery rung ENTRY --bits 32` derives a weak setting from your own
+sheet and your own code runs under it; rung forgeries are evidence, not disqualification.
+
+## How the frontier moves
+
+Each task has one frontier: the cheapest contribution so far at conjecture-free settings, measured
+by the judge on the evaluator host. A contribution that passes the judge and proves at least 1%
+faster than the frontier moves it; the move is recorded with its credits, and the next
+contribution builds on it. A frontier that stops passing (its sheet corrected below the floor,
+say) yields to any entry that passes. Memory, proof size and verify time are published beside the
+time. Official numbers come from the host only; laptop numbers are for your own loop.
+
+Security shows in two shades. A sheet the calculator accepts gives claimed bits, shown grey. Once
+every term is reviewed or Lean-checked, the entry shows proven bits, solid. Until then the wording
+is "conjecture-free query counts, priced".
+
+## The frontier today
+
+Every task's frontier is open for now. The Stwo reference set all three, then its sheets were
+corrected to 92.4 claimed bits and it stepped down. The next entry to pass on the evaluator host
+sets each task's starting point. The batching-grind entries (`entries/stwo-grind`) pass the judge
+with 96.45 claimed bits on a laptop and wait for the host's next idle window.
+
+The price of a conjecture-free Stwo proof, measured on the evaluator host (16 cpus) at 107
+queries on 2026-10-07 with the reference build (the batching grind adds about 256 hashes per proof):
+
+| Task | prove | peak memory | proof | verify |
+|---|---|---|---|---|
+| hash chain, n = 16,384 | 3.7 s | 7.8 GB | 617 KB | 0.32 s |
+| matrix product, k = 48 | 2.9 s | 3.6 GB | 524 KB | 0.37 s |
+| recursion, inner n = 1,024 | 4.2 s | 9.4 GB | 627 KB | 0.31 s |
+
+At today's conjectured settings (35 queries), the same proofs take about the same time, but are
+2.8x smaller (221, 192 and 233 KB) and verify about 3x faster (0.11 to 0.16 s). For a single
+proof the price of conjecture-free settings is proof size and verify time; prover time pays in
+recursion, where every extra query of the inner proof has to be checked inside the circuit.
+
+Why the reference stepped down: every committed column is lifted to one domain, so all 363
+out-of-domain quotients enter one FRI input, combined by powers of one random coefficient. Under
+the unique-decoding bound the S-two whitepaper uses (eprint 2026/532, Remark 20), that step costs
+(363 - 1) x 2^23 / 2^124, about 2^-92.5, whatever the query count. The whitepaper's parameters
+assume grinding at this step (Section 5.5); `batching-grind.patch` adds 8 bits of it, and the
+sheets read 96.45.
+
+Other systems: a Plonky3 floor for the hash chain (`entries/plonky3-chain`, the maintainers'
+floor, not the Plonky3 team's best) passes every check but one on a laptop. It proves in about
+2.5 s with 3.2 GB, verifies in 0.05 s and reads 98.55 claimed bits, but its proofs are 5.8 MB,
+because each query opens a row of 11,920 columns: over the 2x size cap. Fitting it under the cap
+is open.
+
+## Open problems
+
+1. Cost. Bring the frontier's prove time, memory and proof size down to today's conjectured
+   settings, task by task; recursion is where most of the gap lives.
+2. The folding term. Each FRI layer folds 16 values with powers of one challenge, about 2^-97.0
+   over all layers; it now caps the sheets near 96.5. Independent challenges per fold, or grinding
+   before each fold challenge, lift it.
+3. Review. Every term of every sheet is cited and unchecked. Reviews, and Lean proofs against the
+   statements pinned in `lean/PINNED.md`, turn claimed bits into proven bits.
+4. Circle codes. The proximity-gap bounds are proven for Reed-Solomon codes; their transfer to
+   Stwo's circle codes (P5 in `lean/PINNED.md`) is open.
+
+## Sending a contribution
+
+Open an issue in this repository with the contribution form: the repository, the full commit,
+the task, the entry's directory if it is not the root, and the credits. A maintainer queues it on
+the evaluator host, which builds and judges it with no network; the result comes back to the
+issue with its credits, and `results/board.json` records it. Derivations, reviews, falsifications
+and Lean proofs go the same way, through the form for them or a pull request.
+
+## The board
+
+`results/board.json` holds, per task, the frontier, the history of how it moved and who moved it,
+and every judged contribution with its status: reviewed, claimed, waiting for a verifier read,
+failed the judge, or disqualified by a forgery. No ranking: the frontier is shared.

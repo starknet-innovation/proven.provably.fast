@@ -1,0 +1,8 @@
+[Unit]
+Description=proven.provably.fast runner (judges queued entries while the Stwo challenge is idle)
+After=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/opt/provably-fast/proven/current/research/proven
+ExecStart=/usr/bin/python3 -E -s -m proven.host_runner --config /etc/provably-fast/internal-proof-operator.json

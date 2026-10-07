@@ -1,0 +1,25 @@
+[package]
+name = "chain-bench"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Stwo reference entry for the blake2s-chain-v0 statement (proven.provably.fast)"
+
+[[bin]]
+name = "chain"
+path = "src/main.rs"
+
+[dependencies]
+hex = { workspace = true, features = ["std"] }
+serde_json.workspace = true
+zstd.workspace = true
+
+circuits.workspace = true
+circuit-common = { workspace = true, features = ["prover"] }
+circuit-prover.workspace = true
+circuit-serialize.workspace = true
+circuit-verifier.workspace = true
+circuits-stark-verifier.workspace = true
+stwo = { workspace = true, features = ["parallel", "prover"] }
+stwo-constraint-framework.workspace = true
