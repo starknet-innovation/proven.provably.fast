@@ -1,0 +1,484 @@
+diff --git a/crates/cairo-air/src/serde_utils.rs b/crates/cairo-air/src/serde_utils.rs
+index 6014916b2..7b8f92843 100644
+--- a/crates/cairo-air/src/serde_utils.rs
++++ b/crates/cairo-air/src/serde_utils.rs
+@@ -25,6 +25,8 @@ where
+             config,
+             commitments,
+             sampled_values,
++            // Not checked by the Cairo verifier.
++            batching_proof_of_work: _,
+             decommitments,
+             queried_values,
+             proof_of_work,
+diff --git a/crates/cairo-serialize/src/serialize.rs b/crates/cairo-serialize/src/serialize.rs
+index 145c173c5..655bcd6ce 100644
+--- a/crates/cairo-serialize/src/serialize.rs
++++ b/crates/cairo-serialize/src/serialize.rs
+@@ -125,6 +125,8 @@ where
+             config,
+             commitments,
+             sampled_values,
++            // Not checked by the Cairo verifier.
++            batching_proof_of_work: _,
+             decommitments,
+             queried_values,
+             proof_of_work,
+diff --git a/crates/cairo_verifier/src/privacy_test.rs b/crates/cairo_verifier/src/privacy_test.rs
+index 2b221193e..9c50868c5 100644
+--- a/crates/cairo_verifier/src/privacy_test.rs
++++ b/crates/cairo_verifier/src/privacy_test.rs
+@@ -22,6 +22,7 @@ use circuits_stark_verifier::statement::Statement;
+ use itertools::Itertools;
+ use num_traits::Zero;
+ use stwo::core::fields::qm31::QM31;
++use stwo::core::proof_of_work::BATCHING_POW_BITS;
+ use stwo::core::fri::FriConfig;
+ use stwo::core::pcs::PcsConfig;
+ use stwo::core::vcs_lifted::blake2_merkle::Blake2sMerkleHasher;
+@@ -41,6 +42,7 @@ fn verify_circuit_proof(
+         n_outputs: preprocessed_circuit.n_outputs,
+         preprocessed_column_log_sizes: preprocessed_circuit.preprocessed_trace.log_sizes(),
+         preprocessed_root,
++        batching_pow_bits: BATCHING_POW_BITS,
+     };
+     let (proof, public_data) = prepare_circuit_proof_for_circuit_verifier(circuit_proof);
+     verify_circuit(circuit_config, proof, public_data).unwrap()
+@@ -126,6 +128,7 @@ fn test_verify_privacy_with_recursion() {
+         n_outputs: preprocessed.n_outputs,
+         preprocessed_column_log_sizes: preprocessed.preprocessed_trace.log_sizes(),
+         preprocessed_root,
++        batching_pow_bits: BATCHING_POW_BITS,
+     };
+     let (proof, public_data) = prepare_circuit_proof_for_circuit_verifier(circuit_proof);
+     let mut proof_bytes = Vec::new();
+@@ -245,6 +248,7 @@ fn test_privacy_proof_info() {
+         n_outputs: preprocessed_circuit.n_outputs,
+         preprocessed_column_log_sizes: preprocessed_circuit.preprocessed_trace.log_sizes(),
+         preprocessed_root,
++        batching_pow_bits: BATCHING_POW_BITS,
+     };
+     let public_data =
+         CircuitPublicData { output_values: vec![QM31::zero(); preprocessed_circuit.n_outputs] };
+diff --git a/crates/circuit_cairo_serialize/src/proof.rs b/crates/circuit_cairo_serialize/src/proof.rs
+index 00a47e96e..01d5628b2 100644
+--- a/crates/circuit_cairo_serialize/src/proof.rs
++++ b/crates/circuit_cairo_serialize/src/proof.rs
+@@ -146,6 +146,8 @@ impl<H: MerkleHasherLifted<Hash = Blake2sHash>> CairoStarkProof<H> {
+             config,
+             commitments,
+             sampled_values,
++            // Not checked by the Cairo verifier.
++            batching_proof_of_work: _,
+             decommitments,
+             queried_values,
+             proof_of_work,
+diff --git a/crates/circuit_multiverifier/src/verify.rs b/crates/circuit_multiverifier/src/verify.rs
+index 4a88b0126..5d4ee216f 100644
+--- a/crates/circuit_multiverifier/src/verify.rs
++++ b/crates/circuit_multiverifier/src/verify.rs
+@@ -12,6 +12,7 @@ use circuits_stark_verifier::proof::{Proof, ProofConfig, empty_proof};
+ use circuits_stark_verifier::verify::verify;
+ use itertools::{Itertools, chain};
+ use stwo::core::fields::qm31::QM31;
++use stwo::core::proof_of_work::BATCHING_POW_BITS;
+ use stwo::core::pcs::PcsConfig;
+ use stwo_constraint_framework::preprocessed_columns::PreProcessedColumnId;
+ 
+@@ -78,6 +79,7 @@ pub fn build_multiverifier_circuit<Value: IValue>(
+             n_outputs: N_RESERVED,
+             preprocessed_column_log_sizes: shared_config.preprocessed_column_log_sizes.clone(),
+             preprocessed_root,
++            batching_pow_bits: BATCHING_POW_BITS,
+         };
+         let output_values = output_values
+             .iter()
+diff --git a/crates/circuit_prover/src/prover_test.rs b/crates/circuit_prover/src/prover_test.rs
+index 0c4d9c79d..5ac292083 100644
+--- a/crates/circuit_prover/src/prover_test.rs
++++ b/crates/circuit_prover/src/prover_test.rs
+@@ -16,6 +16,7 @@ use circuits::utils::le_u32s_from_bytes;
+ use expect_test::expect;
+ use num_traits::{One, Zero};
+ use stwo::core::channel::{Blake2sM31Channel, Channel};
++use stwo::core::proof_of_work::BATCHING_POW_BITS;
+ use stwo::core::fields::qm31::QM31;
+ use stwo::core::pcs::CommitmentSchemeVerifier;
+ use stwo::core::vcs::blake2_hash::Blake2sHash;
+@@ -358,6 +359,7 @@ fn circuit_verify(
+         n_outputs: preprocessed_circuit.n_outputs,
+         preprocessed_column_log_sizes: preprocessed_circuit.preprocessed_trace.log_sizes(),
+         preprocessed_root: preprocessed_root.into(),
++        batching_pow_bits: BATCHING_POW_BITS,
+     };
+     let (proof, public_data) = prepare_circuit_proof_for_circuit_verifier(circuit_proof);
+     verify_circuit(circuit_config, proof, public_data).unwrap();
+diff --git a/crates/circuit_serialize/src/deserialize.rs b/crates/circuit_serialize/src/deserialize.rs
+index e8eb4a61a..b1e3f7650 100644
+--- a/crates/circuit_serialize/src/deserialize.rs
++++ b/crates/circuit_serialize/src/deserialize.rs
+@@ -122,6 +122,8 @@ pub fn deserialize_proof_with_config(
+     let eval_domain_auth_paths = deserialize_eval_domain_auth_paths(data, config)?;
+     let pow_nonce = QM31::deserialize(data)?;
+     let interaction_pow_nonce = QM31::deserialize(data)?;
++    let batching_pow_nonce =
++        if config.batching_pow_bits > 0 { Some(QM31::deserialize(data)?) } else { None };
+     let fri = deserialize_fri_proof(data, config.log_trace_size, &config.fri)?;
+ 
+     Ok(Proof {
+@@ -138,6 +140,7 @@ pub fn deserialize_proof_with_config(
+         eval_domain_auth_paths,
+         pow_nonce,
+         interaction_pow_nonce,
++        batching_pow_nonce,
+         fri,
+     })
+ }
+diff --git a/crates/circuit_serialize/src/serialize.rs b/crates/circuit_serialize/src/serialize.rs
+index 67ebd02ac..0b559bca5 100644
+--- a/crates/circuit_serialize/src/serialize.rs
++++ b/crates/circuit_serialize/src/serialize.rs
+@@ -27,6 +27,7 @@ impl CircuitSerialize for Proof<QM31> {
+             eval_domain_auth_paths,
+             pow_nonce,
+             interaction_pow_nonce,
++            batching_pow_nonce,
+             fri,
+         } = self;
+ 
+@@ -43,6 +44,9 @@ impl CircuitSerialize for Proof<QM31> {
+         eval_domain_auth_paths.serialize(output);
+         pow_nonce.serialize(output);
+         interaction_pow_nonce.serialize(output);
++        if let Some(nonce) = batching_pow_nonce {
++            nonce.serialize(output);
++        }
+         fri.serialize(output);
+     }
+ }
+diff --git a/crates/circuit_verifier/src/statement.rs b/crates/circuit_verifier/src/statement.rs
+index 209e20596..af864910b 100644
+--- a/crates/circuit_verifier/src/statement.rs
++++ b/crates/circuit_verifier/src/statement.rs
+@@ -58,8 +58,13 @@ impl<Value: IValue> CircuitStatement<Value> {
+         circuit_config: &CircuitConfig,
+         output_values: &[Var],
+     ) -> Self {
+-        let CircuitConfig { config, n_outputs, preprocessed_column_log_sizes, preprocessed_root } =
+-            circuit_config;
++        let CircuitConfig {
++            config,
++            n_outputs,
++            preprocessed_column_log_sizes,
++            preprocessed_root,
++            batching_pow_bits: _,
++        } = circuit_config;
+         assert_eq!(output_values.len(), *n_outputs);
+         let output_values = output_values.to_vec();
+         // Guess the preprocessed root. The guessed wires enter the hash that will be output by
+diff --git a/crates/circuit_verifier/src/verify.rs b/crates/circuit_verifier/src/verify.rs
+index 306c35c78..335ab5073 100644
+--- a/crates/circuit_verifier/src/verify.rs
++++ b/crates/circuit_verifier/src/verify.rs
+@@ -26,6 +26,9 @@ pub struct CircuitConfig {
+     pub n_outputs: usize,
+     pub preprocessed_column_log_sizes: OrderedHashMap<PreProcessedColumnId, u32>,
+     pub preprocessed_root: HashValue<QM31>,
++    /// Proof of work bits before the batching coefficient in the verified proof: see
++    /// [`ProofConfig::batching_pow_bits`].
++    pub batching_pow_bits: u32,
+ }
+ 
+ /// Builds the circuit that verifies a proof of execution of another circuit.
+@@ -53,12 +56,13 @@ pub fn build_verification_circuit<Value: IValue>(
+         .collect_vec();
+     let statement = CircuitStatement::new(&mut context, &circuit_config, &output_values);
+ 
+-    let proof_config = ProofConfig::new(
++    let mut proof_config = ProofConfig::new(
+         statement.get_components(),
+         circuit_config.preprocessed_column_log_sizes.len(),
+         &circuit_config.config,
+         INTERACTION_POW_BITS,
+     );
++    proof_config.batching_pow_bits = circuit_config.batching_pow_bits;
+     let proof_vars = proof.guess(&mut context);
+ 
+     verify(&mut context, &proof_vars, &proof_config, &statement);
+diff --git a/crates/privacy_circuit_verify/src/lib.rs b/crates/privacy_circuit_verify/src/lib.rs
+index 14ea5571c..12a892309 100644
+--- a/crates/privacy_circuit_verify/src/lib.rs
++++ b/crates/privacy_circuit_verify/src/lib.rs
+@@ -31,6 +31,7 @@ use itertools::Itertools;
+ use starknet_types_core::felt::Felt;
+ use starknet_types_core::hash::Blake2Felt252;
+ use stwo::core::fields::m31::M31;
++use stwo::core::proof_of_work::BATCHING_POW_BITS;
+ use stwo::core::fields::qm31::QM31;
+ use stwo::core::vcs::blake2_hash::{Blake2sHash, Blake2sHasher};
+ use stwo_cairo_common::preprocessed_columns::preprocessed_trace::PreProcessedTraceVariant;
+@@ -211,6 +212,7 @@ pub fn get_recursive_circuit_config() -> CircuitConfig {
+         n_outputs: CIRCUIT_OUTPUT_ADDRESSES.len() - 1,
+         preprocessed_column_log_sizes,
+         preprocessed_root: PRIVACY_RECURSION_CIRCUIT_PREPROCESSED_ROOT.into(),
++        batching_pow_bits: BATCHING_POW_BITS,
+     }
+ }
+ 
+diff --git a/crates/stark_verifier/src/proof.rs b/crates/stark_verifier/src/proof.rs
+index b055d6876..b283f69eb 100644
+--- a/crates/stark_verifier/src/proof.rs
++++ b/crates/stark_verifier/src/proof.rs
+@@ -8,6 +8,7 @@ use itertools::{Itertools, zip_eq};
+ use stwo::core::fields::qm31::SECURE_EXTENSION_DEGREE;
+ use stwo::core::fri::FriConfig;
+ use stwo::core::pcs::PcsConfig;
++use stwo::core::proof_of_work::BATCHING_POW_BITS;
+ 
+ use crate::channel::Channel;
+ use crate::constraint_eval::CircuitEval;
+@@ -32,7 +33,7 @@ pub struct ProofInfo {
+     pub n_queries: usize,
+     pub n_columns_per_trace: [usize; N_TRACES],
+     // Fixed scalars: channel_salt (QM31) + 3 roots (HashValue, 32 bytes each) + pow_nonce (QM31) +
+-    // interaction_pow_nonce (QM31).
++    // interaction_pow_nonce (QM31) + batching_pow_nonce (QM31, when the config grinds there).
+     pub fixed: usize,
+     // Claim (serialized in packed format): enable bits + log sizes + claimed sums.
+     pub claim: usize,
+@@ -60,7 +61,8 @@ impl ProofInfo {
+         let n_queries = config.fri.n_queries;
+         let log_eval_domain = config.log_evaluation_domain_size();
+ 
+-        let fixed = (1 + 3 * 2 + 1 + 1) * SECURE_EXTENSION_DEGREE * N_U8S_PER_U32;
++        let batching_nonce = usize::from(config.batching_pow_bits > 0);
++        let fixed = (1 + 3 * 2 + 1 + 1 + batching_nonce) * SECURE_EXTENSION_DEGREE * N_U8S_PER_U32;
+ 
+         let claim = config.n_components() * SECURE_EXTENSION_DEGREE * N_U8S_PER_U32;
+ 
+@@ -246,6 +248,10 @@ pub struct ProofConfig {
+     pub log_trace_size: usize,
+ 
+     pub fri: FriConfig,
++
++    /// Proof of work bits before the batching coefficient: `BATCHING_POW_BITS` for proofs from
++    /// this prover, 0 for proofs from a prover that does not grind there.
++    pub batching_pow_bits: u32,
+ }
+ impl ProofConfig {
+     pub fn new<Value: IValue>(
+@@ -303,6 +309,7 @@ impl ProofConfig {
+             cumulative_sum_columns,
+             log_trace_size,
+             fri: *fri_config,
++            batching_pow_bits: BATCHING_POW_BITS,
+         }
+     }
+ 
+@@ -403,6 +410,8 @@ pub struct Proof<T> {
+ 
+     pub pow_nonce: T,
+     pub interaction_pow_nonce: T,
++    /// Present exactly when the config's `batching_pow_bits` is nonzero.
++    pub batching_pow_nonce: Option<T>,
+     pub fri: FriProof<T>,
+ }
+ impl<T> Proof<T> {
+@@ -422,10 +431,12 @@ impl<T> Proof<T> {
+             eval_domain_auth_paths,
+             pow_nonce: _,
+             interaction_pow_nonce: _,
++            batching_pow_nonce,
+             fri,
+         } = self;
+ 
+         assert_eq!(claimed_sums.len(), config.n_components());
++        assert_eq!(batching_pow_nonce.is_some(), config.batching_pow_bits > 0);
+ 
+         // Validate preprocessed_columns_at_oods.
+         assert_eq!(preprocessed_columns_at_oods.len(), config.n_preprocessed_columns);
+@@ -501,6 +512,7 @@ pub fn empty_proof(config: &ProofConfig) -> Proof<NoValue> {
+         },
+         pow_nonce: NoValue,
+         interaction_pow_nonce: NoValue,
++        batching_pow_nonce: (config.batching_pow_bits > 0).then_some(NoValue),
+         fri: empty_fri_proof(config.log_trace_size, &config.fri),
+         channel_salt: NoValue,
+     }
+@@ -523,6 +535,7 @@ impl<Value: IValue> Guess<Value> for Proof<Value> {
+             eval_domain_auth_paths: self.eval_domain_auth_paths.guess(context),
+             pow_nonce: self.pow_nonce.guess(context),
+             interaction_pow_nonce: self.interaction_pow_nonce.guess(context),
++            batching_pow_nonce: self.batching_pow_nonce.map(|nonce| nonce.guess(context)),
+             fri: self.fri.guess(context),
+             channel_salt: self.channel_salt.guess(context),
+         }
+diff --git a/crates/stark_verifier/src/proof_from_stark_proof.rs b/crates/stark_verifier/src/proof_from_stark_proof.rs
+index a0705fb63..b50c3485d 100644
+--- a/crates/stark_verifier/src/proof_from_stark_proof.rs
++++ b/crates/stark_verifier/src/proof_from_stark_proof.rs
+@@ -34,6 +34,10 @@ pub fn proof_from_stark_proof(
+     let interaction_pow_high = (interaction_pow_nonce >> 32) as u32;
+     let interaction_pow_low = (interaction_pow_nonce & 0xFFFFFFFF) as u32;
+ 
++    let batching_pow: u64 = proof.proof.batching_proof_of_work;
++    let batching_pow_high = (batching_pow >> 32) as u32;
++    let batching_pow_low = (batching_pow & 0xFFFFFFFF) as u32;
++
+     let all_fold_steps = compute_all_fold_steps(
+         config.log_trace_size - config.fri.log_last_layer_degree_bound as usize,
+         config.fri.fold_step as usize,
+@@ -71,6 +75,8 @@ pub fn proof_from_stark_proof(
+         },
+         pow_nonce: qm31_from_u32s(pow_low, pow_high, 0, 0),
+         interaction_pow_nonce: qm31_from_u32s(interaction_pow_low, interaction_pow_high, 0, 0),
++        batching_pow_nonce: (config.batching_pow_bits > 0)
++            .then(|| qm31_from_u32s(batching_pow_low, batching_pow_high, 0, 0)),
+         channel_salt: qm31_from_u32s(channel_salt, 0, 0, 0),
+     }
+ }
+diff --git a/crates/stark_verifier/src/verify.rs b/crates/stark_verifier/src/verify.rs
+index fc9ad5437..b8a078acf 100644
+--- a/crates/stark_verifier/src/verify.rs
++++ b/crates/stark_verifier/src/verify.rs
+@@ -163,6 +163,13 @@ pub fn verify<Value: IValue>(
+     );
+     eq(context, composition_eval, expected_composition_eval);
+ 
++    // Proof of work before drawing the batching coefficient, for proofs from a prover that grinds
++    // there.
++    if config.batching_pow_bits > 0 {
++        let nonce = proof.batching_pow_nonce.expect("the config asks for a batching nonce");
++        channel.pow(context, config.batching_pow_bits, nonce);
++    }
++
+     // Draw a random challenge for the linear combination of the OODS quotients.
+     let oods_quotient_coef = channel.draw_qm31(context);
+ 
+diff --git a/crates/stark_verifier_examples/src/fri_test.rs b/crates/stark_verifier_examples/src/fri_test.rs
+index d26f543de..49b0f9f47 100644
+--- a/crates/stark_verifier_examples/src/fri_test.rs
++++ b/crates/stark_verifier_examples/src/fri_test.rs
+@@ -55,6 +55,7 @@ fn test_fri_decommit_with_jumps(
+         cumulative_sum_columns: vec![],
+         log_trace_size: log_trace_size as usize,
+         fri: FriConfig::new(0, 0, log_blowup_factor, n_queries, fold_step as u32),
++        batching_pow_bits: 0,
+     };
+ 
+     // Compute FRI input.
+diff --git a/crates/stwo/src/core/pcs/quotients.rs b/crates/stwo/src/core/pcs/quotients.rs
+index a4511f6aa..68d89b0a8 100644
+--- a/crates/stwo/src/core/pcs/quotients.rs
++++ b/crates/stwo/src/core/pcs/quotients.rs
+@@ -28,6 +28,8 @@ pub struct CommitmentSchemeProof<H: MerkleHasherLifted> {
+     pub config: PcsConfig,
+     pub commitments: TreeVec<H::Hash>,
+     pub sampled_values: TreeVec<ColumnVec<Vec<SecureField>>>,
++    /// Proof of work nonce ground before the batching coefficient is drawn.
++    pub batching_proof_of_work: u64,
+     pub decommitments: TreeVec<MerkleDecommitmentLifted<H>>,
+     pub queried_values: TreeVec<ColumnVec<Vec<BaseField>>>,
+     pub proof_of_work: u64,
+diff --git a/crates/stwo/src/core/pcs/verifier.rs b/crates/stwo/src/core/pcs/verifier.rs
+index fa3f09443..b5fe50912 100644
+--- a/crates/stwo/src/core/pcs/verifier.rs
++++ b/crates/stwo/src/core/pcs/verifier.rs
+@@ -12,6 +12,7 @@ use super::utils::TreeVec;
+ use crate::core::ColumnVec;
+ use crate::core::channel::{Channel, MerkleChannel};
+ use crate::core::pcs::quotients::CommitmentSchemeProof;
++use crate::core::proof_of_work::BATCHING_POW_BITS;
+ use crate::core::pcs::utils::prepare_preprocessed_query_positions;
+ use crate::core::vcs_lifted::merkle_hasher::MerkleHasherLifted;
+ use crate::core::vcs_lifted::verifier::MerkleVerifierLifted;
+@@ -60,6 +61,10 @@ impl<MC: MerkleChannel> CommitmentSchemeVerifier<MC> {
+         channel: &mut MC::C,
+     ) -> Result<(), VerificationError> {
+         channel.mix_felts(&proof.sampled_values.clone().flatten_cols());
++        if !channel.verify_pow_nonce(BATCHING_POW_BITS, proof.batching_proof_of_work) {
++            return Err(VerificationError::ProofOfWork);
++        }
++        channel.mix_u64(proof.batching_proof_of_work);
+         let random_coeff = channel.draw_secure_felt();
+         let lifting_log_size = self.trees.last().unwrap().height;
+         let bound =
+diff --git a/crates/stwo/src/core/proof.rs b/crates/stwo/src/core/proof.rs
+index 8635fc7b6..bd38d0d77 100644
+--- a/crates/stwo/src/core/proof.rs
++++ b/crates/stwo/src/core/proof.rs
+@@ -68,6 +68,7 @@ impl<H: MerkleHasherLifted> StarkProof<H> {
+         let CommitmentSchemeProof {
+             commitments,
+             sampled_values,
++            batching_proof_of_work: _,
+             decommitments,
+             queried_values,
+             proof_of_work: _,
+@@ -177,6 +178,7 @@ impl<H: MerkleHasherLifted> SizeEstimate for CommitmentSchemeProof<H> {
+         let Self {
+             commitments,
+             sampled_values,
++            batching_proof_of_work,
+             decommitments,
+             queried_values,
+             proof_of_work,
+@@ -185,6 +187,7 @@ impl<H: MerkleHasherLifted> SizeEstimate for CommitmentSchemeProof<H> {
+         } = self;
+         commitments.size_estimate()
+             + sampled_values.size_estimate()
++            + mem::size_of_val(batching_proof_of_work)
+             + decommitments.size_estimate()
+             + queried_values.size_estimate()
+             + mem::size_of_val(proof_of_work)
+diff --git a/crates/stwo/src/core/proof_of_work.rs b/crates/stwo/src/core/proof_of_work.rs
+index 1c61ad840..e072bbcf7 100644
+--- a/crates/stwo/src/core/proof_of_work.rs
++++ b/crates/stwo/src/core/proof_of_work.rs
+@@ -1,5 +1,13 @@
+ use crate::core::channel::Channel;
+ 
++/// Number of proof of work bits ground into the channel before the coefficient that batches the
++/// out-of-domain quotients for FRI is drawn.
++///
++/// The S-two whitepaper's parameters (eprint 2026/532, Section 5.5) need grinding at this step. In
++/// unique decoding the batching error is (M - 1) |D| / |F| (Remark 20); every column is lifted to
++/// one domain, so M counts every sampled value. The grind divides that error by 2^8.
++pub const BATCHING_POW_BITS: u32 = 8;
++
+ pub trait GrindOps<C: Channel> {
+     /// Searches for a nonce s.t. mixing it to the channel makes the digest have `pow_bits` leading
+     /// zero bits.
+diff --git a/crates/stwo/src/prover/pcs/mod.rs b/crates/stwo/src/prover/pcs/mod.rs
+index 3e22a82a4..fdcdc6173 100644
+--- a/crates/stwo/src/prover/pcs/mod.rs
++++ b/crates/stwo/src/prover/pcs/mod.rs
+@@ -16,6 +16,7 @@ use crate::core::pcs::quotients::{
+ };
+ use crate::core::pcs::utils::prepare_preprocessed_query_positions;
+ use crate::core::pcs::{PcsConfig, TreeSubspan, TreeVec};
++use crate::core::proof_of_work::BATCHING_POW_BITS;
+ use crate::core::poly::circle::CanonicCoset;
+ use crate::core::utils::MaybeOwned;
+ use crate::core::vcs_lifted::merkle_hasher::MerkleHasherLifted;
+@@ -245,6 +246,12 @@ impl<'a, B: BackendForChannel<MC>, MC: MerkleChannel> CommitmentSchemeProver<'a,
+             samples.as_cols_ref().map_cols(|x| x.iter().map(|o| o.value).collect());
+         channel.mix_felts(&sampled_values.clone().flatten_cols());
+ 
++        // Proof of work before drawing the batching coefficient.
++        let span0 = span!(Level::INFO, "Grind", class = "Batching POW").entered();
++        let batching_proof_of_work = B::grind(channel, BATCHING_POW_BITS);
++        span0.exit();
++        channel.mix_u64(batching_proof_of_work);
++
+         let columns = self.evaluations();
+         print_column_size_histogram::<B, MC>(&columns);
+         // Compute oods quotients for boundary constraints on the sampled points.
+@@ -320,6 +327,7 @@ impl<'a, B: BackendForChannel<MC>, MC: MerkleChannel> CommitmentSchemeProver<'a,
+             proof: CommitmentSchemeProof {
+                 commitments,
+                 sampled_values,
++                batching_proof_of_work,
+                 decommitments: TreeVec(decommitments),
+                 queried_values: TreeVec(queried_values),
+                 proof_of_work,
