@@ -69,6 +69,12 @@ def sandboxed(base: Path, argv: list[str], network: bool, log: Path) -> None:
                    "HOME": str(base / "cargo-home")}
     if not network:
         environment["CARGO_NET_OFFLINE"] = "true"
+    # systemd-run looks a bare program name up on its own PATH, not the one set for the unit, so an
+    # entry's `cargo build ...` is resolved here against the sandbox PATH.
+    program = argv[0] if "/" in argv[0] else shutil.which(argv[0], path=environment["PATH"])
+    if program is None:
+        raise RuntimeError(f"{argv[0]} is not on the build PATH")
+    argv = [program, *argv[1:]]
     command = ["systemd-run", "--wait", "--pipe", "--quiet", "--collect", *SANDBOX,
                *([] if network else ["-p", "PrivateNetwork=yes"]),
                "-p", f"ReadWritePaths={base / 'repo'} {base / 'cargo-home'}",

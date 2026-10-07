@@ -1,0 +1,9 @@
+{
+  // proven.provably.fast: the static site in docs/, served by Cloudflare. `npx wrangler deploy`
+  // from the repository root publishes it; the custom domain is created with the deploy.
+  "name": "proven-provably-fast",
+  "compatibility_date": "2026-10-01",
+  "assets": { "directory": "./docs" },
+  "routes": [{ "pattern": "proven.provably.fast", "custom_domain": true }],
+  "workers_dev": false
+}
