@@ -45,7 +45,7 @@ USER = "proven"
 TOOLCHAIN = Path("/opt/provably-fast/toolchains/rustup-home/toolchains/"
                  "nightly-2026-01-15-x86_64-unknown-linux-gnu/bin")
 MAX_REPOSITORY_BYTES = 4 << 30
-MIN_FREE_BYTES = 100 << 30
+MIN_FREE_BYTES = 30 << 30
 SANDBOX = ["-p", f"User={USER}", "-p", "NoNewPrivileges=yes", "-p", "ProtectSystem=strict",
            "-p", "ProtectHome=yes", "-p", "PrivateTmp=yes", "-p", "MemoryMax=48G",
            "-p", "TasksMax=4096", "-p", "RuntimeMaxSec=3600"]
