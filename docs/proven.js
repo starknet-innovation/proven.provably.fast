@@ -1,5 +1,5 @@
-// proven.provably.fast: the regime chart, the loop graph, the brief, and data/board.json
-// (written by `python3 -m proven.board`). Everything renders at its final state without motion.
+// proven.provably.fast: the regime chart, the loop graph, the brief, and data/mathematics.json
+// (written by `python3 -m proven.mathematics board`). Everything renders at its final state without motion.
 (() => {
   "use strict";
 
@@ -324,87 +324,12 @@
     });
   }
 
-  // The performance track, from the board. Caps and floor mirror proven/statements.py BOARD.
-  const TASKS = [
-    { id: "blake2s-chain-v0", title: "Hash chain", maxProof: 1_232_000, maxVerify: 0.64, what: "Hash a seed 16,384 times." },
-    { id: "u32-matmul-v0", title: "Matrix product", maxProof: 1_056_000, maxVerify: 0.74, what: "Multiply two 48 × 48 matrices." },
-    { id: "stwo-verify-v0", title: "Recursion step", maxProof: 1_254_000, maxVerify: 0.62, what: "Check a Stwo proof inside a proof." },
-  ];
-  const FLOOR_BITS = 96;
-  const known = (v) => typeof v === "number" && Number.isFinite(v) && v > 0;
-  const seconds = (s) => (known(s) ? `${s < 1 ? s.toFixed(2) : s.toFixed(1)} s` : "–");
-  const gib = (b) => (known(b) ? `${(b / 2 ** 30).toFixed(1)} GiB` : "–");
-  const size = (b) => (!known(b) ? "–" : b >= 1e6 ? `${(b / 1e6).toFixed(1)} MB` : `${Math.round(b / 1e3).toLocaleString("en-US")} KB`);
-  const day = (iso) => (iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }) : "");
-
-  function taskCard(task, board) {
-    const frontier = board.frontiers[task.id];
-    const card = el("article", { class: `task${frontier ? "" : " is-open"}` },
-      el("h3", { class: "task-title" }, task.title), el("p", { class: "task-what" }, task.what));
-    if (frontier) {
-      card.append(el("p", { class: "task-figure" }, seconds(frontier.prove_seconds), el("small", {}, "to beat")),
-        el("p", { class: "task-foot" }, el("b", {}, frontier.entry), ` · since ${day(frontier.moved_at)}`));
-    } else {
-      card.append(el("p", { class: "task-figure" }, "Open"), el("p", { class: "task-foot" }, "The first entry to pass sets the time."));
-    }
-    return card;
-  }
-  function verdict(row, task, frontier) {
-    const status = row.status || "";
-    if (status === "waiting for its first host run") return ["Waiting for its first run", "is-wait"];
-    if (status.startsWith("waiting")) return ["Waiting for a verifier read", "is-wait"];
-    if (status.startsWith("disqualified")) return ["Forged proof found", "is-forged"];
-    if (status.startsWith("failed the judge: its sheet")) return [`Sheet below ${FLOOR_BITS} bits`, ""];
-    if (status.startsWith("failed")) {
-      if (known(row.claimed_bits) && row.claimed_bits < FLOOR_BITS) return [`Below ${FLOOR_BITS} bits`, ""];
-      if (row.proof_bytes > task.maxProof) return ["Proof over the size cap", ""];
-      if (row.verify_seconds > task.maxVerify) return ["Verify over the time cap", ""];
-      return ["Failed the judge", ""];
-    }
-    const holds = frontier && frontier.entry === row.entry;
-    if (status === "reviewed") return [holds ? "Holds the frontier, proven" : "Passes, proven", "is-proven"];
-    return [holds ? "Holds the frontier" : "Passes", holds ? "is-frontier" : ""];
-  }
-  const systemName = (row) => ((row.system || "").match(/^(Stwo|Plonky3|[A-Z][\w.-]*)/) || ["", "Entry"])[1];
-  const ORDER = { "is-proven": 0, "is-frontier": 0, "": 1, "is-wait": 2, "is-forged": 3 };
-  function entriesList(task, board) {
-    const frontier = board.frontiers[task.id];
-    const rows = (board.contributions[task.id] || []).slice();
-    for (const row of board.waiting || []) if (row.statement === task.id) rows.push({ ...row, status: "waiting for its first host run" });
-    const section = el("section", { class: "entries" }, el("h3", { class: "entries-head" }, task.title));
-    if (!rows.length) { section.append(el("p", { class: "loading" }, "No entries yet.")); return section; }
-    const judged = rows.map((row) => ({ row, verdict: verdict(row, task, frontier) }))
-      .sort((a, b) => (a.verdict[0].startsWith("Holds") ? -1 : 0) - (b.verdict[0].startsWith("Holds") ? -1 : 0)
-        || ORDER[a.verdict[1]] - ORDER[b.verdict[1]] || (a.row.prove_seconds || Infinity) - (b.row.prove_seconds || Infinity));
-    const num = (text, extra) => el("span", { class: `entry-n${extra ? ` ${extra}` : ""}` }, text);
-    const head = el("li", { class: "entry entry-head", "aria-hidden": "true" }, ["Entry", "", "Prove", "Memory", "Proof", "Verify", "Bits"].map((label) => el("span", {}, label)));
-    const items = judged.map(({ row, verdict: [words, tone] }) => el("li", { class: "entry" },
-      el("span", { class: "entry-name", title: [row.team, row.system].filter(Boolean).join(": ") }, el("b", {}, systemName(row)), ` ${row.entry}`),
-      el("span", { class: `verdict ${tone}` }, words),
-      el("span", { class: "entry-nums" },
-        num(seconds(row.prove_seconds)), num(gib(row.peak_bytes)), num(size(row.proof_bytes)), num(seconds(row.verify_seconds)),
-        known(row.proven_bits) ? num(row.proven_bits.toFixed(1)) : num(known(row.claimed_bits) ? row.claimed_bits.toFixed(1) : "–", "is-claimed"))));
-    section.append(el("ol", { class: "entry-list" }, head, items));
-    return section;
-  }
-  async function renderBoard() {
-    let board;
-    try {
-      const response = await fetch("data/board.json", { cache: "no-cache" });
-      board = await response.json();
-    } catch {
-      for (const id of ["task-cards", "board-tables"]) $(id).replaceChildren(el("p", { class: "loading" }, "The board could not be read."));
-      return;
-    }
-    $("task-cards").replaceChildren(...TASKS.map((task) => taskCard(task, board)));
-    $("board-tables").replaceChildren(...TASKS.map((task) => entriesList(task, board)));
-  }
-
   // The mathematics record (data/mathematics.json, written by `python3 -m proven.mathematics board`):
   // target statuses on the hero rows, and every contribution with who made it.
   const KIND_WORDS = { idea: "Idea", lemma: "Lemma", counterexample: "Counterexample", "proof-sketch": "Proof sketch",
     proof: "Proof", formalization: "Lean", review: "Review", source: "Source" };
   const STATUS_WORDS = { open: "open", claimed: "claimed, under review", solved: "solved", refuted: "refuted" };
+  const day = (iso) => (iso ? new Date(iso).toLocaleDateString("en-GB", { day: "numeric", month: "short", timeZone: "UTC" }) : "");
   function renderTargets(record) {
     for (const target of record.targets || []) {
       const chip = document.querySelector(`.target.is-${target.id.toLowerCase()} .chip`);
@@ -461,6 +386,5 @@
   renderLoop();
   initBrief();
   reveal([...document.querySelectorAll(".reveal")]);
-  renderBoard();
   renderMathematics();
 })();

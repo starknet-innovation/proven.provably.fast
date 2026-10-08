@@ -1,7 +1,2 @@
 proven.provably.fast
 Copyright 2026 the proven.provably.fast contributors
-
-This repository includes code derived from the Stwo prover and its circuits framework
-(https://github.com/starkware-libs/proving), by StarkWare, licensed under the Apache License,
-Version 2.0, with modifications: entries/stwo-chain/crate, entries/stwo-grind/crate and
-entries/stwo-grind/batching-grind.patch.
