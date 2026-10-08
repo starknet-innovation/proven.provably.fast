@@ -1,4 +1,4 @@
-"""The mathematics track's records: validation, target statuses, and the issue-form draft."""
+"""The mathematics track's records: validation and target statuses."""
 from __future__ import annotations
 
 import re
@@ -91,11 +91,18 @@ class Validation(unittest.TestCase):
         self.targets = m.load_targets()
 
     def test_builds_on_must_resolve(self):
-        m.validate(self.targets, [row("M-0001", builds_on=["DKT26", "#7"]), row("M-0002", builds_on=["M-0001"])])
+        thread, record = "bt1_" + "0a" * 12, "rgr1_" + "ab" * 32
+        m.validate(self.targets, [row("M-0001", builds_on=["DKT26", thread, record]), row("M-0002", builds_on=["M-0001"])])
+        for ref in ("M-0002", "Nobody99", "#7", "bt1_123", "rgr1_" + "ab" * 31):
+            with self.subTest(ref=ref), self.assertRaises(m.RecordError):
+                m.validate(self.targets, [row("M-0001", builds_on=[ref])])
+
+    def test_a_row_names_the_thread_it_was_posted_in(self):
+        m.validate(self.targets, [row("M-0001", thread="bt1_" + "0a" * 12)])
         with self.assertRaises(m.RecordError):
-            m.validate(self.targets, [row("M-0001", builds_on=["M-0002"])])
-        with self.assertRaises(m.RecordError):
-            m.validate(self.targets, [row("M-0001", builds_on=["Nobody99"])])
+            m.validate(self.targets, [row("M-0001", thread=9)])
+        summary = m.summary(self.targets, [row("M-0001", thread="bt1_" + "0a" * 12)], now="2026-10-08T00:00:00+00:00")
+        self.assertEqual(summary["contributions"][0]["thread"], "bt1_" + "0a" * 12)
 
     def test_agents_say_who_runs_them(self):
         agent = row("M-0001")
@@ -113,50 +120,6 @@ class Validation(unittest.TestCase):
         with self.assertRaises(m.RecordError):
             m.validate(self.targets, [row("M-0001"), row("M-0001")])
         self.assertEqual(m.next_id([row("M-0001"), row("M-0007")]), "M-0008")
-
-
-class IssueDraft(unittest.TestCase):
-    BODY = """### Target
-
-T1 (linear count in the first-order regime)
-
-### Kind
-
-Lemma
-
-### Claim
-
-The solution families of the first-order explainer have degree O(1/eta) in z.
-
-### The work
-
-https://example.org/sketch.pdf
-
-### What was checked, and how
-
-By hand; the degree count is unverified for p < 5.
-
-### Builds on
-
-DKT26 Section 5.4, #3 and #5
-
-### Credits
-
-alice
-"""
-
-    def test_a_form_becomes_a_posted_row(self):
-        issue = {"number": 9, "title": "T1 lemma: degree of solution families",
-                 "body": self.BODY, "url": "https://github.com/x/y/issues/9", "author": {"login": "alice"}}
-        draft = m.draft_from_issue(issue, [row("M-0001")], "2026-10-08")
-        self.assertEqual((draft["id"], draft["target"], draft["kind"], draft["status"]), ("M-0002", "T1", "lemma", "posted"))
-        self.assertEqual(draft["builds_on"], ["#3", "#5"])
-        self.assertEqual(draft["title"], "T1 lemma: degree of solution families")
-        m.validate(m.load_targets(), [row("M-0001"), draft])
-
-    def test_an_issue_without_the_form_is_refused(self):
-        with self.assertRaises(m.RecordError):
-            m.draft_from_issue({"title": "a question", "body": "### Something else\n\nhello\n"}, [], "2026-10-08")
 
 
 if __name__ == "__main__":
