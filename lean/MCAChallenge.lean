@@ -42,6 +42,40 @@ theorem firstOrderCurve_eq_threshold {rho : ℝ} (h : 11 - 3 * Real.sqrt 13 ≤ 
     firstOrderCurve rho = firstOrderRateThreshold rho := by
   simp [firstOrderCurve, h]
 
+/-- Below `ρ_c`, the closed form is DKT's lower branch: `firstOrderCurve ρ = √(ρ/2) (1 + u)` with
+`u > 0` and `u² (u + 3) = √(ρ/2)` (equation 30). -/
+theorem firstOrderCurve_lower_branch {rho : ℝ} (h0 : 0 < rho) (h1 : rho < 11 - 3 * Real.sqrt 13) :
+    ∃ u : ℝ, 0 < u ∧ u ^ 2 * (u + 3) = Real.sqrt (rho / 2) ∧
+      firstOrderCurve rho = Real.sqrt (rho / 2) * (1 + u) := by
+  have hs13 : (10 : ℝ) / 3 < Real.sqrt 13 := by
+    rw [Real.lt_sqrt (by norm_num)]; norm_num
+  have ht1 : Real.sqrt (rho / 2) < 1 := by
+    rw [Real.sqrt_lt' (by norm_num)]; nlinarith
+  have ht0 : 0 < Real.sqrt (rho / 2) := Real.sqrt_pos.mpr (by linarith)
+  set t := Real.sqrt (rho / 2) with ht
+  set w := (t - 2) / 2 with hw
+  have hw1 : -1 < w := by rw [hw]; linarith
+  have hw2 : w ≤ 1 := by rw [hw]; linarith
+  set θ := Real.arccos w / 3 with hθ
+  refine ⟨2 * Real.cos θ - 1, ?_, ?_, ?_⟩
+  · have hθ0 : 0 ≤ θ := div_nonneg (Real.arccos_nonneg w) (by norm_num)
+    have hθ3 : θ < Real.pi / 3 := by
+      have := Real.arccos_lt_pi.mpr hw1
+      rw [hθ]; linarith
+    have := Real.cos_lt_cos_of_nonneg_of_le_pi hθ0 (by linarith [Real.pi_pos]) hθ3
+    rw [Real.cos_pi_div_three] at this
+    linarith
+  · have h3 : Real.cos (3 * θ) = 4 * Real.cos θ ^ 3 - 3 * Real.cos θ := Real.cos_three_mul θ
+    have hc : Real.cos (3 * θ) = w := by
+      rw [hθ, show 3 * (Real.arccos w / 3) = Real.arccos w by ring]
+      exact Real.cos_arccos hw1.le hw2
+    rw [hc, hw] at h3
+    linear_combination (-2) * h3
+  · unfold firstOrderCurve
+    simp only [not_le.mpr h1, ↓reduceIte]
+    rw [hθ, hw, ht]
+    ring
+
 /-- A milestone toward T1, not T1: ArkLib's `ReedSolomon.exists_uniformFirstOrder_lineMca` (Dao,
 Kominers and Thaler, Theorem 5.13: `1325775 * n ^ 2` bad challenges at agreement `k + 6 n / 25`)
 with the bound replaced by `C * n`, for a numeral `C`. Agreement `ρ + 0.24` lies below the Johnson
