@@ -240,6 +240,7 @@ def main(argv: list[str] | None = None) -> int:
             validate(targets, records)
             print(f"ok: {len(targets['targets'])} targets, {len(records)} records")
         elif args.command == "board":
+            OUT.parent.mkdir(exist_ok=True)
             OUT.write_text(json.dumps(summary(targets, records), indent=1, ensure_ascii=False) + "\n")
             print(f"wrote {OUT.relative_to(ROOT)}")
         elif args.command == "record":

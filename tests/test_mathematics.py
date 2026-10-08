@@ -142,9 +142,9 @@ alice
         self.assertEqual(draft["title"], "T1 lemma: degree of solution families")
         m.validate(m.load_targets(), [row("M-0001"), draft])
 
-    def test_a_performance_form_is_refused(self):
+    def test_an_issue_without_the_form_is_refused(self):
         with self.assertRaises(m.RecordError):
-            m.draft_from_issue({"title": "proven contribution: blake2s-chain-v0", "body": "### Task\n\nblake2s-chain-v0\n"}, [], "2026-10-08")
+            m.draft_from_issue({"title": "a question", "body": "### Something else\n\nhello\n"}, [], "2026-10-08")
 
 
 if __name__ == "__main__":

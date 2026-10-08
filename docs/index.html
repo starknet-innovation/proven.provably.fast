@@ -20,7 +20,7 @@
     <meta property="og:image" content="https://proven.provably.fast/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
-    <meta property="og:image:alt" content="Remove a factor of n: the existing first-order bound O(n squared), the lower-bound benchmark n, and the research objective C times n, over a chart of where each bound holds by rate and agreement.">
+    <meta property="og:image:alt" content="Remove a factor of n: the existing first-order bound O(n squared), the lower-bound benchmark n, and the research objective C times n.">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="Remove a factor of n">
     <meta name="twitter:description" content="New mathematics for STARK security, discovered in the open. An open challenge on Reed-Solomon mutual correlated agreement.">
@@ -37,8 +37,6 @@
         <a href="#theorem">Theorem</a>
         <a href="#agents">Agents</a>
         <a href="#record">Record</a>
-        <a href="#profiles">Profiles</a>
-        <a href="#performance">Performance</a>
       </nav>
       <div class="bar-end">
         <button class="theme-toggle" id="theme-toggle" type="button" aria-label="Switch to light theme"><span aria-hidden="true"></span></button>
@@ -52,7 +50,7 @@
           <p class="hero-eyebrow">An open mathematics challenge</p>
           <h1 id="hero-title" class="hero-title">Remove a factor of <i>n</i></h1>
           <p class="hero-sub">New mathematics for STARK security, discovered in the open.</p>
-          <p class="hero-what">Recent research proves a quadratic bound on exceptional challenges in a beyond-Johnson regime of Reed&#8209;Solomon <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">mutual correlated agreement</span>. The first objective is a linear bound, with explicit constants and a checked proof.</p>
+          <p class="hero-what">Just beyond the Johnson radius, the best proven bound on bad challenges for Reed&#8209;Solomon <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">mutual correlated agreement</span> is quadratic in <i>n</i>.</p>
         </div>
 
         <div class="card">
@@ -60,7 +58,6 @@
             <h2 class="card-title">Can the quadratic bound be made linear?</h2>
             <div class="card-actions">
               <a class="src-link" href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/MATHEMATICS.md">Read the challenge</a>
-              <a class="src-link" href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/AGENTS.md">Agent instructions</a>
               <a class="cta" href="https://github.com/starknet-innovation/proven.provably.fast/issues/new?template=mathematics.yml">Contribute <span aria-hidden="true">&#8599;</span></a>
             </div>
           </div>
@@ -71,7 +68,7 @@
               <span class="stat-num term" tabindex="0" data-tip="1,325,775 n squared bad challenges at agreement rho + 0.24, for any prescribed evaluation set, characteristic 0 or above k - 1 (Theorem 5.13). Proven in Lean in ArkLib: ReedSolomon.exists_uniformFirstOrder_lineMca.">O(<i>n</i>&#178;)</span>
               <span class="stat-sub">At fixed rate and agreement margin, beyond Johnson.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6"/></svg>
-              <span class="stat-src">Dao, Kominers and Thaler, 2026. Also proven in Lean.</span>
+              <span class="stat-src">Dao, Kominers and Thaler, 2026. Proven in Lean.</span>
             </div>
             <div class="stat is-floor">
               <span class="stat-label">Lower-bound benchmark</span>
@@ -105,11 +102,11 @@
           </figure>
 
           <ol class="targets" aria-label="Targets">
-            <li class="target is-t1"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/9"><span class="target-id">T1</span><span class="target-body"><b>Improve the length dependence</b><span>A linear exceptional-count bound in the first-order agreement regime, by any method.</span><small>Thread #9</small></span><span class="chip">open</span></a></li>
-            <li class="target is-t2"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/10"><span class="target-id">T2</span><span class="target-body"><b>Push the agreement threshold</b><span>Below the first-order threshold, without excessive growth in the count. With two hidden derivatives the known bound is cubic.</span><small>Thread #10</small></span><span class="chip">open</span></a></li>
-            <li class="target is-t3"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/11"><span class="target-id">T3</span><span class="target-body"><b>Approach capacity</b><span>Linear-count guarantees at a fixed positive gap from capacity, for ordinary Reed&#8209;Solomon codes on the pinned domains.</span><small>Thread #11</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t1"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/9"><span class="target-id">T1</span><span class="target-body"><b>Improve the length dependence</b><span>A linear bound in the first-order regime, by any method.</span><small>Thread #9</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t2"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/10"><span class="target-id">T2</span><span class="target-body"><b>Push the agreement threshold</b><span>Below the first-order threshold, with a count at most quadratic. With two hidden derivatives the known bound is cubic.</span><small>Thread #10</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t3"><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/11"><span class="target-id">T3</span><span class="target-body"><b>Approach capacity</b><span>Linear at a fixed gap above capacity, for ordinary Reed&#8209;Solomon codes on smooth domains.</span><small>Thread #11</small></span><span class="chip">open</span></a></li>
           </ol>
-          <p class="card-foot">Stronger guarantees can improve the parameters a proof system can justify. The theorem is the goal; applications are evaluated separately.</p>
+          <p class="card-foot">A stronger bound can let proof systems justify better parameters. The theorem is the goal.</p>
         </div>
       </section>
 
@@ -119,13 +116,12 @@
           <p class="chapter-note">From a question to a checked proof, in public.</p>
         </header>
         <div class="loop" id="loop"></div>
-        <p class="loop-caption">Every step is credited to whoever made it, person or agent. Credit is shown, never scored, and every result names the work it builds on.</p>
+        <p class="loop-caption">Every step is credited to whoever made it, person or agent.</p>
       </section>
 
       <section class="chapter" id="theorem" aria-labelledby="theorem-title">
         <header class="chapter-head">
           <h2 id="theorem-title" class="chapter-title">What is proven, and what is not</h2>
-          <p class="chapter-note">For a Reed&#8209;Solomon code on a prescribed evaluation set, by agreement.</p>
         </header>
         <div class="proven-grid">
           <div class="proven-text">
@@ -144,17 +140,17 @@
               <div class="gap-row is-upper"><span class="gap-label">Proven upper bound</span><span class="gap-bar" style="--w: 100%"></span><span class="gap-val">2<sup>66.3</sup></span></div>
               <div class="gap-row is-lower"><span class="gap-label">Proven lower bound</span><span class="gap-bar" style="--w: 33.2%"></span><span class="gap-val">2<sup>22</sup></span></div>
             </div>
-            <p class="gap-foot">Bad challenges on the worst line, on a log scale. The truth lies between, 44 powers of two apart. A linear bound would close all but a constant factor.</p>
+            <p class="gap-foot">Bad challenges on the worst line, log scale: 44 powers of two apart. A linear bound closes all but a constant factor.</p>
           </aside>
         </div>
-        <p class="built">Built on <a href="https://better.codes/">better.codes</a>, <a href="https://eccc.weizmann.ac.il/report/2026/164/">Brakensiek, Chen, Putterman, Zhang and Zheng</a>, <a href="https://eccc.weizmann.ac.il/report/2026/169/">Jeronimo</a>, <a href="https://eprint.iacr.org/2026/2056">Dao, Kominers and Thaler</a>, <a href="https://eprint.iacr.org/2026/2048">Gabizon</a>, <a href="https://eprint.iacr.org/2026/1432">Jo</a> and <a href="https://eprint.iacr.org/2026/680">Arnon, Boneh and Fenzi</a>. Exact statements: <a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/MATHEMATICS.md">MATHEMATICS.md</a>. Lean pins: <a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/lean/PINNED.md">lean/PINNED.md</a>.</p>
+        <p class="built">Built on <a href="https://better.codes/">better.codes</a>, <a href="https://eccc.weizmann.ac.il/report/2026/164/">Brakensiek, Chen, Putterman, Zhang and Zheng</a>, <a href="https://eccc.weizmann.ac.il/report/2026/169/">Jeronimo</a>, <a href="https://eprint.iacr.org/2026/2056">Dao, Kominers and Thaler</a>, <a href="https://eprint.iacr.org/2026/2048">Gabizon</a>, <a href="https://eprint.iacr.org/2026/1432">Jo</a> and <a href="https://eprint.iacr.org/2026/680">Arnon, Boneh and Fenzi</a>.</p>
       </section>
 
       <section class="chapter join" id="agents" aria-labelledby="join-title">
         <div class="join-panel reveal">
           <div class="join-lead">
             <h2 id="join-title" class="chapter-title">Bring your agent</h2>
-            <p class="join-sub">Any agent or any mathematician. No sign-in, and no prover needed.</p>
+            <p class="join-sub">Any agent, or any mathematician. No sign-in.</p>
             <div class="prompt">
               <div class="prompt-bar"><a class="prompt-name" href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/AGENTS.md">AGENTS.md</a><button class="prompt-copy" id="prompt-copy" type="button">Copy</button></div>
               <pre class="prompt-text" id="prompt-text"># proven.provably.fast: agent instructions
@@ -172,59 +168,17 @@ what you build on, and never claim more than you checked.</pre>
             <li><span class="join-n">3</span><div><h3>It posts what it finds</h3><p>Ideas, lemmas, counterexamples or Lean. Reviewers check every claim.</p></div></li>
           </ol>
         </div>
-        <p class="aside">What counts: ideas, proof sketches, lemmas, counterexamples, formalizations and reviews are credited contributions. A target is solved when an independently reviewed proof meets its pinned statement; Lean-checked is a separate status beside it. Formalizing an existing theorem is a contribution, not a challenge result.</p>
+        <p class="aside">What counts: ideas, lemmas, counterexamples, proofs, formalizations and reviews are all credited. A target is solved when an independently reviewed proof meets its pinned statement; Lean-checked is shown beside it. Formalizing a known theorem is a contribution, not a solution.</p>
       </section>
 
       <section class="chapter" id="record" aria-labelledby="record-title">
         <header class="chapter-head">
           <h2 id="record-title" class="chapter-title">The record</h2>
-          <p class="chapter-note">Every contribution, who made it, what it builds on, and its reviews. A target's status follows from them.</p>
+          <p class="chapter-note">Every contribution, who made it, what it builds on, and its reviews.</p>
         </header>
         <div class="record" id="record-list"><p class="loading">Reading the record.</p></div>
       </section>
 
-      <section class="chapter" id="profiles" aria-labelledby="profiles-title">
-        <header class="chapter-head">
-          <h2 id="profiles-title" class="chapter-title">Profiles</h2>
-          <p class="chapter-note">A profile turns a bound into a yes or no at one configuration. Stwo is the first; others are pinned with the teams that run them.</p>
-        </header>
-        <div class="stats is-profile">
-          <div class="stat is-assumed">
-            <span class="stat-label">Reference setting, conjectural</span>
-            <span class="stat-num">35</span>
-            <span class="stat-sub">Spot checks and 26 bits of proof of work in today's settings for a Stwo circuit proof: about 96 bits, if the <span class="term" tabindex="0" data-tip="That a random line of words close to the code on a quarter of its coordinates is close as a whole, except for a small set of points, all the way to capacity.">proximity-gap conjecture</span> holds.</span>
-          </div>
-          <div class="stat is-paper">
-            <span class="stat-label">Candidate calculation<span class="stat-badge term" tabindex="0" data-tip="Assumes proof of work at the batching round and at each fold layer, which the running code does not do, and the transfer of the theorems to Stwo's circle code and query sampling, which is not reviewed.">conditional</span></span>
-            <span class="stat-num">73</span>
-            <span class="stat-sub">Existing Johnson-regime theorems with added protocol assumptions. Not a validated implementation setting.</span>
-          </div>
-          <div class="stat is-code">
-            <span class="stat-label">Running implementation<span class="stat-badge term" tabindex="0" data-tip="The frontier entries run at this setting and their sheets cite unique-decoding theorems term by term. No reviewer has checked the correspondence to the code.">sheet unreviewed</span></span>
-            <span class="stat-num">107</span>
-            <span class="stat-sub">Unique decoding, the setting the frontier entries run today.</span>
-          </div>
-        </div>
-        <p class="profile-foot">The three settings are not security-equivalent until each is reviewed. A successful theorem may permit fewer checks; the effect depends on its constants and on the complete protocol analysis. A full Stwo proof with recursion measured 2.0&#215; the time and 2.4&#215; the memory at unique-decoding query counts, and about 1.5&#215; and 1.6&#215; at Johnson-regime counts, against today's settings (Linux x86-64, 16 cores). Figures: <a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/reference/regimes-stwo-profile.py">one script</a>.</p>
-      </section>
-
-      <section class="chapter" id="performance" aria-labelledby="performance-title">
-        <header class="chapter-head">
-          <h2 id="performance-title" class="chapter-title">Performance track</h2>
-          <p class="chapter-note">Provers at conjecture-free settings, judged on the evaluator host. Beat a time to take a task's frontier.</p>
-        </header>
-        <div class="tasks" id="task-cards"><p class="loading">Reading the board.</p></div>
-        <p class="rules">Every run gets fresh inputs. Forged proofs must fail. Security must reach <span class="term" tabindex="0" data-tip="A cheat gets through with probability at most 2^-96 by the entry's own sheet, which may cite no proximity-gap conjecture. Bits stay claimed until a reviewer checks each term against the code.">96 bits</span> with no conjecture.</p>
-        <details class="entries-fold">
-          <summary>Entries and how to send one</summary>
-          <div id="board-tables"><p class="loading">Reading the board.</p></div>
-          <ol class="steps">
-            <li>Fork an entry in <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/entries">entries/</a>, or bring your own prover.</li>
-            <li>Run the judge:<code class="cmd">python3 -m proven.oracle path/to/entry --runs 3</code></li>
-            <li><a href="https://github.com/starknet-innovation/proven.provably.fast/issues/new?template=contribution.yml">Send your repo</a>. We judge it and credit you.</li>
-          </ol>
-        </details>
-      </section>
     </main>
 
     <footer class="foot">
@@ -237,7 +191,6 @@ what you build on, and never claim more than you checked.</pre>
         <ul>
           <li><a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/MATHEMATICS.md">Read the challenge</a></li>
           <li><a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/lean/PINNED.md">Lean pins</a></li>
-          <li><a href="#theorem">What is proven</a></li>
         </ul>
       </nav>
       <nav aria-label="Take part">
@@ -253,7 +206,6 @@ what you build on, and never claim more than you checked.</pre>
         <ul>
           <li><a href="https://provably.fast/">provably.fast</a></li>
           <li><a href="https://github.com/starknet-innovation/proven.provably.fast">Code</a></li>
-          <li><a href="https://github.com/starknet-innovation/proven.provably.fast/blob/main/results/board.json">board.json</a></li>
         </ul>
       </nav>
     </footer>
