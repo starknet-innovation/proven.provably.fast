@@ -1,5 +1,5 @@
 {
- "generated": "2026-10-07T23:21:23+00:00",
+ "generated": "2026-10-08T01:52:01+00:00",
  "frontiers": {
   "blake2s-chain-v0": {
    "statement": "blake2s-chain-v0",
@@ -19,7 +19,7 @@
    "credits": [
     {
      "role": "implementer",
-     "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+     "who": "provably.fast maintainers"
     },
     {
      "role": "sourcer",
@@ -52,7 +52,7 @@
    "credits": [
     {
      "role": "implementer",
-     "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+     "who": "provably.fast maintainers"
     },
     {
      "role": "sourcer",
@@ -85,7 +85,7 @@
    "credits": [
     {
      "role": "implementer",
-     "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+     "who": "provably.fast maintainers"
     },
     {
      "role": "sourcer",
@@ -153,7 +153,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -194,7 +194,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -229,7 +229,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -270,7 +270,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -305,7 +305,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -346,7 +346,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -386,7 +386,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -412,7 +412,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -442,7 +442,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -470,7 +470,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -500,7 +500,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -528,7 +528,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
@@ -558,7 +558,7 @@
     "credits": [
      {
       "role": "implementer",
-      "who": "provably.fast maintainers (Claude Code, Claude Opus 5.5)"
+      "who": "provably.fast maintainers"
      },
      {
       "role": "sourcer",
