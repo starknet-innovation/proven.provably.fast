@@ -23,7 +23,7 @@ class ShippedData(unittest.TestCase):
         targets = m.load_targets()
         lean = (ROOT / targets["lean"]["file"]).read_text()
         for target in targets["targets"]:
-            for name in target["lean"]:
+            for name in target["lean"] + target.get("milestones", []):
                 short = name.split(".", 1)[1]
                 self.assertRegex(lean, rf"(?m)^def {re.escape(short)}\b", msg=name)
 
@@ -43,31 +43,43 @@ class Statuses(unittest.TestCase):
         self.targets = m.load_targets()
         self.t1 = self.targets["targets"][0]
 
-    def test_a_posted_proof_is_a_claim(self):
-        status = m.target_status(self.t1, [row("M-0001", "proof")])
+    def test_a_posted_proof_that_settles_is_a_claim(self):
+        status = m.target_status(self.t1, [row("M-0001", "proof", settles=True)])
         self.assertEqual((status["status"], status["by"]), ("claimed", "M-0001"))
+        self.assertEqual(m.target_status(self.t1, [row("M-0001", "proof")])["status"], "open")
 
     def test_an_accepted_proof_needs_a_holding_review_by_someone_else(self):
         self_reviewed = row("M-0001", "proof", status="accepted", reviews=[{"by": "alice", "verdict": "holds"}])
         with self.assertRaises(m.RecordError):
             m.validate(self.targets, [self_reviewed])
-        reviewed = row("M-0001", "proof", status="accepted", reviews=[{"by": "bob", "verdict": "holds"}])
+        reviewed = row("M-0001", "proof", status="accepted", settles=True, reviews=[{"by": "bob", "verdict": "holds"}])
         m.validate(self.targets, [reviewed])
         self.assertEqual(m.target_status(self.t1, [reviewed])["status"], "solved")
 
+    def test_an_accepted_partial_result_leaves_the_target_open(self):
+        partial = row("M-0001", "proof", status="accepted", reviews=[{"by": "bob", "verdict": "holds"}])
+        m.validate(self.targets, [partial])
+        self.assertEqual(m.target_status(self.t1, [partial])["status"], "open")
+        with self.assertRaises(m.RecordError):
+            m.validate(self.targets, [row("M-0002", "idea", settles=True)])
+
     def test_an_accepted_counterexample_refutes(self):
-        counter = row("M-0001", "counterexample", status="accepted", reviews=[{"by": "bob", "verdict": "holds"}])
+        counter = row("M-0001", "counterexample", status="accepted", settles=True,
+                      reviews=[{"by": "bob", "verdict": "holds"}])
         self.assertEqual(m.target_status(self.t1, [counter])["status"], "refuted")
 
-    def test_lean_checked_needs_a_solve_and_a_pinned_declaration(self):
-        proof = row("M-0001", "proof", status="accepted", reviews=[{"by": "bob", "verdict": "holds"}])
-        lean = row("M-0002", "formalization", status="accepted", who="carol", lean="ProvenTargets.T1Uniform",
+    def test_lean_checked_needs_a_solve_and_the_pinned_declaration(self):
+        proof = row("M-0001", "proof", status="accepted", settles=True, reviews=[{"by": "bob", "verdict": "holds"}])
+        lean = row("M-0002", "formalization", status="accepted", who="carol", lean="MCAChallenge.T1",
                    reviews=[{"by": "bob", "verdict": "holds"}])
-        status = m.target_status(self.t1, [proof, lean])
-        self.assertTrue(status["lean_checked"])
+        milestone = row("M-0003", "formalization", status="accepted", who="carol", lean="MCAChallenge.T1Uniform",
+                        reviews=[{"by": "bob", "verdict": "holds"}])
+        m.validate(self.targets, [proof, lean, milestone])
+        self.assertTrue(m.target_status(self.t1, [proof, lean])["lean_checked"])
+        self.assertFalse(m.target_status(self.t1, [proof, milestone])["lean_checked"])
         self.assertFalse(m.target_status(self.t1, [lean])["lean_checked"])
         with self.assertRaises(m.RecordError):
-            m.validate(self.targets, [row("M-0003", "formalization", lean="ProvenTargets.Nope")])
+            m.validate(self.targets, [row("M-0003", "formalization", lean="MCAChallenge.Nope")])
 
     def test_withdrawn_rows_do_not_count(self):
         status = m.target_status(self.t1, [row("M-0001", "proof", status="withdrawn")])
@@ -134,7 +146,7 @@ alice
 """
 
     def test_a_form_becomes_a_posted_row(self):
-        issue = {"number": 9, "title": "proven mathematics: T1 lemma: degree of solution families",
+        issue = {"number": 9, "title": "T1 lemma: degree of solution families",
                  "body": self.BODY, "url": "https://github.com/x/y/issues/9", "author": {"login": "alice"}}
         draft = m.draft_from_issue(issue, [row("M-0001")], "2026-10-08")
         self.assertEqual((draft["id"], draft["target"], draft["kind"], draft["status"]), ("M-0002", "T1", "lemma", "posted"))

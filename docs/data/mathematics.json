@@ -1,8 +1,8 @@
 {
  "schema": "proven-mathematics/0",
- "generated": "2026-10-08T15:57:47+00:00",
+ "generated": "2026-10-08T16:31:33+00:00",
  "lean": {
-  "file": "lean/ProvenTargets.lean",
+  "file": "lean/MCAChallenge.lean",
   "library": "https://github.com/Verified-zkEVM/ArkLib",
   "commit": "35ddcaa83f683011f944f58904be779495a5709a"
  },
@@ -12,8 +12,7 @@
    "title": "Improve the length dependence",
    "level": "first objective",
    "lean": [
-    "ProvenTargets.T1",
-    "ProvenTargets.T1Uniform"
+    "MCAChallenge.T1"
    ],
    "status": "open",
    "by": null,
@@ -25,7 +24,7 @@
    "title": "Push the agreement threshold",
    "level": "next step",
    "lean": [
-    "ProvenTargets.T2"
+    "MCAChallenge.T2"
    ],
    "status": "open",
    "by": null,
@@ -37,7 +36,7 @@
    "title": "Approach capacity",
    "level": "larger ambition",
    "lean": [
-    "ProvenTargets.T3"
+    "MCAChallenge.T3"
    ],
    "status": "open",
    "by": null,

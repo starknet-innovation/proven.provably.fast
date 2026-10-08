@@ -105,7 +105,7 @@
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
     const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", style: `min-width: ${Math.min(W, 560)}px` });
     const desc = svgEl("desc", { id: "regime-desc" });
-    desc.textContent = "Agreement thresholds by code rate. Above the Johnson curve the count of bad challenges is proven linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known bounds have large exponents.";
+    desc.textContent = "Agreement thresholds by code rate. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known bounds have large exponents.";
     const defs = svgEl("defs");
     const hatch = svgEl("pattern", { id: "rg-hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
     hatch.append(svgEl("line", { class: "rg-hatch-line", x1: 0, y1: 0, x2: 0, y2: 7 }));
@@ -195,13 +195,13 @@
     { id: "seed", x: 70, y: 200, r: 13, tone: "seed", at: 0, title: "Question", text: "A target or a hunch", role: "Originator", who: "person" },
     { id: "lead", x: 300, y: 200, r: 12, tone: "lead", at: 0.16, title: "Idea", text: "An approach to try", role: "Explorer", who: "agent" },
     { id: "source", x: 180, y: 330, r: 8, tone: "source", at: 0.24, below: true, title: "Source", text: "A paper, a lemma or a trick", role: "Sourcer", who: "person" },
-    { id: "e1", x: 540, y: 110, r: 9, tone: "experiment", at: 0.38, fails: true, title: "Lemmas", text: "Steps that can be checked", role: "Prover or falsifier", who: "agent" },
+    { id: "e1", x: 540, y: 110, r: 9, tone: "experiment", at: 0.38, fails: true, title: "Lemmas", text: "Steps that can be checked", role: "Author or falsifier", who: "agent" },
     { id: "e2", x: 540, y: 200, r: 10, tone: "experiment", at: 0.39 },
     { id: "e3", x: 540, y: 290, r: 9, tone: "experiment", at: 0.4, fails: true },
     { id: "talk", x: 436, y: 318, r: 5.5, tone: "discussion", at: 0.46, below: true, title: "Discussion", text: "What was tried and what failed", role: "Helper or reviewer", who: "person" },
     { id: "talk2", x: 462, y: 300, r: 4, tone: "discussion", at: 0.47 },
     { id: "talk3", x: 476, y: 326, r: 3.5, tone: "discussion", at: 0.48 },
-    { id: "record", x: 850, y: 200, r: 15, tone: "experiment", at: 0.68, solid: true, below: true, title: "Result", text: "Meets a pinned statement", role: "Prover", who: "agent" },
+    { id: "record", x: 850, y: 200, r: 15, tone: "experiment", at: 0.68, solid: true, below: true, title: "Result", text: "Meets a pinned statement", role: "Author", who: "agent" },
     { id: "repro", x: 1080, y: 200, r: 12, tone: "repro", at: 0.8, end: true, title: "Lean", text: "Checked against ArkLib", role: "Formalizer", who: "agent" },
     { id: "curation", x: 975, y: 330, r: 8, tone: "curation", at: 0.88, below: true, title: "Curation", text: "Summaries and hand-offs", role: "Steward", who: "agent" },
   ];

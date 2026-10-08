@@ -1,7 +1,7 @@
 {
  "schema": "proven-mathematics-targets/0",
  "lean": {
-  "file": "lean/ProvenTargets.lean",
+  "file": "lean/MCAChallenge.lean",
   "library": "https://github.com/Verified-zkEVM/ArkLib",
   "commit": "35ddcaa83f683011f944f58904be779495a5709a"
  },
@@ -10,13 +10,15 @@
    "id": "T1",
    "title": "Improve the length dependence",
    "level": "first objective",
-   "statement": "For 0 < rho < 1 and agreement a above the first-order threshold a1(rho): at most C(rho, a) n bad challenges on every line, C explicit, for every Reed-Solomon code of rate rho on any prescribed evaluation set over a field of characteristic 0 or above a stated bound, by any method.",
+   "statement": "For 0 < rho < 1 and agreement a above the first-order curve a1(rho) of DKT equation 31: at most C(rho, a) n bad challenges on every line, C explicit, for every Reed-Solomon code of rate rho on any prescribed evaluation set over a field of characteristic 0 or above a stated bound, by any method.",
    "lean": [
-    "ProvenTargets.T1",
-    "ProvenTargets.T1Uniform"
+    "MCAChallenge.T1"
+   ],
+   "milestones": [
+    "MCAChallenge.T1Uniform"
    ],
    "baseline": {
-    "bound": "O(n^2 / eta^4) at slack eta above the first-order curve; 1,325,775 n^2 at agreement rho + 0.24",
+    "bound": "O(n^2 / eta^4) at slack eta above the first-order curve (DKT Theorem 1.1); 1,325,775 n^2 at agreement rho + 0.24 (Theorem 5.13). ArkLib formalizes the second, and the first with n^2 / eta^5 above the curve's upper branch.",
     "sources": [
      "DKT26"
     ],
@@ -30,9 +32,9 @@
    "id": "T2",
    "title": "Push the agreement threshold",
    "level": "next step",
-   "statement": "An explicit threshold curve strictly between capacity and a1(rho) at every rate, with a count at most quadratic in n.",
+   "statement": "An explicit threshold curve strictly between capacity and the first-order curve a1(rho) at every rate, with a count at most quadratic in n.",
    "lean": [
-    "ProvenTargets.T2"
+    "MCAChallenge.T2"
    ],
    "baseline": {
     "bound": "cubic in n with two hidden derivatives, in the range those theorems cover",
@@ -46,9 +48,12 @@
    "id": "T3",
    "title": "Approach capacity",
    "level": "larger ambition",
-   "statement": "At every fixed gap delta > 0 above capacity, on smooth domains (cosets of the subgroup of order 2^m): at most C_delta n^c bad challenges, with c independent of delta; c = 1 is the full ambition.",
+   "statement": "At every fixed gap delta > 0 above capacity, on smooth domains (cosets of the subgroup of order 2^m): at most C(delta) n bad challenges once n >= N(delta), with N and C explicit. Milestone: an exponent independent of delta.",
    "lean": [
-    "ProvenTargets.T3"
+    "MCAChallenge.T3"
+   ],
+   "milestones": [
+    "MCAChallenge.T3Exponent"
    ],
    "baseline": {
     "bound": "C_delta n^(d + 1) on any domain, d = ceil(exp(1.5 / delta)) for delta < 0.24",

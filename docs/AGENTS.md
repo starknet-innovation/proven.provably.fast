@@ -7,28 +7,29 @@ on, and never claim more than you checked.
 ## The problem
 
 A verifier combines received words f and g with a random challenge z. The challenge is bad at
-agreement a if f + z g agrees with a Reed-Solomon codeword on a n coordinates while f and g have no
-joint codeword explanation there. Count the bad z on the worst line, for a code of rate rho on n
-prescribed points over a field of large characteristic.
+agreement a if some polynomial of degree below k agrees with f + z g on at least a n coordinates,
+while f and g do not agree with codewords on that whole agreement set. Count the bad z on the worst
+line, for a code of rate rho on n prescribed points over a field of large characteristic.
 
-- Above the Johnson threshold (agreement above sqrt(rho)) the count is proven linear in n.
-- Just below it, in the first-order regime, the best proven bound is quadratic: O(n^2 / eta^4) at
+- Above the Johnson threshold (agreement above sqrt(rho)) the count is known to be linear in n.
+- Just below it, in the first-order regime, the existing bound is quadratic: O(n^2 / eta^4) at
   slack eta above the first-order curve, and 1,325,775 n^2 at agreement rho + 0.24 (Dao, Kominers
-  and Thaler, ePrint 2026/2056, Theorems 1.1 and 5.13). Both are proven in Lean in ArkLib:
-  `ReedSolomon.automaticFirstOrder_rate_bounds` and `ReedSolomon.exists_uniformFirstOrder_lineMca`.
+  and Thaler, ePrint 2026/2056, Theorems 1.1 and 5.13). ArkLib formalizes the second exactly
+  (`ReedSolomon.exists_uniformFirstOrder_lineMca`) and the first in a weaker form, n^2 / eta^5
+  (`ReedSolomon.automaticFirstOrder_rate_bounds`).
 - The worst-case lower bound is linear (Arnon, Boneh and Fenzi, ePrint 2026/680, Lemma 4.16).
-- The list of close codewords is already linear in this regime (Gabizon, ePrint 2026/2048). The
-  count of bad challenges is a different quantity.
+- The list of close codewords is linear at some agreement below the Johnson threshold (Gabizon,
+  ePrint 2026/2048). The count of bad challenges is a different quantity.
 
 ## Targets
 
-- T1, the first objective: a linear count in the first-order regime, with an explicit constant, by
-  any method.
-- T2: below the first-order threshold, with a count at most quadratic.
+- T1, the first objective: a linear count above the first-order curve, with an explicit constant,
+  by any method.
+- T2: below the first-order curve, with a count at most quadratic.
 - T3, the larger ambition: linear at a fixed gap above capacity, on smooth domains.
 
-Exact statements: MATHEMATICS.md. Lean statements: lean/ProvenTargets.lean, explained in
-lean/PINNED.md.
+Exact statements and milestones: MATHEMATICS.md. Lean statements: lean/MCAChallenge.lean, explained
+in lean/PINNED.md.
 
 ## How to work
 
@@ -48,13 +49,14 @@ lean/PINNED.md.
 - Never invent a citation, a theorem number or a result. If you are not sure a step holds, say so.
 - Small checkable steps beat long unchecked proofs.
 - Numbers must be reproducible: attach the script or the computation.
-- A counterexample counts as much as a proof: a family with order n^2 bad challenges in the
-  first-order regime settles T1 the other way.
-- A target is solved when an independently reviewed proof meets its pinned statement. Formalizing a
-  known theorem is a contribution, not a solution.
+- A target is solved when an independently reviewed proof meets its pinned statement. Partial
+  progress and formalizations of known theorems are credited, and the target stays open.
+- A counterexample to T1 is a family at a fixed rate, a fixed margin above the curve and an
+  admissible characteristic, whose worst count divided by n grows without bound.
 
 ## Lean
 
-lean/ is a Lake package pinned to an ArkLib commit. Each target is a Lean proposition. A Lean result
-proves one for explicit parameters, compiles against the pinned commit, and uses no axioms beyond
-propext, Classical.choice and Quot.sound. lean/PINNED.md has the build command.
+lean/ is a Lake package pinned to an ArkLib commit. Each target is a Lean proposition whose
+parameters (constants, curves, characteristic bounds) are arguments. A Lean result supplies them in
+closed form, compiles against the pinned commit, and uses no axioms beyond propext,
+Classical.choice and Quot.sound. lean/PINNED.md has the build command.

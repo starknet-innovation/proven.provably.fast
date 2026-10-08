@@ -6,16 +6,17 @@ counterexample, a proof sketch, a proof, a formalization, a review of another ro
 with who made it, what it builds on, and its reviews. A target's status follows from the rows:
 
 - open: nothing below applies;
-- claimed: a proof or counterexample row is posted and not yet reviewed;
-- solved / refuted: an accepted proof / counterexample row with at least one review that
-  holds, by someone other than its authors;
-- Lean-checked is shown beside solved: an accepted formalization row of one of the target's
-  Lean declarations, with a holding review.
+- claimed: a proof or counterexample row that settles the target (it claims the pinned statement,
+  or its negation) is posted and not yet accepted;
+- solved / refuted: such a row accepted with at least one review that holds, by someone other
+  than its authors. Other accepted rows are partial progress: credited, and the target stays open;
+- Lean-checked is shown beside solved: an accepted formalization row of the target's pinned Lean
+  declaration (a milestone declaration does not count), with a holding review.
 
     python3 -m proven.mathematics check                 # validate both files
     python3 -m proven.mathematics board                 # writes results/mathematics.json
     python3 -m proven.mathematics record --target T1 --kind idea --title "..." --who NAME \\
-        [--agent --runs NAME] [--issue N] [--url URL] [--builds-on DKT26,M-0002]
+        [--agent --runs NAME] [--issue N] [--url URL] [--builds-on DKT26,M-0002] [--settles]
     python3 -m proven.mathematics review M-0003 --by NAME --verdict holds|fails|partial --url URL
     python3 -m proven.mathematics accept M-0003         # or: refute / withdraw
     python3 -m proven.mathematics from-issue ISSUE.json # a draft row from a Mathematics form
@@ -77,7 +78,7 @@ def validate(targets: dict, records: list[dict]) -> None:
     if len(set(ids)) != len(ids):
         raise RecordError("target ids must be unique")
     known_targets = set(ids) | {"other"}
-    lean_names = {name for t in targets["targets"] for name in t["lean"]}
+    lean_names = {name for t in targets["targets"] for name in t["lean"] + t.get("milestones", [])}
     sources = set(targets["sources"])
     for target in targets["targets"]:
         for source in target["baseline"]["sources"]:
@@ -107,6 +108,8 @@ def validate(targets: dict, records: list[dict]) -> None:
         for review in row.get("reviews", []):
             if review.get("verdict") not in VERDICTS or not review.get("by"):
                 raise RecordError(f"{rid}: a review needs a reviewer and a verdict in {', '.join(VERDICTS)}")
+        if row.get("settles") and row["kind"] not in ("proof", "counterexample"):
+            raise RecordError(f"{rid}: only a proof or a counterexample settles a target")
         if row["kind"] == "formalization" and row.get("lean") and row["lean"] not in lean_names:
             raise RecordError(f"{rid}: {row['lean']} is not a pinned Lean declaration")
         if row["status"] == "accepted" and row["kind"] in ("proof", "counterexample", "formalization") \
@@ -117,11 +120,13 @@ def validate(targets: dict, records: list[dict]) -> None:
 
 def target_status(target: dict, records: list[dict]) -> dict:
     mine = [r for r in records if r["target"] == target["id"] and r["status"] != "withdrawn"]
-    solved = [r for r in mine if r["kind"] == "proof" and r["status"] == "accepted" and holding_review(r)]
-    refuted = [r for r in mine if r["kind"] == "counterexample" and r["status"] == "accepted" and holding_review(r)]
+    settling = [r for r in mine if r.get("settles")]
+    solved = [r for r in settling if r["kind"] == "proof" and r["status"] == "accepted" and holding_review(r)]
+    refuted = [r for r in settling if r["kind"] == "counterexample" and r["status"] == "accepted"
+               and holding_review(r)]
     lean = [r for r in mine if r["kind"] == "formalization" and r["status"] == "accepted"
             and r.get("lean") in target["lean"] and holding_review(r)]
-    pending = [r for r in mine if r["kind"] in ("proof", "counterexample") and r["status"] == "posted"]
+    pending = [r for r in settling if r["status"] == "posted"]
     if solved:
         status, by = "solved", solved[0]["id"]
     elif refuted:
@@ -198,7 +203,7 @@ def draft_from_issue(issue: dict, records: list[dict], today: str) -> dict:
     kind = FORM_KINDS.get(form.get("Kind", ""))
     if target not in ("T1", "T2", "T3", "Other") or not kind:
         raise RecordError("the issue is not a Mathematics form with a target and a kind")
-    title = re.sub(r"^proven mathematics:\s*", "", issue.get("title", ""), flags=re.IGNORECASE).strip()
+    title = issue.get("title", "").strip()
     refs = sorted(set(re.findall(r"#\d+", form.get("Builds on", ""))))
     login = (issue.get("author") or {}).get("login", "")
     return {"id": next_id(records), "target": target if target != "Other" else "other", "kind": kind,
@@ -223,6 +228,8 @@ def main(argv: list[str] | None = None) -> int:
     rec.add_argument("--url")
     rec.add_argument("--lean", help="the pinned declaration a formalization proves")
     rec.add_argument("--builds-on", default="")
+    rec.add_argument("--settles", action="store_true",
+                     help="the row claims the target's pinned statement (a proof) or its negation")
     rev = sub.add_parser("review")
     rev.add_argument("record")
     rev.add_argument("--by", required=True)
@@ -251,6 +258,8 @@ def main(argv: list[str] | None = None) -> int:
                    "issue": args.issue, "url": args.url, "date": today, "status": "posted", "reviews": []}
             if args.lean:
                 row["lean"] = args.lean
+            if args.settles:
+                row["settles"] = True
             validate(targets, records + [row])
             append(row)
             print(row["id"])
