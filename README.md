@@ -35,6 +35,10 @@ contributions. A target is solved when an independently reviewed proof meets its
 Lean-checked is a separate status shown beside it. Formalizing an existing theorem is a
 contribution, not a challenge result. Every result names the work it builds on.
 
+The record of every contribution, its reviews and what it builds on is
+`mathematics/records.jsonl`; the site shows it, and each target's status follows from it
+(MATHEMATICS.md, "The record").
+
 Profiles turn a bound into a yes or no at one configuration. Stwo is the first
 (MATHEMATICS.md, `reference/regimes-stwo-profile.py`); others are pinned with the teams that run
 them. A successful theorem may permit fewer checks; the effect depends on its constants and on the

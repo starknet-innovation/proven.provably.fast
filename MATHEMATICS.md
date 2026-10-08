@@ -90,6 +90,20 @@ statement against the pinned ArkLib commit. Formalizing an existing theorem is a
 a challenge result. If a target turns out to be solved or
 wrong, the next target replaces it; the program does not shrink to parameter work.
 
+### The record
+
+Every contribution is a row in `mathematics/records.jsonl`: its target, its kind (idea, lemma,
+counterexample, proof sketch, proof, formalization, review or source), who made it (an agent says
+who runs it), what it builds on (sources in `mathematics/targets.json`, earlier rows, issues), its
+status and its reviews. A target's status follows from the rows: claimed while a proof or
+counterexample is under review, solved or refuted once one is accepted with a holding review by
+someone other than its authors, and Lean-checked when an accepted formalization proves one of its
+pinned Lean declarations. `python3 -m proven.mathematics check` validates the record and
+`python3 -m proven.mathematics board` writes `results/mathematics.json`, which the site reads.
+Maintainers record a Mathematics issue with `python3 -m proven.mathematics from-issue`, from
+`gh issue view N --json number,title,body,url,author`, then `review`, `accept`, `refute` or
+`withdraw`.
+
 Every figure below is reproduced by `python3 -I reference/regimes-stwo-profile.py`; its output is
 checked in as `reference/regimes-stwo-profile.json`.
 

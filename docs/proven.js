@@ -400,6 +400,57 @@
     $("board-tables").replaceChildren(...TASKS.map((task) => entriesList(task, board)));
   }
 
+  // The mathematics record (data/mathematics.json, written by `python3 -m proven.mathematics board`):
+  // target statuses on the hero rows, and every contribution with who made it.
+  const KIND_WORDS = { idea: "Idea", lemma: "Lemma", counterexample: "Counterexample", "proof-sketch": "Proof sketch",
+    proof: "Proof", formalization: "Lean", review: "Review", source: "Source" };
+  const STATUS_WORDS = { open: "open", claimed: "claimed, under review", solved: "solved", refuted: "refuted" };
+  function renderTargets(record) {
+    for (const target of record.targets || []) {
+      const chip = document.querySelector(`.target.is-${target.id.toLowerCase()} .chip`);
+      if (!chip) continue;
+      chip.textContent = STATUS_WORDS[target.status] || target.status;
+      chip.className = `chip is-${target.status}`;
+      if (target.lean_checked) chip.after(el("span", { class: "chip is-lean" }, "Lean-checked"));
+    }
+  }
+  function renderRecord(record) {
+    const root = $("record-list");
+    if (!root) return;
+    const rows = record.contributions || [];
+    const form = "https://github.com/starknet-innovation/proven.provably.fast/issues/new?template=mathematics.yml";
+    if (!rows.length) {
+      root.replaceChildren(el("div", { class: "record-empty" },
+        el("p", {}, "No contributions yet. The first idea, lemma, counterexample or review opens the record."),
+        el("a", { class: "cta", href: form }, "Contribute ", el("span", { "aria-hidden": "true" }, "↗"))));
+      return;
+    }
+    const items = rows.map((row) => {
+      const title = row.url ? el("a", { href: row.url }, row.title) : row.title;
+      const state = row.status === "accepted" ? "accepted" : row.status === "refuted" ? "refuted" : row.reviewed ? "reviewed" : "posted";
+      return el("li", { class: `record-row is-${row.kind}` },
+        el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
+        el("span", { class: "record-target" }, row.target === "other" ? "Other" : row.target),
+        el("span", { class: "record-title" }, title, el("small", {}, `${row.who.join(", ")}${row.date ? ` · ${day(row.date)}` : ""}`)),
+        el("span", { class: `verdict is-${state}` }, state));
+    });
+    const people = (record.people || []).slice(0, 12).map((p) => `${p.name}${p.agent ? " (agent)" : ""}`);
+    root.replaceChildren(el("ol", { class: "record-list" }, items),
+      people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}.`) : null);
+  }
+  async function renderMathematics() {
+    try {
+      const response = await fetch("data/mathematics.json", { cache: "no-cache" });
+      if (!response.ok) throw new Error(String(response.status));
+      const record = await response.json();
+      renderTargets(record);
+      renderRecord(record);
+    } catch {
+      const root = $("record-list");
+      if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));
+    }
+  }
+
   initTheme();
   pointerGlow();
   regimeChart();
@@ -407,4 +458,5 @@
   initBrief();
   reveal([...document.querySelectorAll(".reveal")]);
   renderBoard();
+  renderMathematics();
 })();
