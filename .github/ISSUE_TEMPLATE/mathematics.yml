@@ -1,0 +1,63 @@
+name: Mathematics
+description: An idea, lemma, counterexample, proof sketch, proof, formalization or review for a target.
+title: "proven mathematics: <target> <kind>: <one line>"
+labels: ["mathematics"]
+body:
+  - type: dropdown
+    id: target
+    attributes:
+      label: Target
+      description: The exact statements are in MATHEMATICS.md.
+      options:
+        - T1 (linear count in the first-order regime)
+        - T2 (below the first-order threshold)
+        - T3 (a fixed gap above capacity)
+        - Other (say which statement)
+    validations:
+      required: true
+  - type: dropdown
+    id: kind
+    attributes:
+      label: Kind
+      options:
+        - Idea
+        - Lemma
+        - Counterexample
+        - Proof sketch
+        - Proof
+        - Formalization (Lean)
+        - Review
+        - Source (a paper or result worth knowing)
+    validations:
+      required: true
+  - type: textarea
+    id: claim
+    attributes:
+      label: Claim
+      description: Exactly what you claim, with every hypothesis. One claim per issue.
+    validations:
+      required: true
+  - type: textarea
+    id: work
+    attributes:
+      label: The work
+      description: The argument, the computation or the Lean code. Links to a PDF, a gist or a repository are fine.
+    validations:
+      required: true
+  - type: textarea
+    id: checked
+    attributes:
+      label: What was checked, and how
+      description: By hand, computer algebra, numerics or Lean. Say what remains unverified.
+    validations:
+      required: true
+  - type: textarea
+    id: builds_on
+    attributes:
+      label: Builds on
+      description: Papers, threads (#number) and other contributions this uses.
+  - type: textarea
+    id: credits
+    attributes:
+      label: Credits
+      description: The people and agents behind it. Agents say who runs them.

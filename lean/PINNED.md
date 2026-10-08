@@ -1,12 +1,49 @@
 # Pinned statements for the Lean track
 
-A soundness term becomes LEAN-CHECKED only when a proof of the statement pinned here, with these
-exact parameters and no `sorry`, compiles against the pinned ArkLib commit. Contributors prove the
-statement we pin; they never choose it. A result about Reed-Solomon codes counts for Stwo only
-together with P5, the transfer to circle codes.
+The targets T1, T2 and T3 of the mathematics challenge are stated in Lean in
+[`ProvenTargets.lean`](ProvenTargets.lean), against
+[Verified-zkEVM/ArkLib](https://github.com/Verified-zkEVM/ArkLib) at
+`35ddcaa83f683011f944f58904be779495a5709a` (Apache-2.0), pinned in [`lakefile.toml`](lakefile.toml).
+Contributors prove the statement we pin; they never choose it.
 
-Pinned library: [Verified-zkEVM/ArkLib](https://github.com/Verified-zkEVM/ArkLib) at `35ddcaa83f68`
-(Apache-2.0). Status checked 2026-10-07: Theorem 1.2 of BCIKS20 is stated
+A Lean result proves one target for explicit parameters: constants and curves written in closed
+form, never obtained with `Classical.choose`. It compiles against the pinned commit and depends on
+no axioms beyond `propext`, `Classical.choice` and `Quot.sound`. Reviewers check both, and that the
+parameters are explicit. Lean-checked is a status shown beside a solved target; a target is solved
+by an independently reviewed proof, with or without Lean (MATHEMATICS.md).
+
+| Target | Lean declaration | What it asks | Proven today in ArkLib |
+|---|---|---|---|
+| T1, uniform form | `ProvenTargets.T1Uniform C` | agreement at least k + 6n/25, characteristic 0 or above k - 1: at most `C * n` bad challenges on every line | `ReedSolomon.exists_uniformFirstOrder_lineMca`: 1,325,775 n^2 (restated as `baseline_T1Uniform_quadratic`) |
+| T1, general form | `ProvenTargets.T1 C B` | agreement at least (a1(rho) + eta) n, k at most rho n, characteristic 0 or above max(k - 1, B rho eta): at most `C rho eta * n` | `ReedSolomon.automaticFirstOrder_rate_bounds`: C_E(rho) n^2 / eta^5 (restated as `baseline_T1_quadratic`) |
+| T2 | `ProvenTargets.T2 a2 C B` | a threshold curve a2 strictly between capacity and a1 at every rate, with at most `C rho eta * n ^ 2` | nothing below a1 with a quadratic count |
+| T3 | `ProvenTargets.T3 c` | smooth domains (cosets of the subgroup of order 2^m), every fixed gap delta above capacity: at most `C_delta * n ^ c`, with c independent of delta; `T3 1` is the full ambition | `ReedSolomon.exists_capacity_lineAgreement`: C n^(d + 1) on any domain, with d depending on delta |
+
+a1(rho) here is ArkLib's `ReedSolomon.HiddenDerivative.firstOrderRateThreshold rho`,
+(3 rho + 2 sqrt(rho (5 - rho)(2 - rho))) / (8 - rho): the first-order curve of Dao, Kominers and
+Thaler (ePrint 2026/2056, equation 31) for rho at least 11 - 3 sqrt(13), and the threshold ArkLib's
+quadratic theorem uses at every rate. All four statements use ArkLib's `LineExactAgreementBound`:
+for every received line f + z g, one exceptional set of at most B challenges, outside of which
+every polynomial of degree below k agreeing with the line in at least A places splits as
+P0 + z P1 with the same agreement set for f and g.
+
+Build and check:
+
+    cd lean
+    lake exe cache get    # Mathlib's prebuilt files
+    lake build
+
+To check a proof, add `#print axioms` for your theorem. Status checked 2026-10-08: the file
+compiles with no warnings, both baselines depend only on the three standard axioms, and the
+targets are open.
+
+## Applicability pins (the Stwo profile)
+
+These pin the soundness terms of the performance track's Stwo entries; they are not the
+mathematics targets. A soundness term becomes LEAN-CHECKED only when a proof of the statement
+pinned here, with these exact parameters and no `sorry`, compiles against the pinned ArkLib
+commit. A result about Reed-Solomon codes counts for Stwo only together with P5, the transfer to
+circle codes. Status checked 2026-10-07: Theorem 1.2 of BCIKS20 is stated
 (`ProximityGap/BCIKS20/ReedSolomonGap.lean`); six files in `ProximityGap/BCIKS20/` still contain
 `sorry`, among them `Curves.lean` and `AffineLines/Main.lean`. Schwartz-Zippel is proven
 (`ToMathlib/MvPolynomial/SchwartzZippel.lean`).
