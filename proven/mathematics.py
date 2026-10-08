@@ -3,7 +3,9 @@
 mathematics/targets.json pins T1 to T3 (statements, Lean declarations, baselines, sources).
 mathematics/records.jsonl is append-only: one row per contribution (an idea, a lemma, a
 counterexample, a proof sketch, a proof, a formalization, a review of another row, or a source),
-with who made it, what it builds on, and its reviews. A target's status follows from the rows:
+with who made it, what it builds on, and its reviews. Contributions are posted on provably.fast
+(MATHEMATICS threads and the mathematics research graph); maintainers record them here, with the
+thread they were posted in. A target's status follows from the rows:
 
 - open: nothing below applies;
 - claimed: a proof or counterexample row that settles the target (it claims the pinned statement,
@@ -16,12 +18,11 @@ with who made it, what it builds on, and its reviews. A target's status follows 
     python3 -m proven.mathematics check                 # validate both files
     python3 -m proven.mathematics board                 # writes results/mathematics.json
     python3 -m proven.mathematics record --target T1 --kind idea --title "..." --who NAME \\
-        [--agent --runs NAME] [--issue N] [--url URL] [--builds-on DKT26,M-0002] [--settles]
+        [--agent --runs NAME] [--thread bt1_...] [--url URL] [--builds-on DKT26,M-0002,rgr1_...] [--settles]
     python3 -m proven.mathematics review M-0003 --by NAME --verdict holds|fails|partial --url URL
     python3 -m proven.mathematics accept M-0003         # or: refute / withdraw
-    python3 -m proven.mathematics from-issue ISSUE.json # a draft row from a Mathematics form
 
-Standard library only; no network (from-issue reads `gh issue view N --json number,title,body,url,author`).
+Standard library only; no network.
 """
 from __future__ import annotations
 
@@ -41,11 +42,9 @@ KINDS = ("idea", "lemma", "counterexample", "proof-sketch", "proof", "formalizat
 STATUSES = ("posted", "accepted", "refuted", "withdrawn")
 VERDICTS = ("holds", "fails", "partial")
 RECORD_ID = re.compile(r"^M-\d{4}$")
-ISSUE_REF = re.compile(r"^#\d+$")
-FORM_KINDS = {"Idea": "idea", "Lemma": "lemma", "Counterexample": "counterexample",
-              "Proof sketch": "proof-sketch", "Proof": "proof", "Formalization (Lean)": "formalization",
-              "Review": "review", "Source (a paper or result worth knowing)": "source"}
-NO_RESPONSE = "_No response_"
+# A provably.fast thread, and a record in the mathematics research graph.
+THREAD_ID = re.compile(r"^bt1_[0-9a-f]{24}$")
+GRAPH_RECORD = re.compile(r"^rgr1_[0-9a-f]{64}$")
 
 
 class RecordError(ValueError):
@@ -102,9 +101,11 @@ def validate(targets: dict, records: list[dict]) -> None:
                 raise RecordError(f"{rid}: every contributor needs a name")
             if who.get("agent") and not who.get("runs"):
                 raise RecordError(f"{rid}: an agent says who runs it")
+        if row.get("thread") is not None and not THREAD_ID.match(str(row["thread"])):
+            raise RecordError(f"{rid}: thread {row['thread']!r} is not a provably.fast thread id")
         for ref in row.get("builds_on", []):
-            if not (ref in sources or ref in seen or ISSUE_REF.match(ref)):
-                raise RecordError(f"{rid}: builds_on {ref!r} is not a source, an earlier record or an issue")
+            if not (ref in sources or ref in seen or THREAD_ID.match(ref) or GRAPH_RECORD.match(ref)):
+                raise RecordError(f"{rid}: builds_on {ref!r} is not a source, an earlier record, a thread or a graph record")
         for review in row.get("reviews", []):
             if review.get("verdict") not in VERDICTS or not review.get("by"):
                 raise RecordError(f"{rid}: a review needs a reviewer and a verdict in {', '.join(VERDICTS)}")
@@ -157,7 +158,7 @@ def summary(targets: dict, records: list[dict], now: str | None = None) -> dict:
             entry["contributions"] += 1
             if "review" not in entry["kinds"]:
                 entry["kinds"].append("review")
-    public = [{key: row.get(key) for key in ("id", "target", "kind", "title", "status", "date", "url", "issue", "builds_on")}
+    public = [{key: row.get(key) for key in ("id", "target", "kind", "title", "status", "date", "url", "thread", "builds_on")}
               | {"who": [w["name"] for w in row["who"]], "reviewed": holding_review(row)}
               for row in records if row["status"] != "withdrawn"]
     return {
@@ -185,33 +186,6 @@ def rewrite(records: list[dict], path: Path = RECORDS) -> None:
     path.write_text("".join(json.dumps(r, sort_keys=True, ensure_ascii=False) + "\n" for r in records))
 
 
-def parse_form(body: str) -> dict[str, str]:
-    """A Mathematics issue form's answers, keyed by the form's headings."""
-    form: dict[str, str] = {}
-    for section in re.split(r"^### ", body or "", flags=re.MULTILINE)[1:]:
-        label, _, value = section.partition("\n")
-        value = value.strip()
-        if value and value != NO_RESPONSE:
-            form[label.strip()] = value
-    return form
-
-
-def draft_from_issue(issue: dict, records: list[dict], today: str) -> dict:
-    """A posted row from `gh issue view N --json number,title,body,url,author`; a maintainer checks it."""
-    form = parse_form(issue.get("body", ""))
-    target = (form.get("Target") or "").split(" ")[0]
-    kind = FORM_KINDS.get(form.get("Kind", ""))
-    if target not in ("T1", "T2", "T3", "Other") or not kind:
-        raise RecordError("the issue is not a Mathematics form with a target and a kind")
-    title = issue.get("title", "").strip()
-    refs = sorted(set(re.findall(r"#\d+", form.get("Builds on", ""))))
-    login = (issue.get("author") or {}).get("login", "")
-    return {"id": next_id(records), "target": target if target != "Other" else "other", "kind": kind,
-            "title": title or form.get("Claim", "")[:120], "claim": form.get("Claim", ""),
-            "url": issue.get("url"), "issue": issue.get("number"), "date": today,
-            "who": [{"name": login or "unknown"}], "builds_on": refs, "status": "posted", "reviews": []}
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
@@ -224,7 +198,7 @@ def main(argv: list[str] | None = None) -> int:
     rec.add_argument("--who", required=True, help="comma-separated names")
     rec.add_argument("--agent", action="store_true", help="the contributors are agents")
     rec.add_argument("--runs", help="who runs the agents")
-    rec.add_argument("--issue", type=int)
+    rec.add_argument("--thread", help="the provably.fast thread it was posted in (bt1_...)")
     rec.add_argument("--url")
     rec.add_argument("--lean", help="the pinned declaration a formalization proves")
     rec.add_argument("--builds-on", default="")
@@ -237,8 +211,6 @@ def main(argv: list[str] | None = None) -> int:
     rev.add_argument("--url")
     for name in ("accept", "refute", "withdraw"):
         sub.add_parser(name).add_argument("record")
-    issue = sub.add_parser("from-issue")
-    issue.add_argument("path", type=Path)
     args = parser.parse_args(argv)
     targets, records = load_targets(), load_records()
     today = datetime.now(timezone.utc).date().isoformat()
@@ -255,7 +227,7 @@ def main(argv: list[str] | None = None) -> int:
                    "who": [{"name": n.strip(), **({"agent": True, "runs": args.runs} if args.agent else {})}
                            for n in args.who.split(",") if n.strip()],
                    "builds_on": [r.strip() for r in args.builds_on.split(",") if r.strip()],
-                   "issue": args.issue, "url": args.url, "date": today, "status": "posted", "reviews": []}
+                   "thread": args.thread, "url": args.url, "date": today, "status": "posted", "reviews": []}
             if args.lean:
                 row["lean"] = args.lean
             if args.settles:
@@ -279,8 +251,6 @@ def main(argv: list[str] | None = None) -> int:
             validate(targets, records)
             rewrite(records)
             print(f"{args.record}: {row['status']}")
-        elif args.command == "from-issue":
-            print(json.dumps(draft_from_issue(json.loads(args.path.read_text()), records, today), indent=1, ensure_ascii=False))
     except RecordError as error:
         print(f"refused: {error}", file=sys.stderr)
         return 2
