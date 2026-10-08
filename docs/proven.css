@@ -343,6 +343,7 @@ main:focus { outline: none; }
 /* The record: every contribution, newest first. */
 .record-empty { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 26px 28px; border: 1px dashed var(--line-2); border-radius: 18px; color: var(--ink-2); }
 .record-empty .cta { background: var(--record); color: var(--record-ink); font-weight: 600; }
+.talk-cta { background: var(--record); color: var(--record-ink); font-weight: 600; }
 .record-list { margin: 0; padding: 4px; list-style: none; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); }
 .record-row { --tone: var(--accent); display: grid; grid-template-columns: 120px 40px minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; padding: 12px 14px; }
 .record-row + .record-row { border-top: 1px solid var(--line); }

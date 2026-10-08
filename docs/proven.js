@@ -328,54 +328,6 @@
     });
   }
 
-  // The discussion lives on provably.fast: the latest mathematics threads from its public
-  // bulletin, which this origin may read, each linking to the thread there.
-  const PLATFORM = "https://provably.fast";
-  const BOARD = `${PLATFORM}/#/c/proven-mca-graph-v1/workshop`;
-  const ago = (ms) => {
-    const minutes = Math.max(1, Math.round((Date.now() - ms) / 60000));
-    return minutes < 60 ? `${minutes} min ago` : minutes < 2880 ? `${Math.round(minutes / 60)} h ago` : `${Math.round(minutes / 1440)} days ago`;
-  };
-  async function renderDiscussion() {
-    const root = $("talk-list");
-    if (!root) return;
-    try {
-      const threads = [];
-      for (let cursor = 0, page = 0; page < 10; page += 1) {
-        const response = await fetch(`${PLATFORM}/api/participation/bulletin/threads?topic=MATHEMATICS&cursor=${cursor}&limit=50`);
-        if (!response.ok) throw new Error(String(response.status));
-        const body = await response.json();
-        if (!body || !Array.isArray(body.threads)) throw new Error("shape");
-        threads.push(...body.threads.filter((t) => t && t.topic === "MATHEMATICS" && /^bt1_[0-9a-f]{24}$/.test(t.thread_id)
-          && typeof t.title === "string" && Number.isSafeInteger(t.post_count) && Number.isSafeInteger(t.updated_at)));
-        if (body.next_cursor === null) break;
-        if (!Number.isSafeInteger(body.next_cursor) || body.next_cursor <= cursor) throw new Error("cursor");
-        cursor = body.next_cursor;
-      }
-      const latest = threads.sort((a, b) => b.updated_at - a.updated_at).slice(0, 6);
-      if (!latest.length) {
-        root.replaceChildren(el("div", { class: "record-empty" }, el("p", {}, "No threads yet. Open the first one: a question, an idea or a claim."),
-          el("a", { class: "cta", href: BOARD }, "Join the discussion ", el("span", { "aria-hidden": "true" }, "↗"))));
-        return;
-      }
-      // Titles follow "T1 lemma: one line"; anything else is a thread.
-      const items = latest.map((t) => {
-        const named = t.title.match(/^(T[1-3])\s+([A-Za-z][A-Za-z -]{0,23}):\s/);
-        const kind = named ? named[2].toLowerCase() : "thread";
-        return el("li", { class: `record-row is-${kind.replace(/ /g, "-")}` },
-          el("span", { class: "record-kind" }, kind[0].toUpperCase() + kind.slice(1)),
-          el("span", { class: "record-target" }, named ? named[1] : ""),
-          el("span", { class: "record-title" }, el("a", { href: `${PLATFORM}/#/workshop/threads/${t.thread_id}` }, t.title),
-            el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${ago(t.updated_at)}`)),
-          el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
-      });
-      root.replaceChildren(el("ol", { class: "record-list" }, items),
-        el("p", { class: "record-people" }, el("a", { href: BOARD }, "Every thread, and the research graph, on provably.fast")));
-    } catch {
-      root.replaceChildren(el("p", { class: "loading" }, "The discussion could not be read here. ", el("a", { href: BOARD }, "Read it on provably.fast"), "."));
-    }
-  }
-
   // The mathematics record (data/mathematics.json, written by `python3 -m proven.mathematics board`):
   // target statuses on the hero rows, and every contribution with who made it.
   const KIND_WORDS = { idea: "Idea", lemma: "Lemma", counterexample: "Counterexample", "proof-sketch": "Proof sketch",
@@ -433,6 +385,5 @@
   renderLoop();
   initBrief();
   reveal([...document.querySelectorAll(".reveal")]);
-  renderDiscussion();
   renderMathematics();
 })();
