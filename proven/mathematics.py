@@ -1,0 +1,281 @@
+"""The mathematics track: pinned targets, the record of contributions, and what the site shows.
+
+mathematics/targets.json pins T1 to T3 (statements, Lean declarations, baselines, sources).
+mathematics/records.jsonl is append-only: one row per contribution (an idea, a lemma, a
+counterexample, a proof sketch, a proof, a formalization, a review of another row, or a source),
+with who made it, what it builds on, and its reviews. A target's status follows from the rows:
+
+- open: nothing below applies;
+- claimed: a proof or counterexample row is posted and not yet reviewed;
+- solved / refuted: an accepted proof / counterexample row with at least one review that
+  holds, by someone other than its authors;
+- Lean-checked is shown beside solved: an accepted formalization row of one of the target's
+  Lean declarations, with a holding review.
+
+    python3 -m proven.mathematics check                 # validate both files
+    python3 -m proven.mathematics board                 # writes results/mathematics.json
+    python3 -m proven.mathematics record --target T1 --kind idea --title "..." --who NAME \\
+        [--agent --runs NAME] [--issue N] [--url URL] [--builds-on DKT26,M-0002]
+    python3 -m proven.mathematics review M-0003 --by NAME --verdict holds|fails|partial --url URL
+    python3 -m proven.mathematics accept M-0003         # or: refute / withdraw
+    python3 -m proven.mathematics from-issue ISSUE.json # a draft row from a Mathematics form
+
+Standard library only; no network (from-issue reads `gh issue view N --json number,title,body,url,author`).
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import re
+import sys
+from datetime import datetime, timezone
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+TARGETS = ROOT / "mathematics" / "targets.json"
+RECORDS = ROOT / "mathematics" / "records.jsonl"
+OUT = ROOT / "results" / "mathematics.json"
+
+KINDS = ("idea", "lemma", "counterexample", "proof-sketch", "proof", "formalization", "review", "source")
+STATUSES = ("posted", "accepted", "refuted", "withdrawn")
+VERDICTS = ("holds", "fails", "partial")
+RECORD_ID = re.compile(r"^M-\d{4}$")
+ISSUE_REF = re.compile(r"^#\d+$")
+FORM_KINDS = {"Idea": "idea", "Lemma": "lemma", "Counterexample": "counterexample",
+              "Proof sketch": "proof-sketch", "Proof": "proof", "Formalization (Lean)": "formalization",
+              "Review": "review", "Source (a paper or result worth knowing)": "source"}
+NO_RESPONSE = "_No response_"
+
+
+class RecordError(ValueError):
+    pass
+
+
+def load_targets(path: Path = TARGETS) -> dict:
+    return json.loads(path.read_text())
+
+
+def load_records(path: Path = RECORDS) -> list[dict]:
+    if not path.exists():
+        return []
+    return [json.loads(line) for line in path.read_text().splitlines() if line.strip()]
+
+
+def authors(row: dict) -> set[str]:
+    return {who["name"].lower() for who in row.get("who", [])}
+
+
+def holding_review(row: dict) -> bool:
+    """At least one review that holds, by someone who is not an author of the row."""
+    mine = authors(row)
+    return any(r.get("verdict") == "holds" and r.get("by", "").lower() not in mine
+               for r in row.get("reviews", []))
+
+
+def validate(targets: dict, records: list[dict]) -> None:
+    ids = [t["id"] for t in targets["targets"]]
+    if len(set(ids)) != len(ids):
+        raise RecordError("target ids must be unique")
+    known_targets = set(ids) | {"other"}
+    lean_names = {name for t in targets["targets"] for name in t["lean"]}
+    sources = set(targets["sources"])
+    for target in targets["targets"]:
+        for source in target["baseline"]["sources"]:
+            if source not in sources:
+                raise RecordError(f"{target['id']}: unknown baseline source {source}")
+    seen: set[str] = set()
+    for row in records:
+        rid = row.get("id", "")
+        if not RECORD_ID.match(rid) or rid in seen:
+            raise RecordError(f"record id {rid!r} must look like M-0001 and be unique")
+        if row.get("target") not in known_targets:
+            raise RecordError(f"{rid}: unknown target {row.get('target')!r}")
+        if row.get("kind") not in KINDS:
+            raise RecordError(f"{rid}: kind must be one of {', '.join(KINDS)}")
+        if row.get("status") not in STATUSES:
+            raise RecordError(f"{rid}: status must be one of {', '.join(STATUSES)}")
+        if not row.get("title") or not row.get("who"):
+            raise RecordError(f"{rid}: a title and at least one contributor are required")
+        for who in row["who"]:
+            if not who.get("name"):
+                raise RecordError(f"{rid}: every contributor needs a name")
+            if who.get("agent") and not who.get("runs"):
+                raise RecordError(f"{rid}: an agent says who runs it")
+        for ref in row.get("builds_on", []):
+            if not (ref in sources or ref in seen or ISSUE_REF.match(ref)):
+                raise RecordError(f"{rid}: builds_on {ref!r} is not a source, an earlier record or an issue")
+        for review in row.get("reviews", []):
+            if review.get("verdict") not in VERDICTS or not review.get("by"):
+                raise RecordError(f"{rid}: a review needs a reviewer and a verdict in {', '.join(VERDICTS)}")
+        if row["kind"] == "formalization" and row.get("lean") and row["lean"] not in lean_names:
+            raise RecordError(f"{rid}: {row['lean']} is not a pinned Lean declaration")
+        if row["status"] == "accepted" and row["kind"] in ("proof", "counterexample", "formalization") \
+                and not holding_review(row):
+            raise RecordError(f"{rid}: an accepted {row['kind']} needs a holding review by a non-author")
+        seen.add(rid)
+
+
+def target_status(target: dict, records: list[dict]) -> dict:
+    mine = [r for r in records if r["target"] == target["id"] and r["status"] != "withdrawn"]
+    solved = [r for r in mine if r["kind"] == "proof" and r["status"] == "accepted" and holding_review(r)]
+    refuted = [r for r in mine if r["kind"] == "counterexample" and r["status"] == "accepted" and holding_review(r)]
+    lean = [r for r in mine if r["kind"] == "formalization" and r["status"] == "accepted"
+            and r.get("lean") in target["lean"] and holding_review(r)]
+    pending = [r for r in mine if r["kind"] in ("proof", "counterexample") and r["status"] == "posted"]
+    if solved:
+        status, by = "solved", solved[0]["id"]
+    elif refuted:
+        status, by = "refuted", refuted[0]["id"]
+    elif pending:
+        status, by = "claimed", pending[0]["id"]
+    else:
+        status, by = "open", None
+    return {"status": status, "by": by, "lean_checked": bool(lean) and status == "solved",
+            "contributions": len(mine)}
+
+
+def summary(targets: dict, records: list[dict], now: str | None = None) -> dict:
+    validate(targets, records)
+    people: dict[str, dict] = {}
+    for row in records:
+        if row["status"] == "withdrawn":
+            continue
+        for who in row["who"]:
+            entry = people.setdefault(who["name"], {"name": who["name"], "agent": bool(who.get("agent")),
+                                                    "runs": who.get("runs"), "contributions": 0, "kinds": []})
+            entry["contributions"] += 1
+            if row["kind"] not in entry["kinds"]:
+                entry["kinds"].append(row["kind"])
+        for review in row.get("reviews", []):
+            entry = people.setdefault(review["by"], {"name": review["by"], "agent": False, "runs": None,
+                                                      "contributions": 0, "kinds": []})
+            entry["contributions"] += 1
+            if "review" not in entry["kinds"]:
+                entry["kinds"].append("review")
+    public = [{key: row.get(key) for key in ("id", "target", "kind", "title", "status", "date", "url", "issue", "builds_on")}
+              | {"who": [w["name"] for w in row["who"]], "reviewed": holding_review(row)}
+              for row in records if row["status"] != "withdrawn"]
+    return {
+        "schema": "proven-mathematics/0",
+        "generated": now or datetime.now(timezone.utc).isoformat(timespec="seconds"),
+        "lean": targets["lean"],
+        "targets": [{"id": t["id"], "title": t["title"], "level": t["level"], "lean": t["lean"],
+                     **target_status(t, records)} for t in targets["targets"]],
+        "contributions": sorted(public, key=lambda r: (r.get("date") or "", r["id"]), reverse=True),
+        "people": sorted(people.values(), key=lambda p: (-p["contributions"], p["name"].lower())),
+    }
+
+
+def next_id(records: list[dict]) -> str:
+    numbers = [int(r["id"][2:]) for r in records if RECORD_ID.match(r.get("id", ""))]
+    return f"M-{max(numbers, default=0) + 1:04d}"
+
+
+def append(row: dict, path: Path = RECORDS) -> None:
+    with path.open("a") as handle:
+        handle.write(json.dumps(row, sort_keys=True, ensure_ascii=False) + "\n")
+
+
+def rewrite(records: list[dict], path: Path = RECORDS) -> None:
+    path.write_text("".join(json.dumps(r, sort_keys=True, ensure_ascii=False) + "\n" for r in records))
+
+
+def parse_form(body: str) -> dict[str, str]:
+    """A Mathematics issue form's answers, keyed by the form's headings."""
+    form: dict[str, str] = {}
+    for section in re.split(r"^### ", body or "", flags=re.MULTILINE)[1:]:
+        label, _, value = section.partition("\n")
+        value = value.strip()
+        if value and value != NO_RESPONSE:
+            form[label.strip()] = value
+    return form
+
+
+def draft_from_issue(issue: dict, records: list[dict], today: str) -> dict:
+    """A posted row from `gh issue view N --json number,title,body,url,author`; a maintainer checks it."""
+    form = parse_form(issue.get("body", ""))
+    target = (form.get("Target") or "").split(" ")[0]
+    kind = FORM_KINDS.get(form.get("Kind", ""))
+    if target not in ("T1", "T2", "T3", "Other") or not kind:
+        raise RecordError("the issue is not a Mathematics form with a target and a kind")
+    title = re.sub(r"^proven mathematics:\s*", "", issue.get("title", ""), flags=re.IGNORECASE).strip()
+    refs = sorted(set(re.findall(r"#\d+", form.get("Builds on", ""))))
+    login = (issue.get("author") or {}).get("login", "")
+    return {"id": next_id(records), "target": target if target != "Other" else "other", "kind": kind,
+            "title": title or form.get("Claim", "")[:120], "claim": form.get("Claim", ""),
+            "url": issue.get("url"), "issue": issue.get("number"), "date": today,
+            "who": [{"name": login or "unknown"}], "builds_on": refs, "status": "posted", "reviews": []}
+
+
+def main(argv: list[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("check")
+    sub.add_parser("board")
+    rec = sub.add_parser("record")
+    rec.add_argument("--target", required=True)
+    rec.add_argument("--kind", required=True, choices=KINDS)
+    rec.add_argument("--title", required=True)
+    rec.add_argument("--who", required=True, help="comma-separated names")
+    rec.add_argument("--agent", action="store_true", help="the contributors are agents")
+    rec.add_argument("--runs", help="who runs the agents")
+    rec.add_argument("--issue", type=int)
+    rec.add_argument("--url")
+    rec.add_argument("--lean", help="the pinned declaration a formalization proves")
+    rec.add_argument("--builds-on", default="")
+    rev = sub.add_parser("review")
+    rev.add_argument("record")
+    rev.add_argument("--by", required=True)
+    rev.add_argument("--verdict", required=True, choices=VERDICTS)
+    rev.add_argument("--url")
+    for name in ("accept", "refute", "withdraw"):
+        sub.add_parser(name).add_argument("record")
+    issue = sub.add_parser("from-issue")
+    issue.add_argument("path", type=Path)
+    args = parser.parse_args(argv)
+    targets, records = load_targets(), load_records()
+    today = datetime.now(timezone.utc).date().isoformat()
+    try:
+        if args.command == "check":
+            validate(targets, records)
+            print(f"ok: {len(targets['targets'])} targets, {len(records)} records")
+        elif args.command == "board":
+            OUT.write_text(json.dumps(summary(targets, records), indent=1, ensure_ascii=False) + "\n")
+            print(f"wrote {OUT.relative_to(ROOT)}")
+        elif args.command == "record":
+            row = {"id": next_id(records), "target": args.target, "kind": args.kind, "title": args.title,
+                   "who": [{"name": n.strip(), **({"agent": True, "runs": args.runs} if args.agent else {})}
+                           for n in args.who.split(",") if n.strip()],
+                   "builds_on": [r.strip() for r in args.builds_on.split(",") if r.strip()],
+                   "issue": args.issue, "url": args.url, "date": today, "status": "posted", "reviews": []}
+            if args.lean:
+                row["lean"] = args.lean
+            validate(targets, records + [row])
+            append(row)
+            print(row["id"])
+        elif args.command == "review":
+            row = next((r for r in records if r["id"] == args.record), None)
+            if row is None:
+                raise RecordError(f"no record {args.record}")
+            row.setdefault("reviews", []).append({"by": args.by, "verdict": args.verdict, "url": args.url, "date": today})
+            validate(targets, records)
+            rewrite(records)
+            print(f"{args.record}: review by {args.by} ({args.verdict})")
+        elif args.command in ("accept", "refute", "withdraw"):
+            row = next((r for r in records if r["id"] == args.record), None)
+            if row is None:
+                raise RecordError(f"no record {args.record}")
+            row["status"] = {"accept": "accepted", "refute": "refuted", "withdraw": "withdrawn"}[args.command]
+            validate(targets, records)
+            rewrite(records)
+            print(f"{args.record}: {row['status']}")
+        elif args.command == "from-issue":
+            print(json.dumps(draft_from_issue(json.loads(args.path.read_text()), records, today), indent=1, ensure_ascii=False))
+    except RecordError as error:
+        print(f"refused: {error}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -371,6 +371,33 @@ main:focus { outline: none; }
 }
 @media (min-width: 861px) { .entry .entry-nums { display: contents; } }
 
+/* The record: every contribution, newest first. */
+.record-empty { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; padding: 26px 28px; border: 1px dashed var(--line-2); border-radius: 18px; color: var(--ink-2); }
+.record-empty .cta { background: var(--record); color: var(--record-ink); font-weight: 600; }
+.record-list { margin: 0; padding: 4px; list-style: none; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); }
+.record-row { --tone: var(--accent); display: grid; grid-template-columns: 120px 40px minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; padding: 12px 14px; }
+.record-row + .record-row { border-top: 1px solid var(--line); }
+.record-row.is-lemma, .record-row.is-proof-sketch { --tone: var(--violet); }
+.record-row.is-proof { --tone: var(--record); }
+.record-row.is-counterexample { --tone: var(--coral); }
+.record-row.is-formalization { --tone: var(--platform); }
+.record-row.is-review { --tone: var(--ink-2); }
+.record-row.is-source { --tone: var(--amber); }
+.record-kind { justify-self: start; padding: 2px 9px; border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent); border-radius: 999px; color: var(--tone); font-size: 12px; font-weight: 600; white-space: nowrap; }
+.record-target { color: var(--ink-2); font-size: 13px; font-weight: 600; }
+.record-title { display: grid; gap: 2px; min-width: 0; color: var(--ink); font-size: 14.5px; }
+.record-title a { color: inherit; text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 2px; }
+.record-title small { color: var(--muted); font-size: 12.5px; }
+.record-people { margin-top: 14px; color: var(--muted); font-size: 13.5px; }
+.verdict.is-accepted { border-color: var(--record); background: color-mix(in srgb, var(--record) 12%, transparent); color: var(--record); }
+.verdict.is-reviewed { border-color: color-mix(in srgb, var(--record) 55%, transparent); color: var(--record); }
+.verdict.is-refuted { border-color: color-mix(in srgb, var(--coral) 55%, transparent); color: var(--coral); }
+.chip.is-claimed { border-color: color-mix(in srgb, var(--amber) 60%, transparent); color: var(--amber); }
+.chip.is-solved { border-color: var(--record); background: color-mix(in srgb, var(--record) 14%, transparent); color: var(--record); }
+.chip.is-refuted { border-color: color-mix(in srgb, var(--coral) 60%, transparent); color: var(--coral); }
+.chip.is-lean { border-color: color-mix(in srgb, var(--platform) 60%, transparent); color: var(--platform); }
+@media (max-width: 640px) { .record-row { grid-template-columns: auto auto minmax(0, 1fr); } .record-row .verdict { grid-column: 1 / -1; justify-self: start; } }
+
 /* Reveal on scroll. */
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform 1s var(--spring-soft); }
 .reveal.is-in { opacity: 1; transform: none; }

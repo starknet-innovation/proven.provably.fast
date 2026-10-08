@@ -1,0 +1,122 @@
+{
+ "schema": "proven-mathematics-targets/0",
+ "lean": {
+  "file": "lean/ProvenTargets.lean",
+  "library": "https://github.com/Verified-zkEVM/ArkLib",
+  "commit": "35ddcaa83f683011f944f58904be779495a5709a"
+ },
+ "targets": [
+  {
+   "id": "T1",
+   "title": "Improve the length dependence",
+   "level": "first objective",
+   "statement": "For 0 < rho < 1 and agreement a above the first-order threshold a1(rho): at most C(rho, a) n bad challenges on every line, C explicit, for every Reed-Solomon code of rate rho on any prescribed evaluation set over a field of characteristic 0 or above a stated bound, by any method.",
+   "lean": [
+    "ProvenTargets.T1",
+    "ProvenTargets.T1Uniform"
+   ],
+   "baseline": {
+    "bound": "O(n^2 / eta^4) at slack eta above the first-order curve; 1,325,775 n^2 at agreement rho + 0.24",
+    "sources": [
+     "DKT26"
+    ],
+    "lean": [
+     "ReedSolomon.automaticFirstOrder_rate_bounds",
+     "ReedSolomon.exists_uniformFirstOrder_lineMca"
+    ]
+   }
+  },
+  {
+   "id": "T2",
+   "title": "Push the agreement threshold",
+   "level": "next step",
+   "statement": "An explicit threshold curve strictly between capacity and a1(rho) at every rate, with a count at most quadratic in n.",
+   "lean": [
+    "ProvenTargets.T2"
+   ],
+   "baseline": {
+    "bound": "cubic in n with two hidden derivatives, in the range those theorems cover",
+    "sources": [
+     "DKT26"
+    ],
+    "lean": []
+   }
+  },
+  {
+   "id": "T3",
+   "title": "Approach capacity",
+   "level": "larger ambition",
+   "statement": "At every fixed gap delta > 0 above capacity, on smooth domains (cosets of the subgroup of order 2^m): at most C_delta n^c bad challenges, with c independent of delta; c = 1 is the full ambition.",
+   "lean": [
+    "ProvenTargets.T3"
+   ],
+   "baseline": {
+    "bound": "C_delta n^(d + 1) on any domain, d = ceil(exp(1.5 / delta)) for delta < 0.24",
+    "sources": [
+     "DKT26",
+     "JER26"
+    ],
+    "lean": [
+     "ReedSolomon.exists_capacity_lineAgreement"
+    ]
+   }
+  }
+ ],
+ "sources": {
+  "BCIKS20": {
+   "title": "Proximity gaps for Reed-Solomon codes",
+   "authors": "Ben-Sasson, Carmon, Ishai, Kopparty and Saraf",
+   "url": "https://eprint.iacr.org/2020/654"
+  },
+  "BETTERCODES": {
+   "title": "better.codes, the Proximity Prize autoresearch project",
+   "authors": "better.codes contributors",
+   "url": "https://better.codes/"
+  },
+  "BCPZZ26": {
+   "title": "Algorithmic list decoding of Reed-Solomon codes up to capacity",
+   "authors": "Brakensiek, Chen, Putterman, Zhang and Zheng",
+   "url": "https://eccc.weizmann.ac.il/report/2026/164/"
+  },
+  "JER26": {
+   "title": "Algorithmic list decoding at capacity and optimal proximity gaps for Reed-Solomon codes",
+   "authors": "Jeronimo",
+   "url": "https://eccc.weizmann.ac.il/report/2026/169/"
+  },
+  "DKT26": {
+   "title": "Reed-Solomon codes beyond Johnson: efficient decoding and smaller cryptographic proofs",
+   "authors": "Dao, Kominers and Thaler",
+   "url": "https://eprint.iacr.org/2026/2056"
+  },
+  "GAB26": {
+   "title": "Linear list size bounds for Reed-Solomon beyond the Johnson radius",
+   "authors": "Gabizon",
+   "url": "https://eprint.iacr.org/2026/2048"
+  },
+  "JO26": {
+   "title": "Reed-Solomon mutual correlated agreement beyond the Johnson radius",
+   "authors": "Jo",
+   "url": "https://eprint.iacr.org/2026/1432"
+  },
+  "ABF26": {
+   "title": "Open problems in list decoding and correlated agreement",
+   "authors": "Arnon, Boneh and Fenzi",
+   "url": "https://eprint.iacr.org/2026/680"
+  },
+  "GG25": {
+   "title": "Optimal proximity gaps for subspace-design codes and (random) Reed-Solomon codes",
+   "authors": "Goyal and Guruswami",
+   "url": "https://eprint.iacr.org/2025/2054"
+  },
+  "KKH26": {
+   "title": "Failure of proximity gaps close to capacity",
+   "authors": "Krachun, Kazanin and Haböck",
+   "url": "https://eprint.iacr.org/2026/782"
+  },
+  "ARKLIB": {
+   "title": "ArkLib: formally verified arguments of knowledge in Lean",
+   "authors": "ArkLib contributors",
+   "url": "https://github.com/Verified-zkEVM/ArkLib"
+  }
+ }
+}
