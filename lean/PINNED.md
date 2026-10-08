@@ -27,15 +27,20 @@ for every received line f + z g, one exceptional set of at most B challenges, ou
 every polynomial of degree below k agreeing with the line in at least A places splits as
 P0 + z P1 with the same agreement set for f and g.
 
-Build and check:
+Build and check (`lake-manifest.json` pins every dependency):
 
     cd lean
     lake exe cache get    # Mathlib's prebuilt files
     lake build
 
-To check a proof, add `#print axioms` for your theorem. Status checked 2026-10-08: the file
-compiles with no warnings, both baselines depend only on the three standard axioms, and the
-targets are open.
+To check a proof, import `ProvenTargets` in a file of your own and run `#print axioms` on your
+theorem with `lake env lean YourFile.lean`; the answer must list only `propext`,
+`Classical.choice` and `Quot.sound`. Status checked 2026-10-08 from a fresh clone (lake update,
+cache, build: about nine minutes on a laptop): `ProvenTargets` builds with no warnings, both
+baselines depend only on the three standard axioms, and the targets are open. ArkLib's own build
+prints two `sorry` warnings, in `ArkLib/Data/Fin/Basic.lean` and
+`ArkLib/Data/MvPolynomial/Interpolation.lean`; neither is used by these statements or baselines,
+which `#print axioms` confirms.
 
 ## Applicability pins (the Stwo profile)
 

@@ -61,13 +61,23 @@ Johnson threshold sqrt(rho); above it a linear bound is already known.
   `ReedSolomon.exists_uniformFirstOrder_lineMca` (proven: 1,325,775 n^2 at agreement k + 6n/25,
   characteristic 0 or above k - 1) with C n in place of 1,325,775 n^2. A result names a numeral C.
 - Finite form at the Stwo profile below: a = 0.49, E <= 2^41.5.
+- Thread: [#9](https://github.com/starknet-innovation/proven.provably.fast/issues/9).
+
+Where the n^2 comes from in DKT's proof (Sections 2.2.2 to 2.2.4, Lemma 5.2): two counts each
+reach order n^2. Close candidates off the retained witness lines are bounded through the degree J
+of the joint image of the Taylor map in (challenge, message) space; its formulas have degree O(n)
+and counting a surface takes two linear sections, so J = O(n^2). And the retained witness lines
+number O(n) (a list count over F(Z)), each able to add an accidental agreement at up to n - L
+challenges. Within that strategy a linear bound needs both counts improved; a different strategy
+is just as welcome.
 
 ### T2
 
 **Push the agreement threshold.** An explicit threshold curve strictly between capacity and
 a_1(rho) at every rate, with E_C(a) bounded by a polynomial of degree at most 2 in n. With two
 hidden derivatives the known bound is cubic (DKT Theorems 6.3 and 6.6), in the agreement range
-those theorems cover. Lean: `ProvenTargets.T2 a2 C B`.
+those theorems cover. Lean: `ProvenTargets.T2 a2 C B`. Thread:
+[#10](https://github.com/starknet-innovation/proven.provably.fast/issues/10).
 
 ### T3
 
@@ -78,7 +88,8 @@ results for folded and subspace-design codes. KKH26 (eprint 2026/782) rules it o
 delta shrinks like 1 / log n; at fixed delta the known general bound has exponent
 ceil(exp(1.5 / delta)) + 1 for delta < 0.24 (DKT Theorem 1.2, proven in Lean in ArkLib as
 `ReedSolomon.exists_capacity_lineAgreement`). Lean: `ProvenTargets.T3 c`; circle domains, through
-their Reed-Solomon description, are pinned later.
+their Reed-Solomon description, are pinned later. Thread:
+[#11](https://github.com/starknet-innovation/proven.provably.fast/issues/11).
 
 ### What counts
 

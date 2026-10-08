@@ -218,6 +218,7 @@ main:focus { outline: none; }
 .target-body { display: grid; gap: 3px; }
 .target-body b { color: var(--ink); font-weight: 600; font-size: 15px; }
 .target-body span { color: var(--muted); font-size: 13.5px; line-height: 1.5; text-wrap: pretty; }
+.target-body small { margin-top: 4px; color: var(--tone); font-size: 12.5px; font-weight: 500; }
 .chip { padding: 2px 9px; border: 1px solid var(--line-2); border-radius: 999px; color: var(--ink-2); font-size: 12px; white-space: nowrap; }
 
 /* Chapters */
