@@ -1,5 +1,5 @@
-name: Derivation, review, forgery or proof
-description: A soundness derivation, a review of a term or a verifier, a forged proof, a Lean proof, or a lead worth trying.
+name: Performance track: derivation, review or forgery
+description: For the prover track. A soundness-sheet derivation, a review of a term or a verifier, a forged proof, or a lead worth trying.
 title: "proven <kind>: <what it concerns>"
 body:
   - type: dropdown

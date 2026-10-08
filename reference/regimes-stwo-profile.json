@@ -1,0 +1,300 @@
+{
+ "profile": {
+  "p": 2147483647,
+  "log2_F": 124.0,
+  "n": 8388608,
+  "k": 2097152,
+  "rate": 0.25,
+  "M": 363,
+  "fold_layers": [
+   8388608,
+   524288,
+   32768,
+   2048,
+   128,
+   8
+  ],
+  "pow_query": 26,
+  "pow_cap_per_round": 26,
+  "floor": 96
+ },
+ "thresholds": {
+  "rate 1/2": {
+   "UD": 0.75,
+   "Johnson": 0.7071,
+   "first_order_a1": 0.6899,
+   "gabizon_alpha": 0.6995,
+   "capacity": 0.5,
+   "bits_per_query": {
+    "UD": 0.415,
+    "Johnson": 0.5,
+    "first order": 0.536,
+    "capacity": 1.0
+   }
+  },
+  "rate 1/4": {
+   "UD": 0.625,
+   "Johnson": 0.5,
+   "first_order_a1": 0.4688,
+   "gabizon_alpha": 0.4844,
+   "capacity": 0.25,
+   "bits_per_query": {
+    "UD": 0.678,
+    "Johnson": 1.0,
+    "first order": 1.093,
+    "capacity": 2.0
+   }
+  },
+  "rate 1/8": {
+   "UD": 0.5625,
+   "Johnson": 0.3536,
+   "first_order_a1": 0.3191,
+   "gabizon_alpha": 0.3351,
+   "capacity": 0.125,
+   "bits_per_query": {
+    "UD": 0.83,
+    "Johnson": 1.5,
+    "first order": 1.648,
+    "capacity": 3.0
+   }
+  },
+  "rate 1/16": {
+   "UD": 0.5312,
+   "Johnson": 0.25,
+   "first_order_a1": 0.2181,
+   "gabizon_alpha": 0.2324,
+   "capacity": 0.0625,
+   "bits_per_query": {
+    "UD": 0.913,
+    "Johnson": 2.0,
+    "first order": 2.197,
+    "capacity": 4.0
+   }
+  }
+ },
+ "ledgers": [
+  {
+   "regime": "unique decoding, today's frontier shape",
+   "agreement": 0.625,
+   "bits_per_query": 0.678,
+   "note": "BCIKS20 Theorem 4.1 / whitepaper Remark 20: line count |D|, list 1 (grind as computed, frontier uses 8 at batching)",
+   "grind_bits": {
+    "C-BATCHING": 8,
+    "C-FRI-FOLD-0": 3
+   },
+   "rounds_log2": {
+    "C-BATCHING": -100.5,
+    "C-FRI-FOLD-0": -100.1,
+    "C-FRI-FOLD-1": -101.1,
+    "C-FRI-FOLD-2": -105.1,
+    "C-FRI-FOLD-3": -109.1,
+    "C-FRI-FOLD-4": -113.1,
+    "C-FRI-FOLD-5": -117.1,
+    "C-OOD": -102.0
+   },
+   "queries": 104,
+   "claimed_bits": 96.24,
+   "meets_floor": true
+  },
+  {
+   "regime": "Johnson, whitepaper Theorem 19 constants",
+   "agreement": 0.52,
+   "bits_per_query": 0.943,
+   "note": "eta = 0.020, m = 13, l_GS = 27, list (53) = 13",
+   "grind_bits": {
+    "C-BATCHING": 26,
+    "C-FRI-FOLD-0": 25,
+    "C-FRI-FOLD-1": 21,
+    "C-FRI-FOLD-2": 17,
+    "C-FRI-FOLD-3": 13,
+    "C-FRI-FOLD-4": 9,
+    "C-FRI-FOLD-5": 5,
+    "C-OOD": 2
+   },
+   "rounds_log2": {
+    "C-BATCHING": -97.3,
+    "C-FRI-FOLD-0": -100.9,
+    "C-FRI-FOLD-1": -100.9,
+    "C-FRI-FOLD-2": -100.9,
+    "C-FRI-FOLD-3": -100.9,
+    "C-FRI-FOLD-4": -100.9,
+    "C-FRI-FOLD-5": -100.9,
+    "C-OOD": -100.3
+   },
+   "queries": 76,
+   "claimed_bits": 96.05,
+   "meets_floor": true
+  },
+  {
+   "regime": "Johnson, DKT Theorem 5.12 constants",
+   "agreement": 0.504,
+   "bits_per_query": 0.989,
+   "note": "eta0 = 0.004, m = 63, list (53) = 63",
+   "grind_bits": {
+    "C-BATCHING": 26,
+    "C-FRI-FOLD-0": 25,
+    "C-FRI-FOLD-1": 21,
+    "C-FRI-FOLD-2": 17,
+    "C-FRI-FOLD-3": 13,
+    "C-FRI-FOLD-4": 9,
+    "C-FRI-FOLD-5": 5,
+    "C-OOD": 4
+   },
+   "rounds_log2": {
+    "C-BATCHING": -97.1,
+    "C-FRI-FOLD-0": -100.7,
+    "C-FRI-FOLD-1": -100.7,
+    "C-FRI-FOLD-2": -100.7,
+    "C-FRI-FOLD-3": -100.7,
+    "C-FRI-FOLD-4": -100.7,
+    "C-FRI-FOLD-5": -100.7,
+    "C-OOD": -100.0
+   },
+   "queries": 73,
+   "claimed_bits": 96.04,
+   "meets_floor": true
+  },
+  {
+   "regime": "first order, DKT Theorem 5.13 as stated (n^2)",
+   "agreement": 0.49,
+   "bits_per_query": 1.029,
+   "note": "E <= 1,325,775 n^2 per line, list <= 307 n; p > k - 1 holds (2^31 - 1 > 2^21)",
+   "grind_bits": {
+    "C-BATCHING": 26,
+    "C-FRI-FOLD-0": 26,
+    "C-FRI-FOLD-1": 26,
+    "C-FRI-FOLD-2": 26,
+    "C-FRI-FOLD-3": 23,
+    "C-FRI-FOLD-4": 15,
+    "C-FRI-FOLD-5": 7,
+    "C-OOD": 26
+   },
+   "rounds_log2": {
+    "C-BATCHING": -75.2,
+    "C-FRI-FOLD-0": -79.8,
+    "C-FRI-FOLD-1": -87.8,
+    "C-FRI-FOLD-2": -95.8,
+    "C-FRI-FOLD-3": -100.8,
+    "C-FRI-FOLD-4": -100.8,
+    "C-FRI-FOLD-5": -100.8,
+    "C-OOD": -96.7
+   },
+   "queries": null,
+   "claimed_bits": 75.1,
+   "meets_floor": false,
+   "blocking": [
+    "C-BATCHING",
+    "C-FRI-FOLD-0",
+    "C-FRI-FOLD-1",
+    "C-FRI-FOLD-2",
+    "C-OOD"
+   ]
+  },
+  {
+   "regime": "first order, if the line count were 1,325,775 n",
+   "agreement": 0.49,
+   "bits_per_query": 1.029,
+   "note": "the flagship's shape with DKT's constant; list still 307 n",
+   "grind_bits": {
+    "C-BATCHING": 26,
+    "C-FRI-FOLD-0": 24,
+    "C-FRI-FOLD-1": 20,
+    "C-FRI-FOLD-2": 16,
+    "C-FRI-FOLD-3": 12,
+    "C-FRI-FOLD-4": 8,
+    "C-FRI-FOLD-5": 4,
+    "C-OOD": 26
+   },
+   "rounds_log2": {
+    "C-BATCHING": -98.2,
+    "C-FRI-FOLD-0": -100.8,
+    "C-FRI-FOLD-1": -100.8,
+    "C-FRI-FOLD-2": -100.8,
+    "C-FRI-FOLD-3": -100.8,
+    "C-FRI-FOLD-4": -100.8,
+    "C-FRI-FOLD-5": -100.8,
+    "C-OOD": -96.7
+   },
+   "queries": null,
+   "claimed_bits": 95.9,
+   "meets_floor": false,
+   "blocking": [
+    "C-BATCHING",
+    "C-OOD"
+   ]
+  },
+  {
+   "regime": "first order, line count 2^21 n and list 2^8 n",
+   "agreement": 0.49,
+   "bits_per_query": 1.029,
+   "note": "what fits: constants a proof must reach at this profile",
+   "grind_bits": {
+    "C-BATCHING": 26,
+    "C-FRI-FOLD-0": 24,
+    "C-FRI-FOLD-1": 20,
+    "C-FRI-FOLD-2": 16,
+    "C-FRI-FOLD-3": 12,
+    "C-FRI-FOLD-4": 8,
+    "C-FRI-FOLD-5": 4,
+    "C-OOD": 26
+   },
+   "rounds_log2": {
+    "C-BATCHING": -97.5,
+    "C-FRI-FOLD-0": -100.1,
+    "C-FRI-FOLD-1": -100.1,
+    "C-FRI-FOLD-2": -100.1,
+    "C-FRI-FOLD-3": -100.1,
+    "C-FRI-FOLD-4": -100.1,
+    "C-FRI-FOLD-5": -100.1,
+    "C-OOD": -97.0
+   },
+   "queries": null,
+   "claimed_bits": 95.7,
+   "meets_floor": false,
+   "blocking": [
+    "C-BATCHING",
+    "C-OOD"
+   ]
+  },
+  {
+   "regime": "conjectured capacity, today's settings",
+   "agreement": 0.25,
+   "bits_per_query": 2.0,
+   "note": "2 bits per query if the conjecture holds; algebraic terms as the UD sheet",
+   "grind_bits": {},
+   "rounds_log2": {},
+   "queries": 36,
+   "claimed_bits": 98.0,
+   "meets_floor": true
+  }
+ ],
+ "frontier_under_budget": {
+  "per_line_budget_log2": 41.5,
+  "DKT 5.12": {
+   "a_star": 0.5079,
+   "queries_for_70_bits": 72,
+   "line_count_log2": 41.5
+  },
+  "whitepaper Thm 19": {
+   "a_star": 0.5313,
+   "queries_for_70_bits": 77,
+   "line_count_log2": 40.9
+  }
+ },
+ "needed_at_profile": {
+  "per_line_count_log2_max_with_26_bit_batching_grind": 41.5,
+  "linear_constant_log2_max": 18.5,
+  "list_size_log2_max_with_26_bit_ood_grind": 28.0,
+  "known_first_order_line_count_log2": 66.3,
+  "abf_lemma_4_16_floor_log2": 22.0,
+  "queries_for_70_bits": {
+   "a=0.6250": 104,
+   "a=0.5000": 70,
+   "a=0.4900": 69,
+   "a=0.4850": 68,
+   "a=0.4750": 66,
+   "a=0.4688": 65,
+   "a=0.2500": 35
+  }
+ }
+}
