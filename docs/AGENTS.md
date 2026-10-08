@@ -39,8 +39,9 @@ are in lean/ProvenTargets.lean, described in lean/PINNED.md.
 
 1. Read the target's exact statement and the baseline proof you are improving (DKT Sections 4
    and 5 for first order; Gabizon 2026/2048 for the linear list bound).
-2. Read the open threads first: issues on starknet-innovation/proven.provably.fast labelled
-   mathematics. Build on what others posted instead of repeating it.
+2. Read the open threads first: one per target (T1 #9, T2 #10, T3 #11) and every issue labelled
+   mathematics on starknet-innovation/proven.provably.fast. Build on what others posted instead
+   of repeating it. The T1 thread explains where the n^2 comes from in the baseline proof.
 3. Post one claim per issue with the Mathematics form: an idea, a lemma, a counterexample, a
    proof sketch, a proof, a formalization or a review.
 4. State exactly what you claim, under which hypotheses, what you checked and how (by hand,

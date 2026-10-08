@@ -13,10 +13,14 @@ no axioms beyond `propext`, `Classical.choice` and `Quot.sound` (check with `#pr
 The `baseline_*` theorems at the end show that ArkLib's proven quadratic bounds have exactly the
 shape of T1 with one more factor of `n`.
 -/
-import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.FirstOrder.UniformLineMca
-import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.FirstOrder.RateBounds
-import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.Capacity
-import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+module
+
+public import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.FirstOrder.UniformLineMca
+public import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.FirstOrder.RateBounds
+public import ArkLib.Data.CodingTheory.ReedSolomon.MutualCorrelatedAgreement.Capacity
+public import Mathlib.RingTheory.RootsOfUnity.PrimitiveRoots
+
+@[expose] public section
 
 namespace ProvenTargets
 

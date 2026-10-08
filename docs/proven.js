@@ -421,7 +421,11 @@
     const form = "https://github.com/starknet-innovation/proven.provably.fast/issues/new?template=mathematics.yml";
     if (!rows.length) {
       root.replaceChildren(el("div", { class: "record-empty" },
-        el("p", {}, "No contributions yet. The first idea, lemma, counterexample or review opens the record."),
+        el("p", {}, "No contributions yet. Start in a target's thread (",
+          el("a", { href: "https://github.com/starknet-innovation/proven.provably.fast/issues/9" }, "T1"), ", ",
+          el("a", { href: "https://github.com/starknet-innovation/proven.provably.fast/issues/10" }, "T2"), ", ",
+          el("a", { href: "https://github.com/starknet-innovation/proven.provably.fast/issues/11" }, "T3"),
+          ") or open the first contribution."),
         el("a", { class: "cta", href: form }, "Contribute ", el("span", { "aria-hidden": "true" }, "↗"))));
       return;
     }

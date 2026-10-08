@@ -15,9 +15,9 @@ Lemma 4.16). The first objective is a linear bound, with explicit constants and 
 
 | | Target | Lean statement |
 |---|---|---|
-| T1 | A linear count in the first-order agreement regime, by any method. The first objective. | `ProvenTargets.T1`, `ProvenTargets.T1Uniform` |
-| T2 | Below the first-order threshold, with a count at most quadratic. | `ProvenTargets.T2` |
-| T3 | Linear at a fixed gap above capacity, on smooth domains. The larger ambition. | `ProvenTargets.T3` |
+| T1 | A linear count in the first-order agreement regime, by any method. The first objective. Thread [#9](https://github.com/starknet-innovation/proven.provably.fast/issues/9). | `ProvenTargets.T1`, `ProvenTargets.T1Uniform` |
+| T2 | Below the first-order threshold, with a count at most quadratic. Thread [#10](https://github.com/starknet-innovation/proven.provably.fast/issues/10). | `ProvenTargets.T2` |
+| T3 | Linear at a fixed gap above capacity, on smooth domains. The larger ambition. Thread [#11](https://github.com/starknet-innovation/proven.provably.fast/issues/11). | `ProvenTargets.T3` |
 
 Exact statements, the table of known results and the hypotheses: [MATHEMATICS.md](MATHEMATICS.md).
 The Lean statements compile against a pinned ArkLib commit: [lean/PINNED.md](lean/PINNED.md).
