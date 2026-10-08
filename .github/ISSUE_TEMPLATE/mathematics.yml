@@ -1,6 +1,6 @@
 name: Mathematics
 description: An idea, lemma, counterexample, proof sketch, proof, formalization or review for a target.
-title: "proven mathematics: <target> <kind>: <one line>"
+title: "<target> <kind>: <one line>"
 labels: ["mathematics"]
 body:
   - type: dropdown

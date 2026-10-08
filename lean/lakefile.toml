@@ -1,5 +1,5 @@
-name = "proven-targets"
-defaultTargets = ["ProvenTargets"]
+name = "mca-challenge"
+defaultTargets = ["MCAChallenge"]
 
 # The pinned ArkLib commit. Its own manifest pins Mathlib and every other dependency.
 [[require]]
@@ -8,4 +8,4 @@ git = "https://github.com/Verified-zkEVM/ArkLib"
 rev = "35ddcaa83f683011f944f58904be779495a5709a"
 
 [[lean_lib]]
-name = "ProvenTargets"
+name = "MCAChallenge"
