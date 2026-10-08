@@ -90,7 +90,7 @@
     if (!root) return;
     let drawn = 0;
     const draw = () => {
-      const width = Math.round(Math.min(1000, Math.max(560, root.clientWidth || 1000)));
+      const width = Math.round(Math.min(1000, Math.max(300, root.clientWidth || 1000)));
       if (Math.abs(width - drawn) < 40) return;
       drawn = width;
       buildRegime(root, width);
@@ -100,10 +100,10 @@
   }
   function buildRegime(root, W) {
     const read = $("regime-read");
-    const narrow = W < 720;
+    const narrow = W < 720, tiny = W < 480;
     const H = narrow ? Math.round(W * 0.8) : 430, L = 54, R = 18, T = 14, B = 46;
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
-    const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", style: `min-width: ${Math.min(W, 560)}px` });
+    const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", });
     const desc = svgEl("desc", { id: "regime-desc" });
     desc.textContent = "Agreement thresholds by code rate. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known bounds have large exponents.";
     const defs = svgEl("defs");
@@ -150,14 +150,17 @@
       g.append(svgEl("rect", { class: "rg-pill-bg", x: -w / 2, y: -11, width: w, height: 22, rx: 11 }), t);
       notes.append(g);
     };
-    if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.075, "unique decoding", "start");
-    else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.05, "unique decoding (1 + ρ) / 2", "end");
-    pill("is-johnson", 0.27, Math.sqrt(0.3) + 0.035, narrow ? "Johnson" : "Johnson √ρ", "start");
-    pill("is-first", 0.55, a1(0.55) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
-    pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "capacity" : "capacity ρ");
+    // On a phone the readout below names the curves in their colours; the plot keeps T1 to T3.
+    if (!tiny) {
+      if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.075, "unique decoding", "start");
+      else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.05, "unique decoding (1 + ρ) / 2", "end");
+      pill("is-johnson", 0.27, Math.sqrt(0.3) + 0.035, narrow ? "Johnson" : "Johnson √ρ", "start");
+      pill("is-first", 0.55, a1(0.55) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
+      pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "capacity" : "capacity ρ");
+    }
     pill("is-t1", 0.16, (Math.sqrt(0.16) + a1(0.16)) / 2, "T1");
-    pill("is-t2", 0.7, a1(0.7) - 0.07, "T2");
-    pill("is-t3", 0.78, 0.78 + 0.04, "T3");
+    pill("is-t2", tiny ? 0.6 : 0.7, a1(tiny ? 0.6 : 0.7) - 0.07, "T2");
+    pill("is-t3", tiny ? 0.86 : 0.78, (tiny ? 0.86 : 0.78) + 0.04, "T3");
     svg.append(notes);
     // Crosshair: the four thresholds at one rate.
     const cross = svgEl("g", { class: "rg-fade", style: "--d: 1.5s" });
@@ -297,9 +300,13 @@
     const root = $("loop");
     if (!root) return;
     const { svg, spine } = buildLoop();
-    const list = el("ol", { class: "sr-only", id: "loop-desc" });
-    for (const node of LOOP_NODES) if (node.title) list.append(el("li", {}, `${node.title}: ${node.text}. Credit: ${node.role}.`));
-    list.append(el("li", {}, "Review: independent reviewers decide results."));
+    const step = (tone, title, text, role) => el("li", { class: `s-${tone}` }, el("b", {}, title), el("span", {}, text), role ? el("small", {}, role) : null);
+    const list = el("ol", { class: "loop-steps", id: "loop-desc" });
+    for (const node of LOOP_NODES) {
+      if (!node.title) continue;
+      if (node.id === "record") list.append(step("discussion", "Review", "Independent reviewers decide", null));
+      list.append(step(node.tone, node.title, node.text, node.role));
+    }
     root.replaceChildren(svg, list);
     if (still) return;
     root.classList.add("is-armed");
@@ -374,6 +381,8 @@
       const record = await response.json();
       renderTargets(record);
       renderRecord(record);
+      const version = $("foot-version");
+      if (version && record.source) version.textContent = `Built from provably.fast ${record.source} · ArkLib ${record.lean.commit.slice(0, 8)}`;
     } catch {
       const root = $("record-list");
       if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));

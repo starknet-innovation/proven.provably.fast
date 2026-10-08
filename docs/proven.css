@@ -15,7 +15,7 @@
   --bg-2: #0e1013;
   --ink: #f2efe6;
   --ink-2: #bcb9ae;
-  --muted: #807d75;
+  --muted: #9a968c;
   --line: #1e2024;
   --line-2: #2c2f35;
   --record: #3ddc8a;
@@ -33,7 +33,7 @@
   :root:not([data-theme="dark"]) {
     --pf-outline: #4c5dd7;
     --bg: #f3efe4; --bg-2: #ebe5d6;
-    --ink: #15140f; --ink-2: #47443b; --muted: #68645a;
+    --ink: #15140f; --ink-2: #47443b; --muted: #57534a;
     --line: #dcd5c4; --line-2: #c9c0ab;
     --record: #08703c; --record-ink: #f3efe4;
     --accent: #3a49c4; --platform: #0b6b74; --muted-node: #a39d8d;
@@ -43,7 +43,7 @@
 :root[data-theme="light"] {
   --pf-outline: #4c5dd7;
   --bg: #f3efe4; --bg-2: #ebe5d6;
-  --ink: #15140f; --ink-2: #47443b; --muted: #68645a;
+  --ink: #15140f; --ink-2: #47443b; --muted: #57534a;
   --line: #dcd5c4; --line-2: #c9c0ab;
   --record: #08703c; --record-ink: #f3efe4;
   --accent: #3a49c4; --platform: #0b6b74; --muted-node: #a39d8d;
@@ -148,6 +148,11 @@ main:focus { outline: none; }
 .is-in .spark-line.is-dashed { opacity: 1; }
 .is-in .spark-area { opacity: 1; }
 @media (max-width: 760px) { .stat + .stat { border-left: 0; border-top: 1px solid var(--line); } }
+@media (max-width: 640px) {
+  .stat { padding: 16px 18px 14px; gap: 4px; }
+  .stat-num { font-size: 44px; }
+  .spark { display: none; }
+}
 
 /* Where each bound holds: agreement thresholds by rate, the bands between them. */
 .regime { margin: 26px 0 0; padding: 22px 22px 16px; border: 1px solid var(--line); border-radius: 16px; }
@@ -196,6 +201,7 @@ main:focus { outline: none; }
 .regime-read .is-first { color: var(--accent); }
 .regime-read .is-johnson { color: var(--record); }
 .regime-note { margin-top: 4px; color: var(--muted); font-size: 12.5px; }
+.foot-version { color: var(--muted); font-size: 12.5px; font-variant-numeric: tabular-nums; }
 .regime-read .is-capacity { color: var(--amber); }
 .rg-draw { stroke-dasharray: 1; stroke-dashoffset: 1; transition: stroke-dashoffset 1.6s var(--ease) var(--d, 0s); }
 .is-in .rg-draw { stroke-dashoffset: 0; }
@@ -228,6 +234,18 @@ main:focus { outline: none; }
 /* How a theorem gets made: the provably.fast loop graph, drawn when it scrolls in. */
 .loop { margin-top: 4px; overflow-x: auto; }
 .loop-svg { display: block; width: 100%; min-width: 900px; height: auto; overflow: visible; }
+/* The steps as a list: read by screen readers on wide screens, shown instead of the graph on phones. */
+.loop-steps { position: absolute; width: 1px; height: 1px; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+@media (max-width: 720px) {
+  .loop-svg { display: none; }
+  .loop-steps { position: static; width: auto; height: auto; margin: 8px 0 0; overflow: visible; clip-path: none; white-space: normal; list-style: none; padding: 0; display: grid; }
+  .loop-steps li { position: relative; display: grid; gap: 2px; padding: 0 0 18px 28px; }
+  .loop-steps li::before { content: ""; position: absolute; left: 3px; top: 5px; width: 9px; height: 9px; border-radius: 50%; border: 2px solid var(--tone); }
+  .loop-steps li:not(:last-child)::after { content: ""; position: absolute; left: 8.5px; top: 20px; bottom: 2px; width: 1px; background: var(--line-2); }
+  .loop-steps b { color: var(--ink); font-size: 16px; font-weight: 600; }
+  .loop-steps span { color: var(--ink-2); font-size: 14.5px; }
+  .loop-steps small { color: var(--tone); font-size: 13px; }
+}
 .loop-edge { fill: none; stroke-width: 2; stroke-linecap: round; }
 .loop-edge.is-faint { stroke-width: 1.2; stroke-opacity: .55; }
 .loop-grid-dot { fill: var(--line-2); }

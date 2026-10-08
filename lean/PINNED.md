@@ -20,7 +20,8 @@ is solved by an independently reviewed proof, with or without Lean.
 | T3 milestone | `MCAChallenge.T3Exponent c N C` | as T3, with at most `C delta * n ^ c` for one exponent c | as above |
 
 a1 is `MCAChallenge.firstOrderCurve`, the first-order curve of Dao, Kominers and Thaler (ePrint
-2026/2056, equation 31), with the lower branch in closed form. ArkLib's
+2026/2056, equation 31), with the lower branch in closed form; `firstOrderCurve_lower_branch` proves
+that the closed form solves their equation (30). ArkLib's
 `ReedSolomon.HiddenDerivative.firstOrderRateThreshold` is the upper-branch formula
 (3 rho + 2 sqrt(rho (5 - rho)(2 - rho))) / (8 - rho) at every rate. It equals the curve for rho at
 least 11 - 3 sqrt(13) (`firstOrderCurve_eq_threshold`) and lies above it by at most 0.0014 below that
@@ -30,6 +31,18 @@ All statements use ArkLib's `LineExactAgreementBound`. For every received line f
 exceptional set of at most B challenges. Outside it, every polynomial of degree below k that agrees
 with the line in at least A places splits as P0 + z P1, where f agrees with P0 and g with P1 on
 that whole agreement set.
+
+## How a Lean result is checked
+
+A Lean result is a file that proves one pinned statement for parameters it defines, for example
+`theorem solution : MCAChallenge.T1 C B` with `C` and `B` defined in the same file. Maintainers check
+it with Lean FRO's [comparator](https://github.com/leanprover/comparator). The challenge file states
+the same theorem with `C` and `B` left as holes, importing `lean/MCAChallenge.lean` at the named
+commit, unchanged. Comparator checks that the solution fills the holes with the same names and
+types, proves the statement, uses only `propext`, `Classical.choice` and `Quot.sound`, and passes
+the kernel on replay; it builds in a sandbox. Comparator cannot tell a closed form from a disguised
+answer, so a reviewer reads the parameters. A result that edits `lakefile.toml`,
+`lake-manifest.json`, `lean-toolchain` or `MCAChallenge.lean` is not checked.
 
 ## Build and check
 
@@ -44,6 +57,6 @@ theorem with `lake env lean YourFile.lean`; it must list only `propext`, `Classi
 `Quot.sound`.
 
 Checked 2026-10-08: `MCAChallenge` compiles against the pinned ArkLib with no warnings, and the
-baselines and `firstOrderCurve_eq_threshold` use only the three standard axioms. The targets are
+baselines and both `firstOrderCurve` lemmas use only the three standard axioms. The targets are
 open. ArkLib's own build prints two `sorry` warnings, in `ArkLib/Data/Fin/Basic.lean` and
 `ArkLib/Data/MvPolynomial/Interpolation.lean`; `#print axioms` confirms neither is used here.
