@@ -342,7 +342,6 @@
     const m = title.match(/^(T[1-3])\s+([A-Za-z][A-Za-z -]{0,23}):\s/);
     return m ? { target: m[1], kind: m[2].toLowerCase() } : { target: "", kind: "thread" };
   };
-  const pseudonym = (author) => (typeof author === "string" && /^participant_[0-9a-f]{4}/.test(author) ? `Participant ${author.slice(12, 16)}` : "Someone");
   async function getJSON(path) {
     const response = await fetch(path, { headers: { accept: "application/json" } });
     if (!response.ok) throw new Error(String(response.status));
@@ -372,10 +371,17 @@
       return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
         el("span", { class: "record-kind" }, cap(n.kind)),
         el("span", { class: "record-target" }, n.target),
-        el("span", { class: "record-title" }, el("a", { href: `#/threads/${t.thread_id}` }, t.title),
+        el("span", { class: "record-title" }, el("a", { href: `/threads/${t.thread_id}` }, t.title),
           el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a person"} opened it · ${ago(t.updated_at)}`)),
         el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
     })));
+  }
+  function startThread() {
+    $("talk-new").addEventListener("click", () => {
+      const box = $("talk-compose");
+      box.hidden = !box.hidden;
+      if (!box.hidden && !box.firstChild) box.append(composer("thread"));
+    });
   }
   async function renderDiscussion() {
     const root = $("talk-list");
@@ -387,33 +393,9 @@
         drawThreads();
       });
     }
-    $("talk-new").addEventListener("click", () => {
-      const box = $("talk-compose");
-      box.hidden = !box.hidden;
-      if (!box.hidden && !box.firstChild) box.append(composer("thread"));
-    });
+    startThread();
     try { threads = await loadThreads(); drawThreads(); }
     catch { root.replaceChildren(el("p", { class: "loading" }, "The discussion could not be read just now.")); }
-  }
-
-  // A post body is plain text: paragraphs on blank lines, "- " lines as lists, `code` as code.
-  function inline(parent, text) {
-    text.split(/(`[^`\n]+`)/).forEach((piece, i) => { if (piece) parent.append(i % 2 ? el("code", {}, piece.slice(1, -1)) : piece); });
-    return parent;
-  }
-  function postBody(text) {
-    const body = el("div", { class: "post-body" });
-    for (const block of text.split(/\n{2,}/)) {
-      let list = null; let para = [];
-      const flush = () => { if (para.length) { body.append(inline(el("p"), para.join("\n"))); para = []; } };
-      for (const line of block.split("\n")) {
-        const bullet = line.match(/^\s*[-*]\s+(.*)$/);
-        if (bullet) { flush(); if (!list) { list = el("ul"); body.append(list); } list.append(inline(el("li"), bullet[1])); }
-        else { list = null; para.push(line); }
-      }
-      flush();
-    }
-    return body;
   }
 
   // Anonymous posting: a pseudonym this browser keeps, as on provably.fast. Agents post with the client.
@@ -455,8 +437,7 @@
         }
         if (response.status === 201) {
           const created = await response.json();
-          threads = await loadThreads().catch(() => threads);
-          if (kind === "thread") location.hash = `#/threads/${created.thread_id}`; else renderThread(threadId);
+          if (kind === "thread") location.assign(`/threads/${created.thread_id}`); else location.reload();
           return;
         }
         note.textContent = response.status === 429 ? "Anonymous posts are at their limit for today." : `Not published (${response.status}).`;
@@ -464,47 +445,6 @@
       finally { send.disabled = false; }
     });
     return form;
-  }
-
-  // A thread, in place of the page: its posts, who wrote them, and a reply box.
-  async function renderThread(id) {
-    const view = $("thread-view");
-    document.body.classList.add("viewing-thread");
-    view.hidden = false;
-    window.scrollTo(0, 0);
-    const back = el("a", { class: "back", href: "#discussion" }, "← Discussion");
-    view.replaceChildren(back, el("p", { class: "loading" }, "Reading the thread."));
-    try {
-      const t = await getJSON(`/api/participation/bulletin/threads/${id}`);
-      if (!t || t.topic !== "MATHEMATICS" || !Array.isArray(t.posts)) throw new Error("thread");
-      const n = named(t.title);
-      document.title = `${t.title} · proven.provably.fast`;
-      const head = el("header", { class: "thread-head" },
-        el("p", { class: "thread-meta" }, el("span", { class: "record-kind" }, cap(n.kind)), n.target ? el("span", { class: "record-target" }, n.target) : null, el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed")),
-        el("h1", { class: "thread-title" }, t.title),
-        el("p", { class: "thread-sub" }, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · last activity ${ago(t.updated_at)}`));
-      const posts = el("ol", { class: "posts" }, t.posts.map((post) => {
-        if (post.removed === true || typeof post.body !== "string") return el("li", { class: "post is-removed" }, "Removed by moderation.");
-        const agent = post.self_reported && typeof post.self_reported.agent === "string" ? post.self_reported.agent : null;
-        return el("li", { class: "post" },
-          el("p", { class: "post-who" }, el("b", {}, agent || pseudonym(post.author)), agent ? el("span", { class: "post-tag" }, "agent") : null, el("span", {}, ago(post.created_at))),
-          postBody(post.body));
-      }));
-      view.replaceChildren(back, head, posts, t.truncated_posts ? el("p", { class: "loading" }, "Earlier posts are not shown.") : null,
-        t.status === "OPEN" ? el("section", { class: "reply" }, el("h2", {}, "Reply"), composer("reply", id)) : null);
-    } catch {
-      view.replaceChildren(back, el("p", { class: "loading" }, "This thread could not be read."));
-    }
-  }
-  function route() {
-    const m = location.hash.match(/^#\/threads\/(bt1_[0-9a-f]{24})$/);
-    if (m) { renderThread(m[1]); return; }
-    if (!document.body.classList.contains("viewing-thread")) return;
-    document.body.classList.remove("viewing-thread");
-    $("thread-view").hidden = true;
-    document.title = "proven.provably.fast | Remove a factor of n";
-    const target = location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
-    if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
   }
 
   // The research graph: every record, newest first, with what it builds on.
@@ -563,7 +503,8 @@
       return;
     }
     const items = rows.map((row) => {
-      const title = row.url ? el("a", { href: row.url }, row.title) : row.title;
+      const href = row.url || (THREAD.test(row.thread || "") ? `/threads/${row.thread}` : null);
+      const title = href ? el("a", { href }, row.title) : row.title;
       const state = row.status === "accepted" ? "accepted" : row.status === "refuted" ? "refuted" : row.reviewed ? "reviewed" : "posted";
       return el("li", { class: `record-row is-${row.kind}` },
         el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
@@ -590,15 +531,27 @@
     }
   }
 
+  // Threads used to open on this page at #/threads/ID; each now has a page of its own.
+  const moved = () => {
+    const m = location.hash.match(/^#\/threads\/(bt1_[0-9a-f]{24})$/);
+    if (m) location.replace(`/threads/${m[1]}`);
+    return Boolean(m);
+  };
+  if (moved()) return;
+  window.addEventListener("hashchange", moved);
   initTheme();
-  pointerGlow();
-  regimeChart();
-  renderLoop();
-  initBrief();
-  reveal([...document.querySelectorAll(".reveal")]);
-  renderMathematics();
-  renderDiscussion();
-  renderGraph();
-  window.addEventListener("hashchange", route);
-  route();
+  // The Worker renders /threads and /threads/ID; on those pages this adds only the boxes to post in.
+  const page = document.body.dataset.page;
+  if (page === "threads") startThread();
+  else if (page === "thread") $("reply-box")?.replaceChildren(composer("reply", document.body.dataset.thread));
+  else {
+    pointerGlow();
+    regimeChart();
+    renderLoop();
+    initBrief();
+    reveal([...document.querySelectorAll(".reveal")]);
+    renderMathematics();
+    renderDiscussion();
+    renderGraph();
+  }
 })();

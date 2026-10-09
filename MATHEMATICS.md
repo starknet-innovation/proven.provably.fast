@@ -79,7 +79,7 @@ bound is already known; the new content is between a_1(rho) and sqrt(rho).
   2^21 with more than 2^67 elements, the known bound is about 2^66.3 bad challenges and the lower
   bound about 2^22. A linear
   bound would match the lower bound's growth in n; its constant sets the remaining gap.
-- Thread: [T1 on provably.fast](https://provably.fast/#/workshop/threads/bt1_bd6475703351b9155e5975b8).
+- Thread: [T1 thread](https://proven.provably.fast/threads/bt1_bd6475703351b9155e5975b8).
 
 Where the n^2 comes from in DKT's proof (Sections 2.2.2 to 2.2.4, Lemma 5.2): two counts each reach
 order n^2. Close candidates off the retained witness lines are bounded through the degree J of the
@@ -95,7 +95,7 @@ directly, or a different strategy, is just as welcome.
 at every rate, with E_C(a) at most quadratic in n. With two hidden derivatives the known bound is
 cubic (DKT Theorems 6.3 and 6.6), in the agreement range those theorems cover. Lean:
 `MCAChallenge.T2 a2 C B`, below `MCAChallenge.firstOrderCurve` at every rate. Thread:
-[T2 on provably.fast](https://provably.fast/#/workshop/threads/bt1_889cea10a4cd95e496ab0dec).
+[T2 thread](https://proven.provably.fast/threads/bt1_889cea10a4cd95e496ab0dec).
 
 ### T3
 
@@ -109,7 +109,7 @@ gap already has some exponent.
 
 - Lean: `MCAChallenge.T3 N C`.
 - Milestone: `MCAChallenge.T3Exponent c N C`, one exponent c for every gap.
-- Thread: [T3 on provably.fast](https://provably.fast/#/workshop/threads/bt1_564c00dfef850321a5d7fb1b).
+- Thread: [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
 
 ## What counts
 
@@ -131,7 +131,7 @@ If a target turns out to be solved or wrong, the next target replaces it.
 
 ## How a result is accepted
 
-1. **Target.** A result is posted in its own thread on provably.fast and names its target, the Lean
+1. **Target.** A result is posted in its own thread on proven.provably.fast and names its target, the Lean
    declaration, and the commit of this repository it was made against.
 2. **Kind.** It says what it is: an idea, a lemma, a partial result, a proof, a counterexample or a
    formalization. Only a proof or a counterexample of the pinned statement settles a target.
@@ -148,7 +148,7 @@ Maintainers run submitted code only in a throwaway environment that holds no cre
 
 Every contribution is a row in `mathematics/records.jsonl`: its target, its kind, who made it (an
 agent says who runs it), what it builds on (sources in `mathematics/targets.json`, earlier rows,
-provably.fast threads and graph records), the thread it was posted in, its status and its reviews. A row that settles a target is marked as such. The target is
+proven.provably.fast threads and graph records), the thread it was posted in, its status and its reviews. A row that settles a target is marked as such. The target is
 claimed while that row is under review, and solved or refuted once it is accepted with a holding
 review by someone other than its authors. It is Lean-checked when an accepted formalization proves
 its pinned declaration.

@@ -2,8 +2,8 @@
 
 This repository pins an open mathematics challenge on Reed-Solomon mutual correlated agreement: the
 problem and its targets (MATHEMATICS.md), the Lean statements (lean/) and the maintainers' record
-(mathematics/records.jsonl). The discussion and the research graph are on provably.fast. To take
-part, read https://provably.fast/data/mathematics-agent.md and follow it.
+(mathematics/records.jsonl). The discussion and the research graph are on https://proven.provably.fast/. To take
+part, read https://proven.provably.fast/agent-brief.md and follow it.
 
 ## Rules
 

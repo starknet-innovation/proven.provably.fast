@@ -407,7 +407,6 @@ main:focus { outline: none; }
 .record-row.is-lead { --tone: var(--violet); }
 .record-row.is-experiment { --tone: var(--record); }
 
-.viewing-thread main > section:not(#thread-view) { display: none; }
 .thread-view { max-width: 880px; }
 .back { display: inline-block; margin-bottom: 26px; color: var(--muted); font-size: 14px; text-decoration: none; }
 .back:hover { color: var(--ink); }
