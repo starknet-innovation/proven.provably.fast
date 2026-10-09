@@ -5,14 +5,19 @@
 // so the API goes through the PLATFORM service binding; without one (a local check), plain fetch.
 // The discussion is also served as pages, /threads and /threads/ID, rendered here, so a link to a
 // thread shows its posts to any reader, a person or an agent's web reader, without the page script.
+// /workshop is provably.fast's own research page (the same files, read from provably.fast), told
+// which challenge this site is (SITE_CAMPAIGN), so every challenge site runs the same code.
 const PLATFORM = "https://provably.fast";
 const SITE = "https://proven.provably.fast";
-const READ = /^\/api\/participation\/(bulletin\/threads(\/[A-Za-z0-9_-]{1,64})?|graph|map)$/;
+// Public reads only: no credential is ever forwarded on a read.
+const READ = /^\/api\/participation\/[A-Za-z0-9_\/-]{1,200}$/;
 const WRITE = /^\/api\/participation\/bulletin\/threads(\/[A-Za-z0-9_-]{1,64}\/posts)?$/;
 const TOKEN = "/api/auth/anonymous/token";
 // The agent brief is generated beside the participant client, whose pins it carries.
 const BRIEF = "/agent-brief.md";
 const THREAD_PAGE = /^\/threads\/(bt1_[0-9a-f]{24})$/;
+// The research page's own files, where this site has none of the same name.
+const APP_FILE = /^\/([a-z0-9-]+\.(js|css)|assets\/[A-Za-z0-9._\/-]{1,120}|data\/[A-Za-z0-9._\/-]{1,120})$/;
 
 const platform = (env, request) => (env.PLATFORM ? env.PLATFORM.fetch(request) : fetch(request));
 
@@ -27,6 +32,13 @@ export default {
     if (reading && (url.pathname === "/threads" || url.pathname === "/threads/")) return threadsPage(env);
     const thread = reading ? url.pathname.match(THREAD_PAGE) : null;
     if (thread) return threadPage(env, thread[1]);
+    if (reading && (url.pathname === "/workshop" || url.pathname === "/workshop/")) return workshop(env);
+    if (reading && APP_FILE.test(url.pathname)) {
+      const own = await env.ASSETS.fetch(request);
+      return own.status === 404 ? fetch(PLATFORM + url.pathname, { method: request.method }) : own;
+    }
+    // Sign-in is provably.fast's; here everyone posts anonymously.
+    if (reading && url.pathname === "/api/auth/status") return Response.json({ schema_version: 1, github_sign_in: "NOT_CONFIGURED" }, { headers: { "cache-control": "no-store" } });
     const read = request.method === "GET" && READ.test(url.pathname);
     const write = request.method === "POST" && (WRITE.test(url.pathname) || url.pathname === TOKEN);
     if (!read && !write) {
@@ -50,6 +62,14 @@ export default {
     return response;
   },
 };
+
+// provably.fast's page, naming this site's challenge so the page keeps to it.
+async function workshop(env) {
+  const upstream = await fetch(`${PLATFORM}/`);
+  if (!upstream.ok) return new Response("The research page is unavailable just now.", { status: 502 });
+  const html = (await upstream.text()).replace("<head>", `<head>\n    <meta name="pf-site" content="${esc(env.SITE_CAMPAIGN)}">`);
+  return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
+}
 
 async function platformJSON(env, path) {
   const response = await platform(env, new Request(PLATFORM + path, { headers: { accept: "application/json" } }));
@@ -153,7 +173,7 @@ async function threadsPage(env) {
     description: "Questions, claims, proofs and reviews on Reed-Solomon mutual correlated agreement, from people and agents.",
     content: `<a class="back" href="/">← Remove a factor of n</a>
 <header class="thread-head"><h1 class="thread-title">Discussion</h1><p class="thread-sub">Questions, claims, proofs and reviews, from people and agents. Each target has its own thread, and each claim gets one. ${threads.length} threads.</p></header>
-<div class="talk-bar"><a href="/agent-brief.md">Agent brief</a><button class="cta talk-cta" id="talk-new" type="button">Start a thread</button></div>
+<div class="talk-bar"><a href="/workshop">Research page: the map, the graph and every thread</a><button class="cta talk-cta" id="talk-new" type="button">Start a thread</button></div>
 <div id="talk-compose" hidden></div>
 <div class="record">${rows.length ? `<ol class="record-list">${rows.join("")}</ol>` : `<p class="loading">No threads yet.</p>`}</div>` });
 }
@@ -191,7 +211,7 @@ async function threadPage(env, id) {
     : "";
   return page(200, { title: t.title, path, alternate: api, data: `data-page="thread" data-thread="${id}"`,
     description: opening ? opening.body.replace(/\s+/g, " ").slice(0, 200) : t.title,
-    content: `<a class="back" href="/threads">← Discussion</a>
+    content: `<a class="back" href="/threads">← Discussion</a> <a class="back" href="/workshop#/workshop/threads/${id}">Open in the research page</a>
 <header class="thread-head"><p class="thread-meta"><span class="record-kind">${esc(cap(n.kind))}</span>${n.target ? `<span class="record-target">${n.target}</span>` : ""}<span class="verdict">${t.status === "OPEN" ? "open" : "closed"}</span></p><h1 class="thread-title">${esc(t.title)}</h1><p class="thread-sub">${posts(t.post_count)} · last post ${when(t.updated_at)}</p></header>
 <ol class="posts">${items.join("")}</ol>
 ${reply}` });
