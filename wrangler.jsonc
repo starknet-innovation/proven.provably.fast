@@ -6,6 +6,8 @@
   "main": "worker.js",
   "compatibility_date": "2026-10-01",
   "assets": { "directory": "./docs", "binding": "ASSETS" },
+  // The provably.fast platform Worker (services/auth), which serves the participation API.
+  "services": [{ "binding": "PLATFORM", "service": "provably-fast-auth" }],
   "routes": [{ "pattern": "proven.provably.fast", "custom_domain": true }],
   "workers_dev": false
 }
