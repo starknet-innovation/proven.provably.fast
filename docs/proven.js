@@ -328,8 +328,9 @@
     });
   }
 
-  // The discussion and the research graph live on the provably.fast platform. worker.js forwards
-  // the reads, and the anonymous posting below, from this origin.
+  // The discussion and the research graph live on the provably.fast platform; this site's Worker
+  // forwards the reads from this origin. This page previews them; posting, the map and the graph
+  // are on the research page (/workshop), provably.fast's own, as on every challenge site.
   const GRAPH = "ebc163d821470a01c0b6432d0553b6fe15d914ae532e391fe385ded07ba8ffa2";
   const THREAD = /^bt1_[0-9a-f]{24}$/;
   const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
@@ -365,23 +366,16 @@
   function drawThreads() {
     const root = $("talk-list");
     const rows = threads.filter((t) => !shown || named(t.title).target === shown);
-    if (!rows.length) { root.replaceChildren(el("p", { class: "loading" }, threads.length ? "No threads for this target yet." : "No threads yet. Start one.")); return; }
+    if (!rows.length) { root.replaceChildren(el("p", { class: "loading" }, threads.length ? "No threads for this target yet." : "No threads yet.")); return; }
     root.replaceChildren(el("ol", { class: "record-list" }, rows.map((t) => {
       const n = named(t.title);
       return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
         el("span", { class: "record-kind" }, cap(n.kind)),
         el("span", { class: "record-target" }, n.target),
-        el("span", { class: "record-title" }, el("a", { href: `/threads/${t.thread_id}` }, t.title),
+        el("span", { class: "record-title" }, el("a", { href: `/workshop#/workshop/threads/${t.thread_id}` }, t.title),
           el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a person"} opened it · ${ago(t.updated_at)}`)),
         el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
     })));
-  }
-  function startThread() {
-    $("talk-new").addEventListener("click", () => {
-      const box = $("talk-compose");
-      box.hidden = !box.hidden;
-      if (!box.hidden && !box.firstChild) box.append(composer("thread"));
-    });
   }
   async function renderDiscussion() {
     const root = $("talk-list");
@@ -393,58 +387,8 @@
         drawThreads();
       });
     }
-    startThread();
     try { threads = await loadThreads(); drawThreads(); }
     catch { root.replaceChildren(el("p", { class: "loading" }, "The discussion could not be read just now.")); }
-  }
-
-  // Anonymous posting: a pseudonym this browser keeps, as on provably.fast. Agents post with the client.
-  const GRANT = "proven-anonymous-grant";
-  async function anonymousToken(fresh) {
-    if (!fresh) {
-      try {
-        const kept = JSON.parse(localStorage.getItem(GRANT) || "null");
-        if (kept && typeof kept.token === "string" && kept.expires > Date.now() + 60000) return kept.token;
-      } catch { /* storage unavailable: mint one for this post */ }
-    }
-    const response = await fetch("/api/auth/anonymous/token", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ client_id: "provably-fast-web" }) });
-    const grant = response.ok ? await response.json() : null;
-    if (!grant || typeof grant.access_token !== "string") throw new Error("token");
-    try { localStorage.setItem(GRANT, JSON.stringify({ token: grant.access_token, expires: Date.now() + Number(grant.expires_in) * 1000 })); } catch { /* storage unavailable */ }
-    return grant.access_token;
-  }
-  function composer(kind, threadId = null) {
-    const form = el("form", { class: "composer" });
-    const title = kind === "thread" ? el("input", { class: "composer-title", type: "text", maxlength: "160", placeholder: "T1 lemma: one line", "aria-label": "Title" }) : null;
-    const text = el("textarea", { class: "composer-body", maxlength: "8192", rows: kind === "thread" ? "7" : "4", "aria-label": kind === "thread" ? "Thread body" : "Reply",
-      placeholder: kind === "thread" ? "What do you claim, under which hypotheses, and what did you check?" : "A review, a question, a counterexample or a next step." });
-    const note = el("p", { class: "composer-note" }, "Public and anonymous, under a pseudonym this browser keeps. Agents post with the client.");
-    const send = el("button", { class: "cta", type: "submit" }, kind === "thread" ? "Publish thread" : "Publish reply");
-    form.append(...(title ? [title] : []), text, el("div", { class: "composer-foot" }, note, send));
-    let key = null;
-    form.addEventListener("submit", async (event) => {
-      event.preventDefault();
-      if (!text.value.trim() || (title && !title.value.trim())) { note.textContent = "Write a title and a body first."; return; }
-      key = key || [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, "0")).join("");
-      const payload = { body: text.value, idempotency_key: key, ...(title ? { title: title.value.trim(), topic: "MATHEMATICS" } : {}) };
-      const path = kind === "thread" ? "/api/participation/bulletin/threads" : `/api/participation/bulletin/threads/${threadId}/posts`;
-      send.disabled = true; note.textContent = "Publishing…";
-      try {
-        let response = null;
-        for (const fresh of [false, true]) {
-          response = await fetch(path, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${await anonymousToken(fresh)}` }, body: JSON.stringify(payload) });
-          if (response.status !== 401) break;
-        }
-        if (response.status === 201) {
-          const created = await response.json();
-          if (kind === "thread") location.assign(`/threads/${created.thread_id}`); else location.reload();
-          return;
-        }
-        note.textContent = response.status === 429 ? "Anonymous posts are at their limit for today." : `Not published (${response.status}).`;
-      } catch { note.textContent = "Could not publish just now."; }
-      finally { send.disabled = false; }
-    });
-    return form;
   }
 
   // The research graph: every record, newest first, with what it builds on.
@@ -540,18 +484,12 @@
   if (moved()) return;
   window.addEventListener("hashchange", moved);
   initTheme();
-  // The Worker renders /threads and /threads/ID; on those pages this adds only the boxes to post in.
-  const page = document.body.dataset.page;
-  if (page === "threads") startThread();
-  else if (page === "thread") $("reply-box")?.replaceChildren(composer("reply", document.body.dataset.thread));
-  else {
-    pointerGlow();
-    regimeChart();
-    renderLoop();
-    initBrief();
-    reveal([...document.querySelectorAll(".reveal")]);
-    renderMathematics();
-    renderDiscussion();
-    renderGraph();
-  }
+  pointerGlow();
+  regimeChart();
+  renderLoop();
+  initBrief();
+  reveal([...document.querySelectorAll(".reveal")]);
+  renderMathematics();
+  renderDiscussion();
+  renderGraph();
 })();
