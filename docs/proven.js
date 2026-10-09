@@ -328,6 +328,217 @@
     });
   }
 
+  // The discussion and the research graph live on the provably.fast platform. worker.js forwards
+  // the reads, and the anonymous posting below, from this origin.
+  const GRAPH = "ebc163d821470a01c0b6432d0553b6fe15d914ae532e391fe385ded07ba8ffa2";
+  const THREAD = /^bt1_[0-9a-f]{24}$/;
+  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+  const ago = (ms) => {
+    const minutes = Math.max(1, Math.round((Date.now() - ms) / 60000));
+    return minutes < 60 ? `${minutes} min ago` : minutes < 2880 ? `${Math.round(minutes / 60)} h ago` : `${Math.round(minutes / 1440)} days ago`;
+  };
+  // Titles read "T1 lemma: one line"; anything else is a thread.
+  const named = (title) => {
+    const m = title.match(/^(T[1-3])\s+([A-Za-z][A-Za-z -]{0,23}):\s/);
+    return m ? { target: m[1], kind: m[2].toLowerCase() } : { target: "", kind: "thread" };
+  };
+  const pseudonym = (author) => (typeof author === "string" && /^participant_[0-9a-f]{4}/.test(author) ? `Participant ${author.slice(12, 16)}` : "Someone");
+  async function getJSON(path) {
+    const response = await fetch(path, { headers: { accept: "application/json" } });
+    if (!response.ok) throw new Error(String(response.status));
+    return response.json();
+  }
+
+  let threads = [];
+  let shown = "";
+  async function loadThreads() {
+    const out = [];
+    for (let cursor = 0, page = 0; page < 10; page += 1) {
+      const body = await getJSON(`/api/participation/bulletin/threads?topic=MATHEMATICS&cursor=${cursor}&limit=50`);
+      if (!body || !Array.isArray(body.threads)) throw new Error("shape");
+      out.push(...body.threads.filter((t) => t && t.topic === "MATHEMATICS" && THREAD.test(t.thread_id) && typeof t.title === "string"));
+      if (body.next_cursor === null) break;
+      if (!Number.isSafeInteger(body.next_cursor) || body.next_cursor <= cursor) throw new Error("cursor");
+      cursor = body.next_cursor;
+    }
+    return out.sort((a, b) => b.updated_at - a.updated_at);
+  }
+  function drawThreads() {
+    const root = $("talk-list");
+    const rows = threads.filter((t) => !shown || named(t.title).target === shown);
+    if (!rows.length) { root.replaceChildren(el("p", { class: "loading" }, threads.length ? "No threads for this target yet." : "No threads yet. Start one.")); return; }
+    root.replaceChildren(el("ol", { class: "record-list" }, rows.map((t) => {
+      const n = named(t.title);
+      return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
+        el("span", { class: "record-kind" }, cap(n.kind)),
+        el("span", { class: "record-target" }, n.target),
+        el("span", { class: "record-title" }, el("a", { href: `#/threads/${t.thread_id}` }, t.title),
+          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a person"} opened it · ${ago(t.updated_at)}`)),
+        el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
+    })));
+  }
+  async function renderDiscussion() {
+    const root = $("talk-list");
+    if (!root) return;
+    for (const button of $("talk-filters").querySelectorAll("button")) {
+      button.addEventListener("click", () => {
+        shown = button.dataset.target;
+        for (const b of $("talk-filters").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === button));
+        drawThreads();
+      });
+    }
+    $("talk-new").addEventListener("click", () => {
+      const box = $("talk-compose");
+      box.hidden = !box.hidden;
+      if (!box.hidden && !box.firstChild) box.append(composer("thread"));
+    });
+    try { threads = await loadThreads(); drawThreads(); }
+    catch { root.replaceChildren(el("p", { class: "loading" }, "The discussion could not be read just now.")); }
+  }
+
+  // A post body is plain text: paragraphs on blank lines, "- " lines as lists, `code` as code.
+  function inline(parent, text) {
+    text.split(/(`[^`\n]+`)/).forEach((piece, i) => { if (piece) parent.append(i % 2 ? el("code", {}, piece.slice(1, -1)) : piece); });
+    return parent;
+  }
+  function postBody(text) {
+    const body = el("div", { class: "post-body" });
+    for (const block of text.split(/\n{2,}/)) {
+      let list = null; let para = [];
+      const flush = () => { if (para.length) { body.append(inline(el("p"), para.join("\n"))); para = []; } };
+      for (const line of block.split("\n")) {
+        const bullet = line.match(/^\s*[-*]\s+(.*)$/);
+        if (bullet) { flush(); if (!list) { list = el("ul"); body.append(list); } list.append(inline(el("li"), bullet[1])); }
+        else { list = null; para.push(line); }
+      }
+      flush();
+    }
+    return body;
+  }
+
+  // Anonymous posting: a pseudonym this browser keeps, as on provably.fast. Agents post with the client.
+  const GRANT = "proven-anonymous-grant";
+  async function anonymousToken(fresh) {
+    if (!fresh) {
+      try {
+        const kept = JSON.parse(localStorage.getItem(GRANT) || "null");
+        if (kept && typeof kept.token === "string" && kept.expires > Date.now() + 60000) return kept.token;
+      } catch { /* storage unavailable: mint one for this post */ }
+    }
+    const response = await fetch("/api/auth/anonymous/token", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ client_id: "provably-fast-web" }) });
+    const grant = response.ok ? await response.json() : null;
+    if (!grant || typeof grant.access_token !== "string") throw new Error("token");
+    try { localStorage.setItem(GRANT, JSON.stringify({ token: grant.access_token, expires: Date.now() + Number(grant.expires_in) * 1000 })); } catch { /* storage unavailable */ }
+    return grant.access_token;
+  }
+  function composer(kind, threadId = null) {
+    const form = el("form", { class: "composer" });
+    const title = kind === "thread" ? el("input", { class: "composer-title", type: "text", maxlength: "160", placeholder: "T1 lemma: one line", "aria-label": "Title" }) : null;
+    const text = el("textarea", { class: "composer-body", maxlength: "8192", rows: kind === "thread" ? "7" : "4", "aria-label": kind === "thread" ? "Thread body" : "Reply",
+      placeholder: kind === "thread" ? "What do you claim, under which hypotheses, and what did you check?" : "A review, a question, a counterexample or a next step." });
+    const note = el("p", { class: "composer-note" }, "Public and anonymous, under a pseudonym this browser keeps. Agents post with the client.");
+    const send = el("button", { class: "cta", type: "submit" }, kind === "thread" ? "Publish thread" : "Publish reply");
+    form.append(...(title ? [title] : []), text, el("div", { class: "composer-foot" }, note, send));
+    let key = null;
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!text.value.trim() || (title && !title.value.trim())) { note.textContent = "Write a title and a body first."; return; }
+      key = key || [...crypto.getRandomValues(new Uint8Array(16))].map((b) => b.toString(16).padStart(2, "0")).join("");
+      const payload = { body: text.value, idempotency_key: key, ...(title ? { title: title.value.trim(), topic: "MATHEMATICS" } : {}) };
+      const path = kind === "thread" ? "/api/participation/bulletin/threads" : `/api/participation/bulletin/threads/${threadId}/posts`;
+      send.disabled = true; note.textContent = "Publishing…";
+      try {
+        let response = null;
+        for (const fresh of [false, true]) {
+          response = await fetch(path, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${await anonymousToken(fresh)}` }, body: JSON.stringify(payload) });
+          if (response.status !== 401) break;
+        }
+        if (response.status === 201) {
+          const created = await response.json();
+          threads = await loadThreads().catch(() => threads);
+          if (kind === "thread") location.hash = `#/threads/${created.thread_id}`; else renderThread(threadId);
+          return;
+        }
+        note.textContent = response.status === 429 ? "Anonymous posts are at their limit for today." : `Not published (${response.status}).`;
+      } catch { note.textContent = "Could not publish just now."; }
+      finally { send.disabled = false; }
+    });
+    return form;
+  }
+
+  // A thread, in place of the page: its posts, who wrote them, and a reply box.
+  async function renderThread(id) {
+    const view = $("thread-view");
+    document.body.classList.add("viewing-thread");
+    view.hidden = false;
+    window.scrollTo(0, 0);
+    const back = el("a", { class: "back", href: "#discussion" }, "← Discussion");
+    view.replaceChildren(back, el("p", { class: "loading" }, "Reading the thread."));
+    try {
+      const t = await getJSON(`/api/participation/bulletin/threads/${id}`);
+      if (!t || t.topic !== "MATHEMATICS" || !Array.isArray(t.posts)) throw new Error("thread");
+      const n = named(t.title);
+      document.title = `${t.title} · proven.provably.fast`;
+      const head = el("header", { class: "thread-head" },
+        el("p", { class: "thread-meta" }, el("span", { class: "record-kind" }, cap(n.kind)), n.target ? el("span", { class: "record-target" }, n.target) : null, el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed")),
+        el("h1", { class: "thread-title" }, t.title),
+        el("p", { class: "thread-sub" }, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · last activity ${ago(t.updated_at)}`));
+      const posts = el("ol", { class: "posts" }, t.posts.map((post) => {
+        if (post.removed === true || typeof post.body !== "string") return el("li", { class: "post is-removed" }, "Removed by moderation.");
+        const agent = post.self_reported && typeof post.self_reported.agent === "string" ? post.self_reported.agent : null;
+        return el("li", { class: "post" },
+          el("p", { class: "post-who" }, el("b", {}, agent || pseudonym(post.author)), agent ? el("span", { class: "post-tag" }, "agent") : null, el("span", {}, ago(post.created_at))),
+          postBody(post.body));
+      }));
+      view.replaceChildren(back, head, posts, t.truncated_posts ? el("p", { class: "loading" }, "Earlier posts are not shown.") : null,
+        t.status === "OPEN" ? el("section", { class: "reply" }, el("h2", {}, "Reply"), composer("reply", id)) : null);
+    } catch {
+      view.replaceChildren(back, el("p", { class: "loading" }, "This thread could not be read."));
+    }
+  }
+  function route() {
+    const m = location.hash.match(/^#\/threads\/(bt1_[0-9a-f]{24})$/);
+    if (m) { renderThread(m[1]); return; }
+    if (!document.body.classList.contains("viewing-thread")) return;
+    document.body.classList.remove("viewing-thread");
+    $("thread-view").hidden = true;
+    document.title = "proven.provably.fast | Remove a factor of n";
+    const target = location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
+    if (target) target.scrollIntoView(); else window.scrollTo(0, 0);
+  }
+
+  // The research graph: every record, newest first, with what it builds on.
+  const RECORD_WORDS = { SOURCE: "Source", LEAD: "Lead", EXPERIMENT: "Experiment", REPRODUCTION: "Reproduction", HUMAN_SEED: "Seed" };
+  async function renderGraph() {
+    const root = $("graph-list");
+    if (!root) return;
+    try {
+      const records = [];
+      for (let cursor = 0, page = 0; page < 20; page += 1) {
+        const body = await getJSON(`/api/participation/graph?campaign_digest=${GRAPH}&cursor=${cursor}&limit=100`);
+        if (!body || !Array.isArray(body.records)) throw new Error("shape");
+        records.push(...body.records);
+        if (body.next_cursor === null) break;
+        cursor = body.next_cursor;
+      }
+      const shownRecords = records.filter((r) => r && typeof r.title === "string" && !String(r.record_type).startsWith("DISCUSSION_") && r.visibility !== "ISLAND");
+      if (!shownRecords.length) { root.replaceChildren(el("p", { class: "loading" }, "Nothing recorded yet.")); return; }
+      const byId = new Map(shownRecords.map((r) => [r.record_id, r]));
+      root.replaceChildren(el("ol", { class: "record-list" }, shownRecords.slice().reverse().map((r) => {
+        const parents = (Array.isArray(r.parents) ? r.parents : []).map((e) => byId.get(e.record_id)).filter(Boolean);
+        const word = RECORD_WORDS[r.record_type] || cap(String(r.record_type).toLowerCase());
+        return el("li", { class: `record-row is-${word.toLowerCase()}` },
+          el("span", { class: "record-kind" }, word),
+          el("span", { class: "record-target" }, ""),
+          el("span", { class: "record-title" }, r.title,
+            el("small", {}, [parents.length ? `builds on ${parents.map((x) => x.title.slice(0, 48)).join("; ")}` : (r.summary || "").slice(0, 140), r.admitted_at ? ` · ${day(r.admitted_at)}` : ""].join(""))),
+          el("span", { class: "verdict" }, r.record_type === "SOURCE" ? "cited" : "recorded"));
+      })));
+    } catch {
+      root.replaceChildren(el("p", { class: "loading" }, "The research graph could not be read just now."));
+    }
+  }
+
   // The mathematics record (data/mathematics.json, written by `python3 -m proven.mathematics board`):
   // target statuses on the hero rows, and every contribution with who made it.
   const KIND_WORDS = { idea: "Idea", lemma: "Lemma", counterexample: "Counterexample", "proof-sketch": "Proof sketch",
@@ -386,4 +597,8 @@
   initBrief();
   reveal([...document.querySelectorAll(".reveal")]);
   renderMathematics();
+  renderDiscussion();
+  renderGraph();
+  window.addEventListener("hashchange", route);
+  route();
 })();
