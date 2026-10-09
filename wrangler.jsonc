@@ -8,6 +8,8 @@
   "assets": { "directory": "./docs", "binding": "ASSETS" },
   // The provably.fast platform Worker (services/auth), which serves the participation API.
   "services": [{ "binding": "PLATFORM", "service": "provably-fast-auth" }],
+  // The challenge this site is: provably.fast's research page (/workshop) keeps to it.
+  "vars": { "SITE_CAMPAIGN": "proven-mca-graph-v1" },
   "routes": [{ "pattern": "proven.provably.fast", "custom_domain": true }],
   "workers_dev": false
 }

@@ -403,6 +403,9 @@ main:focus { outline: none; }
 .talk-filters button { border: 0; background: transparent; color: var(--muted); font: 500 14px var(--sans); padding: 6px 16px; border-radius: 999px; cursor: pointer; }
 .talk-filters button[aria-pressed="true"] { background: var(--ink); color: var(--bg); }
 #talk-compose { margin-bottom: 18px; }
+.talk-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; }
+.talk-open, .graph-open a { color: var(--ink); font-size: 14.5px; }
+.graph-open { margin: 14px 0 0; }
 .record-row.is-thread { --tone: var(--accent); }
 .record-row.is-lead { --tone: var(--violet); }
 .record-row.is-experiment { --tone: var(--record); }
