@@ -526,7 +526,7 @@
   function boardChart(root) {
     const draw = () => {
       const w = Math.max(300, Math.round(root.clientWidth || 520)), h = Math.round(Math.min(300, Math.max(220, w * 0.55)));
-      const padL = 8, padR = 118, padT = 34, padB = 30;
+      const padL = 8, padR = 150, padT = 34, padB = 30;
       const y0 = 2017.5, y1 = new Date().getFullYear() + 0.8;
       const qTop = 260, qBottom = 90;
       const X = (yr) => padL + ((yr - y0) / (y1 - y0)) * (w - padL - padR);
@@ -564,6 +564,8 @@
       const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · capacity`; svg.append(tc);
       const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
       const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
+      const last = QUERY_STEPS[QUERY_STEPS.length - 1];
+      const ts = svgEl("text", { class: "board-label", x: end.x + 10, y: (end.y + rungY) / 2 + 20 }); ts.textContent = `no proven step since ${last.year}`; svg.append(ts);
       const ax0 = svgEl("text", { class: "board-axis", x: padL, y: h - 8 }); ax0.textContent = "2018";
       const ax1 = svgEl("text", { class: "board-axis", x: end.x, y: h - 8, "text-anchor": "middle" }); ax1.textContent = "today";
       svg.append(ax0, ax1);
