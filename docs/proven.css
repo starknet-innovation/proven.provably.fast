@@ -121,6 +121,54 @@ main:focus { outline: none; }
 .stat-num.term { border-bottom: 0; text-decoration: underline dotted color-mix(in srgb, var(--tone) 45%, transparent); text-decoration-thickness: 2px; text-underline-offset: .14em; }
 
 .card { position: relative; display: flex; flex-direction: column; padding: clamp(22px, 3vw, 34px) clamp(18px, 3.4vw, 44px) 24px; border: 1px solid var(--line); border-radius: 22px; background: var(--bg-2); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 5%, transparent), 0 24px 60px -30px #000000b0; }
+/* The board: the query count as a proven staircase, in the style of the memory card. */
+.board-card { position: relative; display: flex; flex-direction: column; gap: 18px; margin-bottom: 18px; padding: clamp(22px, 3vw, 34px) clamp(18px, 3.4vw, 44px) 22px; border: 1px solid var(--line); border-radius: 22px; background: var(--bg-2); box-shadow: inset 0 1px 0 color-mix(in srgb, var(--ink) 5%, transparent), 0 24px 60px -30px #000000b0; }
+.board-card .card-title { max-width: 30ch; }
+.board-grid { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 20px 40px; align-items: center; }
+.board-copy { display: grid; gap: 10px; }
+.board-figure { display: flex; align-items: baseline; flex-wrap: wrap; gap: 6px 16px; margin: 0; }
+.board-num { font: 700 clamp(64px, 9vw, 120px)/1 var(--display); letter-spacing: -.04em; }
+.board-num.is-proven { color: var(--accent); }
+.board-num.is-rung { color: var(--record); font-size: clamp(44px, 6vw, 76px); }
+.board-unit { font: 600 clamp(22px, 2.6vw, 36px)/1.1 var(--display); letter-spacing: -.02em; color: var(--ink); }
+.board-figure.is-second .board-unit { font-size: clamp(18px, 2vw, 26px); color: var(--ink-2); }
+.board-line { margin: 2px 0 0; color: var(--ink-2); font-size: 15.5px; }
+.board-line s { color: var(--muted); }
+.board-links { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; }
+.board-bold { margin: 4px 0 0; color: var(--ink); font-weight: 600; font-size: 16px; }
+.board-thanks { display: flex; align-items: center; gap: 12px; margin-top: 4px; color: var(--ink); font-size: 15px; }
+.board-marks { display: inline-flex; }
+.board-mark { display: inline-grid; place-items: center; width: var(--size, 28px); height: var(--size, 28px); margin-left: -8px; border-radius: 50%; border: 2px solid var(--bg-2); background: hsl(var(--hue) 55% 42%); color: #fff; font: 600 11px var(--sans); letter-spacing: .02em; text-transform: uppercase; }
+.board-mark:first-child { margin-left: 0; }
+.board-chart { min-width: 0; }
+.board-svg { display: block; width: 100%; height: auto; overflow: visible; }
+.board-dot { fill: color-mix(in srgb, var(--accent) 70%, transparent); }
+.board-dot.is-dim { fill: color-mix(in srgb, var(--ink) 10%, transparent); }
+.board-area { opacity: .9; }
+path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-linejoin: round; }
+.board-step { fill: var(--bg-2); stroke: var(--accent); stroke-width: 2.2; }
+.board-end { fill: var(--accent); }
+.board-rung { stroke: var(--record); stroke-dasharray: 4 5; stroke-width: 1.4; }
+.board-cap { stroke: var(--amber); stroke-dasharray: 3 5; stroke-width: 1.2; opacity: .8; }
+.board-label { fill: var(--muted); font: 11.5px var(--sans); }
+.board-label.is-step { fill: var(--ink-2); }
+.board-label.is-now { fill: var(--ink); font-weight: 600; font-size: 13px; }
+.board-rung-label { fill: var(--record); font: 600 12px var(--sans); }
+.board-cap-label { fill: var(--amber); font: 11.5px var(--sans); }
+.board-togo { stroke: var(--ink-2); stroke-width: 1.2; stroke-dasharray: 2 3; }
+.board-togo-label { fill: var(--ink-2); font: 11.5px var(--sans); }
+.board-axis { fill: var(--muted); font: 11.5px var(--sans); }
+.board-proved { padding-top: 16px; border-top: 1px solid var(--line); }
+.board-proved-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 18px; margin-bottom: 10px; }
+.board-proved-head h3 { margin: 0; font: 600 16px var(--display); color: var(--ink); }
+.board-counts { margin: 0; color: var(--muted); font-size: 13px; }
+.board-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
+.board-row { --tone: var(--accent); display: grid; grid-template-columns: 92px 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 14px; }
+.board-row.is-lemma { --tone: var(--violet); } .board-row.is-formalization { --tone: var(--platform); } .board-row.is-counterexample { --tone: var(--coral); } .board-row.is-proof { --tone: var(--record); }
+.board-row a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-more { margin: 10px 0 0; font-size: 13.5px; }
+.board-foot { margin: 0; color: var(--muted); font-size: 12.5px; }
+@media (max-width: 860px) { .board-grid { grid-template-columns: 1fr; } .board-row { grid-template-columns: auto auto minmax(0, 1fr); } .board-row .verdict { grid-column: 1 / -1; justify-self: start; } .board-row a { white-space: normal; } }
 .card-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 24px; }
 .card-title { margin: 0; max-width: 40ch; color: var(--ink); font: 600 clamp(20px, 2vw, 26px)/1.25 var(--display); letter-spacing: -.015em; }
 .card-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }

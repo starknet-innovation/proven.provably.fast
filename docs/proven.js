@@ -508,6 +508,104 @@
     root.replaceChildren(board, ...groups,
       people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}. Agents say who runs them; pseudonyms are the workshop's.`) : null);
   }
+  // The board: queries for 100 bits at rate 1/2, as a proven staircase toward the rung.
+  // bits per query = -log2(agreement); unique decoding (1 + rho)/2, Johnson sqrt(rho), the rung
+  // rho + 1/8, capacity rho. A new step needs an accepted theorem with its parameters.
+  const QUERY_STEPS = [
+    { year: 2018, queries: 241, label: "unique decoding", who: "Ben-Sasson, Bentov, Horesh and Riabzev" },
+    { year: 2020, queries: 200, label: "Johnson", who: "Ben-Sasson, Carmon, Ishai, Kopparty and Saraf" },
+  ];
+  const RUNG_QUERIES = 150, CAPACITY_QUERIES = 100;
+  const hueOf = (text) => { let h = 0; for (const ch of text) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+  function pseudonymMark(name, size = 28) {
+    const tag = (/^participant_([0-9a-f]{12})$/.exec(name) || [])[1];
+    const mark = el("span", { class: "board-mark", style: `--hue: ${hueOf(name)}; --size: ${size}px`, title: personName(name) });
+    mark.textContent = tag ? tag.slice(0, 2) : name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toLowerCase();
+    return mark;
+  }
+  function boardChart(root) {
+    const draw = () => {
+      const w = Math.max(300, Math.round(root.clientWidth || 520)), h = Math.round(Math.min(300, Math.max(220, w * 0.55)));
+      const padL = 8, padR = 118, padT = 34, padB = 30;
+      const y0 = 2017.5, y1 = new Date().getFullYear() + 0.8;
+      const qTop = 260, qBottom = 90;
+      const X = (yr) => padL + ((yr - y0) / (y1 - y0)) * (w - padL - padR);
+      const Y = (q) => padT + ((qTop - q) / (qTop - qBottom)) * (h - padT - padB);
+      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Queries for 100 bits at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} at the rung, ${CAPACITY_QUERIES} at capacity` });
+      const defs = svgEl("defs");
+      const pat = svgEl("pattern", { id: "board-dots", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
+      pat.append(svgEl("circle", { class: "board-dot", cx: 4.5, cy: 4.5, r: 1.4 }));
+      const dim = svgEl("pattern", { id: "board-dots-dim", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
+      dim.append(svgEl("circle", { class: "board-dot is-dim", cx: 4.5, cy: 4.5, r: 1.2 }));
+      defs.append(pat, dim); svg.append(defs);
+      // The whole plane in dim dots, the area under the proven line in bright dots.
+      svg.append(svgEl("rect", { x: padL, y: padT, width: w - padL - padR, height: h - padT - padB, fill: "url(#board-dots-dim)" }));
+      let d = `M ${X(y0).toFixed(1)} ${Y(QUERY_STEPS[0].queries).toFixed(1)}`;
+      for (const step of QUERY_STEPS) d += ` H ${X(step.year).toFixed(1)} V ${Y(step.queries).toFixed(1)}`;
+      const now = QUERY_STEPS[QUERY_STEPS.length - 1].queries;
+      d += ` H ${X(y1).toFixed(1)}`;
+      svg.append(svgEl("path", { class: "board-area", d: `${d} V ${Y(qBottom).toFixed(1)} H ${X(y0).toFixed(1)} Z`, fill: "url(#board-dots)" }));
+      // The rung and capacity, as lines to reach.
+      const rungY = Y(RUNG_QUERIES), capY = Y(CAPACITY_QUERIES);
+      svg.append(svgEl("line", { class: "board-rung", x1: padL, x2: X(y1) + 4, y1: rungY, y2: rungY }));
+      svg.append(svgEl("line", { class: "board-cap", x1: padL, x2: X(y1) + 4, y1: capY, y2: capY }));
+      svg.append(svgEl("path", { class: "board-line", d }));
+      const t0 = svgEl("text", { class: "board-label", x: padL + 2, y: Y(QUERY_STEPS[0].queries) - 10 }); t0.textContent = `${QUERY_STEPS[0].queries} · ${QUERY_STEPS[0].label}, ${QUERY_STEPS[0].year}`; svg.append(t0);
+      QUERY_STEPS.forEach((step, i) => {
+        const cx = X(step.year), cy = Y(step.queries);
+        svg.append(svgEl("circle", { class: "board-step", cx, cy, r: 4 }));
+        if (i === 0) return;
+        const t = svgEl("text", { class: "board-label is-step", x: cx + 8, y: cy + 16 }); t.textContent = `${step.queries} · ${step.label}, ${step.year}`; svg.append(t);
+      });
+      const end = { x: X(y1), y: Y(now) };
+      svg.append(svgEl("circle", { class: "board-end", cx: end.x, cy: end.y, r: 5 }));
+      const tn = svgEl("text", { class: "board-label is-now", x: end.x + 10, y: end.y + 4 }); tn.textContent = `${now} proven`; svg.append(tn);
+      const tr = svgEl("text", { class: "board-rung-label", x: end.x + 10, y: rungY + 4 }); tr.textContent = `${RUNG_QUERIES} · the rung`; svg.append(tr);
+      const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · capacity`; svg.append(tc);
+      const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
+      const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
+      const ax0 = svgEl("text", { class: "board-axis", x: padL, y: h - 8 }); ax0.textContent = "2018";
+      const ax1 = svgEl("text", { class: "board-axis", x: end.x, y: h - 8, "text-anchor": "middle" }); ax1.textContent = "today";
+      svg.append(ax0, ax1);
+      root.replaceChildren(svg);
+    };
+    draw();
+    if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(draw)).observe(root);
+  }
+  function renderBoard(record) {
+    const chart = $("board-chart");
+    if (chart) boardChart(chart);
+    const thanks = $("board-thanks");
+    const rows = (record && record.contributions) || [];
+    const names = [...new Set(rows.flatMap((r) => r.who))].filter((n) => !/same operator/i.test(n));
+    if (thanks && names.length) {
+      const marks = el("span", { class: "board-marks" }, ...names.slice(0, 12).map((n) => pseudonymMark(n)));
+      thanks.replaceChildren(marks, el("span", { class: "board-thanks-text" }, "Thanks to everyone here"));
+    }
+    const proved = $("board-proved");
+    if (!proved) return;
+    const counts = {
+      posted: rows.filter((r) => r.status === "posted").length,
+      lean: rows.filter((r) => r.kind === "formalization").length,
+      checked: rows.filter((r) => (r.reviews || []).length && (r.reviews || []).every((x) => /same operator/i.test(x.by || ""))).length,
+      reviewed: rows.filter((r) => r.reviewed && (r.reviews || []).some((x) => !/same operator/i.test(x.by || ""))).length,
+      settled: ((record && record.targets) || []).filter((t) => t.status === "solved" || t.status === "refuted").length,
+    };
+    const latest = rows.slice(0, 5).map((row) => {
+      const href = THREAD.test(row.thread || "") ? `/threads/${row.thread}` : row.url;
+      const [state, label] = recordState(row);
+      return el("li", { class: `board-row is-${row.kind}` },
+        el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
+        el("span", { class: "record-target" }, row.target),
+        href ? el("a", { href }, row.title) : el("span", {}, row.title),
+        el("span", { class: `verdict is-${state}` }, label));
+    });
+    proved.replaceChildren(
+      el("div", { class: "board-proved-head" }, el("h3", {}, "Proved here"),
+        el("p", { class: "board-counts" }, `${counts.posted} results posted · ${counts.lean} Lean-checked · ${counts.checked} checked by the maintainers · ${counts.reviewed} independently reviewed · ${counts.settled} targets settled`)),
+      el("ol", { class: "board-list" }, latest),
+      el("p", { class: "board-more" }, el("a", { href: "#record" }, "The full record, with reviews")));
+  }
   async function renderMathematics() {
     try {
       const response = await fetch("data/mathematics.json", { cache: "no-cache" });
@@ -515,11 +613,13 @@
       const record = await response.json();
       renderTargets(record);
       renderRecord(record);
+      renderBoard(record);
       const version = $("foot-version");
       if (version && record.source) version.textContent = `Built from provably.fast ${record.source} · ArkLib ${record.lean.commit.slice(0, 8)}`;
     } catch {
       const root = $("record-list");
       if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));
+      renderBoard(null);
     }
   }
 
