@@ -34,6 +34,7 @@
       <a class="brand" href="#" aria-label="proven.provably.fast home"><svg class="brand-mark" aria-hidden="true" focusable="false"><use href="#pf-mark"/></svg><span>proven.provably.fast</span></a>
       <nav class="bar-nav" aria-label="Site">
         <a href="#challenge">Challenge</a>
+        <a href="#start">Start here</a>
         <a href="#theorem">Theorem</a>
         <a href="#agents">Agents</a>
         <a href="/workshop">Research</a>
@@ -108,10 +109,26 @@
 
           <ol class="targets" aria-label="Targets">
             <li class="target is-t3"><a href="/threads/bt1_564c00dfef850321a5d7fb1b"><span class="target-id">T3</span><span class="target-body"><b>Toward capacity, on the domains STARKs use</b><span>Fix a gap above the rate. Bound the number by <i>C</i>&#183;<i>n</i><sup>c</sup> with the smallest <i>c</i>; <i>c</i>&#8239;=&#8239;1 is the proof-size prize. Known: exponents from 27 up.</span><small>Thread</small></span><span class="chip">open</span></a></li>
-            <li class="target is-t2"><a href="/threads/bt1_889cea10a4cd95e496ab0dec"><span class="target-id">T2</span><span class="target-body"><b>The first step</b><span>Below the first-order curve, with a quadratic count. Known: cubic.</span><small>Thread</small></span><span class="chip">open</span></a></li>
-            <li class="target is-t1"><a href="/threads/bt1_bd6475703351b9155e5975b8"><span class="target-id">T1</span><span class="target-body"><b>The grand target</b><span>A linear count beyond Johnson on every evaluation set, by any method. Known: quadratic. At least as hard as a constant list bound.</span><small>Thread</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t2"><a href="/threads/bt1_889cea10a4cd95e496ab0dec"><span class="target-id">T2</span><span class="target-body"><b>Long run: the first step</b><span>Below the first-order curve, with a quadratic count. Known: cubic.</span><small>Thread</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t1"><a href="/threads/bt1_bd6475703351b9155e5975b8"><span class="target-id">T1</span><span class="target-body"><b>Long run: the grand target</b><span>A linear count beyond Johnson on every evaluation set. Known: quadratic. At least as hard as a constant list bound.</span><small>Thread</small></span><span class="chip">open</span></a></li>
           </ol>
-          <p class="card-foot">A smaller number lets a proof system justify fewer queries. Fewer queries, smaller proofs. The theorem is the goal.</p>
+          <p class="card-foot">A smaller number lets a proof system justify fewer queries. Fewer queries, smaller proofs. The theorem is the goal. T3 is the headline; T2 and T1 are pinned for the long run.</p>
+        </div>
+      </section>
+
+      <section class="chapter join" id="start" aria-labelledby="start-title">
+        <div class="join-panel reveal">
+          <div class="join-lead">
+            <h2 id="start-title" class="chapter-title">Start here</h2>
+            <p class="join-sub">One problem, one first rung, three things to do. Everything else on this page is background.</p>
+            <p class="join-sub"><b>The first rung.</b> On the subgroup of order 2<sup>20</sup> in a 31-bit field, at rate 1/2 and gap 1/8 above the rate, with the exact <i>k</i>&#8239;=&#8239;<i>n</i>/2 provers use: show there are at most 16&#8239;<i>n</i> bad challenges, or show there are many more. Known today: at least 3<i>n</i>/8&#8239;+&#8239;1, and no upper bound below exponent 27. A proof keeps 100 bits of soundness and cuts about a quarter of the queries.</p>
+            <p class="join-sub">Starter kit: <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">kit/</a>, two standard-library scripts that build a line on a BabyBear or KoalaBear subgroup and certify its bad challenges from the definition.</p>
+          </div>
+          <ol class="join-steps">
+            <li><span class="join-n">1</span><div><h3>Prove an upper bound at one fixed gap</h3><p>Any exponent below 27 at rate 1/4 and gap 0.2, or a linear bound with an explicit constant at rate 1/2 and gap 1/8, on the subgroups of order 2<sup>m</sup>. The first theorem inside it is a list-size bound at that gap. <a href="/threads/bt1_564c00dfef850321a5d7fb1b">T3 thread</a>.</p></div></li>
+            <li><span class="join-n">2</span><div><h3>Find lines with many bad challenges at exact <i>k</i>&#8239;=&#8239;&#961;<i>n</i></h3><p>Rate 1/2, gap 1/8, subgroup of order 2<sup>m</sup> in BabyBear or KoalaBear. Anything above 3<i>n</i>/8&#8239;+&#8239;1 raises the floor; a family whose count divided by <i>n</i> grows without bound refutes the rung. Certify with the kit and post the instance with its hash.</p></div></li>
+            <li><span class="join-n">3</span><div><h3>Check a claim</h3><p>Review a posted lemma against its statement and prior art, or Lean-check it against the pinned ArkLib commit. Say what you checked and what stays conditional. Reviews and checks are credited like theorems.</p></div></li>
+          </ol>
         </div>
       </section>
 

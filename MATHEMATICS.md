@@ -188,7 +188,7 @@ lemma then applies on mu_(2^m) is itself open (T3 thread, post bp1_3d649db4dbd55
 
 ### T2
 
-**The first rung of T3.** An explicit threshold curve strictly between capacity and a_1(rho) at
+**Pinned for the long run: the first rung of T3.** An explicit threshold curve strictly between capacity and a_1(rho) at
 every rate, with E_C(a) at most quadratic in n. With two hidden derivatives the known bound is cubic
 (DKT Theorems 6.3 and 6.6), in the agreement range those theorems cover. Lean:
 `MCAChallenge.T2 a2 C B`, below `MCAChallenge.firstOrderCurve` at every rate. Thread:
@@ -196,7 +196,7 @@ every rate, with E_C(a) at most quadratic in n. With two hidden derivatives the 
 
 ### T1
 
-**The grand target: a linear count beyond Johnson, on every evaluation set.** For 0 < rho < 1 and
+**Pinned for the long run: a linear count beyond Johnson, on every evaluation set.** For 0 < rho < 1 and
 a_1(rho) < a: E_C(a) <= C(rho, a) n with C explicit, for every Reed-Solomon code of rate rho on any
 prescribed set, over a field of characteristic 0 or above a stated bound, by any method. This is
 DKT Theorem 1.1 with one factor of n removed, which its authors list as open (Section 10.4). Above
@@ -230,7 +230,25 @@ directly, or a different strategy, is just as welcome.
 
 ## Where to start
 
-Five lanes, each with a deliverable anyone can check.
+One problem, one first rung, three things to do; everything else in this document is background.
+The first rung: on mu_(2^20) in a 31-bit field, at rate 1/2 and gap 1/8 with the exact k = n/2
+that provers use, show there are at most 16 n bad challenges, or show there are many more. Known:
+at least 3n/8 + 1, and no upper bound below exponent 27. The starter kit in `kit/` (two
+standard-library scripts) builds a line on a BabyBear or KoalaBear subgroup and certifies its bad
+challenges from the definition.
+
+1. **Prove an upper bound at one fixed gap.** Any exponent below 27 at rate 1/4 and gap 0.2, or a
+   linear bound with an explicit constant at rate 1/2 and gap 1/8, on mu_(2^m) at exact k = rho n.
+   The first theorem inside it is a list-size bound at that gap.
+2. **Find lines with many bad challenges at exact k = rho n.** Rate 1/2, gap 1/8, mu_(2^m) in
+   BabyBear or KoalaBear: anything above 3n/8 + 1 raises the floor; a family whose count divided
+   by n grows without bound refutes the rung. Certify with the kit and post the instance with its
+   SHA-256. A larger finite example improves the record; it is not a refutation.
+3. **Check a claim.** Review a posted lemma against its statement and prior art, or Lean-check it
+   against the pinned ArkLib commit; say what you checked and what stays conditional. Reviews and
+   checks are credited like theorems.
+
+The longer menu, for anyone who has done one of the three:
 
 1. **T3 with numbers.** On mu_(2^m) at rate 1/4 or 1/2 and gap 0.2, 1/8 or 1/16: any bound with an
    exponent below 27, or a linear bound with an explicit C. The first theorem inside it is a
