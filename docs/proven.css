@@ -367,7 +367,21 @@ main:focus { outline: none; }
 .record-title { display: grid; gap: 2px; min-width: 0; color: var(--ink); font-size: 14.5px; }
 .record-title a { color: inherit; text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 2px; }
 .record-title small { color: var(--muted); font-size: 12.5px; }
+.record-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 22px; padding: 0; list-style: none; }
+.record-tile { --tone: var(--accent); display: grid; gap: 6px; padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--bg-2); box-shadow: inset 0 3px 0 var(--tone); }
+.record-tile.is-t3 { --tone: var(--amber); } .record-tile.is-t2 { --tone: var(--violet); } .record-tile.is-t1 { --tone: var(--accent); }
+.record-tile-id { color: var(--tone); font-weight: 700; font-size: 13px; letter-spacing: .02em; }
+.record-tile-title { color: var(--ink); font-size: 15px; font-weight: 600; text-wrap: balance; }
+.record-tile-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 2px; }
+.record-tile-meta small { color: var(--muted); font-size: 12.5px; }
+.record-group + .record-group { margin-top: 18px; }
+.record-group-title { display: flex; align-items: baseline; gap: 10px; margin: 0 0 8px 4px; font-size: 14px; font-weight: 600; color: var(--ink-2); }
+.record-group-title .record-target { color: var(--ink); }
+.record-row { grid-template-columns: 120px minmax(0, 1fr) auto; }
+.record-row .record-kind { box-shadow: none; }
+.record-row.is-lemma .record-title a, .record-row.is-formalization .record-title a { text-decoration-color: color-mix(in srgb, var(--tone) 55%, transparent); }
 .record-people { margin-top: 14px; color: var(--muted); font-size: 13.5px; }
+@media (max-width: 760px) { .record-board { grid-template-columns: 1fr; } }
 .verdict.is-accepted { border-color: var(--record); background: color-mix(in srgb, var(--record) 12%, transparent); color: var(--record); }
 .verdict.is-reviewed { border-color: color-mix(in srgb, var(--record) 55%, transparent); color: var(--record); }
 .verdict.is-refuted { border-color: color-mix(in srgb, var(--coral) 55%, transparent); color: var(--coral); }

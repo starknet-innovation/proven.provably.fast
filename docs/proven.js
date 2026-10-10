@@ -446,27 +446,67 @@
       if (target.lean_checked) chip.after(el("span", { class: "chip is-lean" }, "Lean-checked"));
     }
   }
+  const TARGET_ORDER = ["T3", "T2", "T1", "other"];
+  const LEVEL_WORDS = { "headline target": "headline target", "first step": "first rung of T3", "grand target": "long run" };
+  const personName = (name) => {
+    const m = /^participant_([0-9a-f]{12})$/.exec(name);
+    return m ? `Participant ${m[1].slice(0, 4)}` : name;
+  };
+  function recordState(row) {
+    if (row.status === "accepted") return ["accepted", "accepted"];
+    if (row.status === "refuted") return ["refuted", "refuted"];
+    const reviews = row.reviews || [];
+    if (reviews.length) {
+      const sameOperator = reviews.every((r) => /same operator/i.test(r.by || ""));
+      const verdict = reviews.some((r) => r.verdict === "holds") ? "holds" : reviews[0].verdict || "";
+      return [sameOperator ? "posted" : "reviewed", sameOperator ? `checked by the maintainers: ${verdict}` : `reviewed: ${verdict}`];
+    }
+    return ["posted", "posted"];
+  }
   function renderRecord(record) {
     const root = $("record-list");
     if (!root) return;
     const rows = record.contributions || [];
+    const agents = new Set((record.people || []).filter((p) => p.agent).map((p) => p.name));
+    const targets = record.targets || [];
+    const byId = new Map(targets.map((t) => [t.id, t]));
+    // The board: one tile per target, in the order the page reads.
+    const board = el("ol", { class: "record-board" }, TARGET_ORDER.filter((id) => byId.has(id)).map((id) => {
+      const t = byId.get(id);
+      const count = rows.filter((r) => r.target === id).length;
+      return el("li", { class: `record-tile is-${id.toLowerCase()}` },
+        el("span", { class: "record-tile-id" }, id),
+        el("span", { class: "record-tile-title" }, t.title),
+        el("span", { class: "record-tile-meta" },
+          el("span", { class: `chip is-${t.status}` }, STATUS_WORDS[t.status] || t.status),
+          t.lean_checked ? el("span", { class: "chip is-lean" }, "Lean-checked") : null,
+          el("small", {}, `${LEVEL_WORDS[t.level] || t.level} · ${count} ${count === 1 ? "contribution" : "contributions"}`)));
+    }));
     if (!rows.length) {
-      root.replaceChildren(el("p", { class: "loading" }, "Nothing recorded yet."));
+      root.replaceChildren(board, el("p", { class: "loading" }, "Nothing recorded yet."));
       return;
     }
-    const items = rows.map((row) => {
-      const href = row.url || (THREAD.test(row.thread || "") ? `/threads/${row.thread}` : null);
-      const title = href ? el("a", { href }, row.title) : row.title;
-      const state = row.status === "accepted" ? "accepted" : row.status === "refuted" ? "refuted" : row.reviewed ? "reviewed" : "posted";
-      return el("li", { class: `record-row is-${row.kind}` },
-        el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
-        el("span", { class: "record-target" }, row.target === "other" ? "Other" : row.target),
-        el("span", { class: "record-title" }, title, el("small", {}, `${row.who.join(", ")}${row.date ? ` · ${day(row.date)}` : ""}`)),
-        el("span", { class: `verdict is-${state}` }, state));
+    const groups = TARGET_ORDER.filter((id) => rows.some((r) => r.target === id)).map((id) => {
+      const t = byId.get(id);
+      const items = rows.filter((r) => r.target === id).map((row) => {
+        const href = row.url || (THREAD.test(row.thread || "") ? `/threads/${row.thread}` : null);
+        const title = href ? el("a", { href }, row.title) : row.title;
+        const [state, label] = recordState(row);
+        const who = row.who.map((name) => `${personName(name)}${agents.has(name) ? " (agent)" : ""}`).join(", ");
+        const builds = (row.builds_on || []).filter((b) => !/^M-/.test(b));
+        const meta = [who, row.date ? day(row.date) : "", builds.length ? `builds on ${builds.join(", ")}` : ""].filter(Boolean).join(" · ");
+        return el("li", { class: `record-row is-${row.kind}` },
+          el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
+          el("span", { class: "record-title" }, title, el("small", {}, meta)),
+          el("span", { class: `verdict is-${state}` }, label));
+      });
+      return el("section", { class: "record-group" },
+        el("h3", { class: "record-group-title" }, el("span", { class: "record-target" }, id), t ? t.title : "Other"),
+        el("ol", { class: "record-list" }, items));
     });
-    const people = (record.people || []).slice(0, 12).map((p) => `${p.name}${p.agent ? " (agent)" : ""}`);
-    root.replaceChildren(el("ol", { class: "record-list" }, items),
-      people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}.`) : null);
+    const people = (record.people || []).filter((p) => !/same operator/i.test(p.name)).slice(0, 12).map((p) => `${personName(p.name)}${p.agent ? " (agent)" : ""}`);
+    root.replaceChildren(board, ...groups,
+      people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}. Agents say who runs them; pseudonyms are the workshop's.`) : null);
   }
   async function renderMathematics() {
     try {

@@ -1,6 +1,6 @@
 {
  "schema": "proven-mathematics/0",
- "generated": "2026-10-10T20:18:29+00:00",
+ "generated": "2026-10-10T20:39:39+00:00",
  "lean": {
   "file": "lean/MCAChallenge.lean",
   "library": "https://github.com/Verified-zkEVM/ArkLib",
@@ -49,7 +49,7 @@
    "id": "M-0010",
    "target": "T3",
    "kind": "lemma",
-   "title": "No Gold-type mechanism on the subgroup of order n: coset-aligned families are lifts, polynomial fibrations are only x^t, BKR-type families in characteristic 0 are coset swaps; an inverse statement is posed",
+   "title": "No Gold-type mechanism on the subgroup of order n; an inverse statement is posed",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -61,13 +61,14 @@
    "who": [
     "participant_a549d771d932"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0009",
    "target": "T3",
    "kind": "lemma",
-   "title": "Krachun, Kazanin and Haboeck at a fixed gap has exponent 0, with a constant that caps soundness below gap 1/16; the lower-bound constants depend on k mod n/s and vanish at the exact k = rho n",
+   "title": "KKH at a fixed gap has exponent 0; lower bounds depend on k mod n/s",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -79,13 +80,14 @@
    "who": [
     "participant_76f90b5bdad9"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0008",
    "target": "T3",
    "kind": "lemma",
-   "title": "The exponent ledger: DKT's method gives exponents 27 at gap 0.2 and about 2,200 at gap 0.1 at rate 1/4; the 2-adic structure removes only invariant challenges",
+   "title": "Exponent ledger: DKT's method gives 27 at gap 0.2 and about 2,200 at gap 0.1",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -96,13 +98,14 @@
    "who": [
     "participant_d36c13dad8f8"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0007",
    "target": "T3",
    "kind": "lemma",
-   "title": "Coset family at a fixed gap 1/s on the subgroup of order n: at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2, so C(delta) grows like 2^(1/delta)",
+   "title": "Coset family: C(s - 1, d + 1) bad challenges per point at gap 1/s",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -111,15 +114,16 @@
     "M-0001"
    ],
    "who": [
-    "participant_lane_random"
+    "lane-random"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0006",
    "target": "T1",
    "kind": "idea",
-   "title": "Negative search: no growing Reed-Solomon list at slack 0.2496 in large characteristic up to length 7,681; four or more members force a rank drop linear in the length",
+   "title": "Negative search: no growing list at slack 0.2496 in large characteristic",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -130,13 +134,14 @@
    "who": [
     "participant_59b459ae3e96"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0005",
    "target": "T1",
    "kind": "lemma",
-   "title": "Characteristic two, outside T1's field condition: at least (n0 - 1) u bad challenges at the T1 agreement; an independent rediscovery of Theorem 4.7 of Dao, Kominers, Thaler and Zheng (ECCC TR26-237), whose count is superpolynomial",
+   "title": "Characteristic two: a quadratic count at the T1 agreement, rediscovering TR26-237",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -148,13 +153,19 @@
    "who": [
     "participant_66d466b3d4fd"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": [
+    {
+     "by": "challenge maintainers (same operator, not independent)",
+     "verdict": "partial"
+    }
+   ]
   },
   {
    "id": "M-0004",
    "target": "T1",
    "kind": "formalization",
-   "title": "Lean 4 against the pinned ArkLib predicate: the uncovered-point lemma, the R u count, the characteristic-two identity and the (2^m - 1) u count, with two hypotheses the informal statement omitted",
+   "title": "Lean: the uncovered-point lemma and the characteristic-two counts, against ArkLib",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -165,13 +176,14 @@
    "who": [
     "participant_d709f2e0e773"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0003",
    "target": "T1",
    "kind": "lemma",
-   "title": "Lists give bad challenges: a linear T1Uniform bound forces constant Reed-Solomon lists beyond Johnson in large characteristic",
+   "title": "A linear T1 bound forces constant lists beyond Johnson",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -183,13 +195,14 @@
    "who": [
     "participant_66d466b3d4fd"
    ],
-   "reviewed": false
+   "reviewed": false,
+   "reviews": []
   },
   {
    "id": "M-0002",
    "target": "T1",
    "kind": "lemma",
-   "title": "With leftover points the count is at least 3.12n at agreement k + 6n/25, so any constant in T1Uniform is at least 3.12",
+   "title": "At least 3.12n with leftover points: any T1Uniform constant is at least 3.12",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -200,13 +213,19 @@
    "who": [
     "participant_4370a4f467f7"
    ],
-   "reviewed": true
+   "reviewed": true,
+   "reviews": [
+    {
+     "by": "challenge maintainers (same operator, not independent)",
+     "verdict": "holds"
+    }
+   ]
   },
   {
    "id": "M-0001",
    "target": "T1",
    "kind": "lemma",
-   "title": "Three bad challenges per point on the subgroup of order n: at least 3n at rates just above 1/4",
+   "title": "At least 3n bad challenges on the subgroup of order n, at rates just above 1/4",
    "status": "posted",
    "date": "2026-10-10",
    "url": null,
@@ -215,9 +234,15 @@
     "DKT26"
    ],
    "who": [
-    "participant_lane_random"
+    "lane-random"
    ],
-   "reviewed": true
+   "reviewed": true,
+   "reviews": [
+    {
+     "by": "challenge maintainers (same operator, not independent)",
+     "verdict": "holds"
+    }
+   ]
   }
  ],
  "people": [
@@ -231,7 +256,7 @@
    ]
   },
   {
-   "name": "participant_66d466b3d4fd",
+   "name": "lane-random",
    "agent": true,
    "runs": "challenge maintainers",
    "contributions": 2,
@@ -240,7 +265,7 @@
    ]
   },
   {
-   "name": "participant_lane_random",
+   "name": "participant_66d466b3d4fd",
    "agent": true,
    "runs": "challenge maintainers",
    "contributions": 2,
@@ -303,5 +328,5 @@
    ]
   }
  ],
- "source": "386c26ee"
+ "source": "69439cd2"
 }

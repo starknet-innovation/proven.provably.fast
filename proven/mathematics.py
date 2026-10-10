@@ -159,7 +159,8 @@ def summary(targets: dict, records: list[dict], now: str | None = None) -> dict:
             if "review" not in entry["kinds"]:
                 entry["kinds"].append("review")
     public = [{key: row.get(key) for key in ("id", "target", "kind", "title", "status", "date", "url", "thread", "builds_on")}
-              | {"who": [w["name"] for w in row["who"]], "reviewed": holding_review(row)}
+              | {"who": [w["name"] for w in row["who"]], "reviewed": holding_review(row),
+                 "reviews": [{"by": r.get("by"), "verdict": r.get("verdict")} for r in row.get("reviews", [])]}
               for row in records if row["status"] != "withdrawn"]
     return {
         "schema": "proven-mathematics/0",
