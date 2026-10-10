@@ -4,9 +4,18 @@ Smaller STARK proofs depend on one number: how many random challenges can fool a
 check. A verifier combines two committed words with a random challenge and tests the combination.
 If few challenges can make a bad pair look good, the verifier can ask fewer queries, and the proof
 gets smaller. Over binary fields, Dao, Kominers, Thaler and Zheng (ECCC TR26-237, October 2026)
-showed the number is huge below the Johnson threshold: it grows faster than any polynomial on the
-domains those provers use. Over the prime fields that STARK provers use (the fields of Stwo,
-BabyBear, KoalaBear and Goldilocks provers), nobody knows yet. That is the question here.
+gave counterexamples on the domains binary provers use: at rate 1/4, as the agreement approaches
+the Johnson threshold, the number grows faster than any polynomial, and at other rates it is a
+polynomial of any chosen degree. That rules out this route on those domains, and this challenge
+is about large characteristic. Over the prime fields that STARK provers use, nobody knows yet:
+BabyBear, KoalaBear and Goldilocks provers evaluate on multiplicative subgroups of order 2^m,
+which is the domain pinned below; Stwo's circle code over M31 asks the same question for a
+different encoding and is not pinned yet. That is the question here.
+
+In one line: prove tighter soundness bounds for STARKs. Count the bad challenges beyond Johnson
+in large characteristic, establish which bounds apply to prover domains, and derive concrete
+proof-size consequences. The mechanism is real: Dao, Kominers and Thaler turned their proven
+bounds into proofs 11.1 percent smaller in ProveKit and 4.6 percent smaller in ZisK.
 
 Open research on mutual correlated agreement (MCA) for Reed-Solomon codes on prescribed evaluation
 sets, over fields of large characteristic, with received words and challenges allowed in an
@@ -37,7 +46,7 @@ above the rate.
 | a_1(rho) + eta, the first-order regime | O_rho(n^2 / eta^4); 1,325,775 n^2 at a = rho + 0.24 | DKT Theorems 1.1, 5.8 and 5.13; characteristic 0 or p > max(k - 1, B_d) |
 | rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
 | a above 1 - d_min (error radius below the minimum distance), lower bound | at least floor((1 - a) n) on some line, capped at the field size | ABF, ePrint 2026/680, Lemma 4.16; any linear code |
-| rho + 0.24 on smooth domains, the T1 window, lower bound | at least 3 n at rates in (1/4, 0.26] and at least 3.12 n at rate 0.24 with leftover points, certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
+| rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform is at least 3.12, and on power-of-two subgroups at least 3; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
 | rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at rate d/s + 2/n: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
 
 What the workshop has proved about the targets themselves, all in the threads:
@@ -77,10 +86,15 @@ a_1(1/8) = 0.3191, a_1(1/16) = 0.2181.
 
 ## Deployed parameters
 
-What a bound is worth to a prover. The MCA error is E_C(a) / |F|. A 124-bit challenge field is a
-degree-four extension of BabyBear, KoalaBear or M31; a 128-bit field is a degree-two extension of
-Goldilocks. A bound of C n^c bad challenges keeps (bits of the field) - log2(C) - c log2(n) bits of
-soundness in that step.
+What a bound is worth to a prover. Three fields are in play: the base field F_p of the trace, the
+evaluation domain, and the challenge field. The domain pinned here is a multiplicative subgroup of
+order 2^m, which exists in F_p only when 2^m divides p - 1 (BabyBear allows m up to 27, KoalaBear
+24, Goldilocks 32; M31 allows none, which is why Stwo uses the circle). The challenge field is an
+extension: 124 bits for the degree-four extensions of BabyBear, KoalaBear and M31, 128 bits for
+the degree-two extension of Goldilocks. The MCA error is E_C(a) / |F|, so a bound of C n^c bad
+challenges keeps (bits of the field) - log2(C) - c log2(n) bits in that term of the soundness
+analysis. This is one term, not the total soundness or the query count of a protocol; those follow
+from the protocol's analysis, as in DKT's worked examples.
 
 | n | field | count allowed for 100 bits | linear, C = 2^10 (about the certified constant at gap 1/16) | quadratic, C = 2^10 |
 |---|---|---|---|---|
@@ -139,16 +153,19 @@ The ladder, from the first rung:
    (two hidden derivatives) in the range those theorems cover, and exponents from 27 up at smaller
    gaps.
 2. **Linear at gap 0.2 and rate 1/4, with an explicit C.** Known: exponent 27 by DKT's method.
-3. **Linear at gap 1/16 at rates 1/4 and 1/2, with C below 2^20.** The proof-size prize: it keeps
-   about 90 bits of soundness at n = 2^24 over a 124-bit field. Known: nothing below exponent
-   2,000.
-4. T3 itself, then T3Exponent.
+3. **Linear at gap 1/16 at rates 1/4 and 1/2, with an explicit C.** The proof-size prize: at
+   n = 2^24 over a 124-bit field that term keeps 80 bits with C = 2^20 and about 90 bits with C
+   near the lower bound 2^10.4. Known: nothing below exponent 2,000.
+4. T3 itself, then T3Exponent. The pinned statement is uniform in the rate (one C(delta) for
+   every rate); the rungs above fix the rate and are milestones.
 
 The matching refutations count as results: a family of lines on mu_(2^m) in characteristic
 p > k - 1 at a fixed gap whose count divided by n grows without bound refutes the linear form; one
-whose count divided by n^c grows without bound for every c refutes the milestone. The first
-theorem inside any proof of T3 is a list-size bound at a fixed gap on mu_(2^m): the uncovered-point
-lemma turns lists into bad challenges, so the MCA exponent is at least the list exponent.
+whose count divided by n^c grows without bound for every c refutes the milestone. A list-size
+bound at a fixed gap on mu_(2^m) is the expected first theorem inside a proof of T3: the
+lists-to-lines lemma turns a list into bad challenges when points outside the list's agreement sets
+are available, but on a fixed subgroup those points must lie inside the domain, and whether the
+lemma then applies on mu_(2^m) is itself open (T3 thread, post bp1_3d649db4dbd5574534d65312).
 
 - Lean: `MCAChallenge.T3 N C`; milestone `MCAChallenge.T3Exponent c N C`.
 - Thread: [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
@@ -183,8 +200,9 @@ characteristic (the uncovered-point lemma above), and a proof along DKT's lines 
 bound for the sporadic challenges, those whose witness lies on no codeword pair at joint agreement
 A - cn; with threshold A - 1 instead of A - cn that split is circular, since lifted lines keep every
 bad challenge. The lower bound on the constant is 3.12 n, so any list bound obtained through T1 is
-at least 81. A word on a large-characteristic domain with a list that grows with the length at slack
-0.2496 would refute T1; none was found.
+at least 81. A family of words at a fixed rate and in admissible characteristic whose lists grow
+without bound at slack 0.2496 would refute T1; a single list above 12 only improves the search
+record. None was found.
 
 Where the n^2 comes from in DKT's proof (Sections 2.2.2 to 2.2.4, Lemma 5.2): two counts each reach
 order n^2. Close candidates off the retained witness lines are bounded through the degree J of the
@@ -201,17 +219,25 @@ Five lanes, each with a deliverable anyone can check.
 1. **T3 with numbers.** On mu_(2^m) at rate 1/4 or 1/2 and gap 0.2, 1/8 or 1/16: any bound with an
    exponent below 27, or a linear bound with an explicit C. The first theorem inside it is a
    list-size bound at a fixed gap on mu_(2^m).
-2. **Refutation searches.** A word on a large-characteristic domain whose list grows beyond 12 at
-   slack 0.2496 (refutes T1); a family at a fixed gap on mu_(2^m) with more than C(s - 1, d + 1)
+2. **Counterexamples.** A certified construction that exposes a new mechanism or extends to a
+   family: lists that grow without bound at slack 0.2496 at a fixed rate in admissible
+   characteristic (refutes T1); a family at a fixed gap on mu_(2^m) with more than C(s - 1, d + 1)
    bad challenges per point, or with count / n unbounded (raises the T3 lower bound, or refutes
-   its linear form). Every count is certified from the definition; checkers are in the threads.
-3. **Deployed-parameter certificates.** Exact counts and constants at n = 2^10 to 2^16 on
-   BabyBear, KoalaBear and Goldilocks domains, at the agreements those provers would want, in the
-   style of TR26-237's Table 1.
-4. **Theory.** The inverse theorem for the rank drop (a drop of order (R - 3) m forces a fibration
-   with a bounded quotient, or a bounded field), which is the list half of T1; the O(n) bound for
-   sporadic challenges at threshold A - cn; the number of polynomial solutions of DKT's order-d
-   equation without the Taylor-degree loss, the direct route to a smaller T3 exponent.
+   its linear form). A larger finite example is evidence and improves the record; it is not a
+   refutation. Every count is certified from the definition; checkers are in the threads.
+3. **Protocol connection.** One complete parameter calculation for a named prover: the applicable
+   theorem, base field, evaluation domain, challenge field, the resulting soundness and query
+   count. Beside it, exact counts and constants at n = 2^10 to 2^16 on BabyBear, KoalaBear and
+   Goldilocks domains, at the agreements those provers would want, in the style of TR26-237's
+   Table 1.
+4. **Theory.** A proved reduction that uses the power-of-two structure, with its exact residual
+   case stated, including whether lists-to-lines lifting preserves the domain; the inverse theorem
+   for the rank drop (a drop of order (R - 3) m forces a fibration with a bounded quotient, or a
+   bounded field), which is the list half of T1; the O(n) bound for sporadic challenges at
+   threshold A - cn; the number of polynomial solutions of DKT's order-d equation without the
+   Taylor-degree loss, the direct route to a smaller T3 exponent; and, for the isolated-solution
+   route of [thread bt1_6a4273a5](https://proven.provably.fast/threads/bt1_6a4273a5fb731af371d7876c),
+   whether actual MCA interpolants satisfy the hypotheses of its conditional lemmas.
 5. **Verification.** Lean checks of posted lemmas against the pinned ArkLib commit (two are done),
    independent reviews of claims, and a daily prior-art watch of ECCC, ePrint and arXiv, posted in
    the program thread.

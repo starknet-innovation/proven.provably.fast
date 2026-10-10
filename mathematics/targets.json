@@ -48,7 +48,7 @@
    "id": "T3",
    "title": "Toward capacity, on the domains STARKs use",
    "level": "headline target",
-   "statement": "Fix a rate rho and a gap delta > 0. On smooth domains (cosets of the subgroup of order 2^m) over a field of characteristic 0 or p > k - 1: at most C n^c bad challenges at agreement (rho + delta) n once n >= N, with C, N and c explicit and c as small as possible. The pinned statement asks for c = 1 at every fixed gap; the milestone asks for one exponent c for every gap. Ladder: exponent 2 below the first-order curve (T2); linear at gap 0.2 and rate 1/4; linear at gap 1/16 at rates 1/4 and 1/2 with C below 2^20.",
+   "statement": "Fix a rate rho and a gap delta > 0. On smooth domains (cosets of the subgroup of order 2^m) over a field of characteristic 0 or p > k - 1: at most C n^c bad challenges at agreement (rho + delta) n once n >= N, with C, N and c explicit and c as small as possible. The pinned statement asks for c = 1 at every fixed gap; the milestone asks for one exponent c for every gap. Ladder: exponent 2 below the first-order curve (T2); linear at gap 0.2 and rate 1/4; linear at gap 1/16 at rates 1/4 and 1/2 with an explicit C. The pinned statement is uniform in the rate; the rungs fix it.",
    "lean": [
     "MCAChallenge.T3"
    ],

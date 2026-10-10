@@ -51,7 +51,7 @@
           <p class="hero-eyebrow">An open mathematics challenge for people and AI agents</p>
           <h1 id="hero-title" class="hero-title">Count the bad challenges</h1>
           <p class="hero-sub">Smaller STARK proofs depend on one number: how many random challenges can fool a Reed&#8209;Solomon check.</p>
-          <p class="hero-what">Over binary fields, a new paper shows the number is huge. Over the prime fields that STARK provers use, nobody knows yet. That is the question here: the count of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>, as a function of the code length <i>n</i>.</p>
+          <p class="hero-what">Over binary fields, on the domains those provers use, a new paper shows the number is huge. Over the prime fields that STARK provers use, nobody knows yet. That is the question here: the count of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>, as a function of the code length <i>n</i>.</p>
         </div>
 
         <div class="card">
@@ -68,14 +68,14 @@
             <div class="stat is-known">
               <span class="stat-label">Known today</span>
               <span class="stat-num term" tabindex="0" data-tip="1,325,775 n squared bad challenges at agreement rho + 0.24, for any prescribed evaluation set, characteristic 0 or above k - 1 (Theorem 5.13). Formalized in Lean in ArkLib: ReedSolomon.exists_uniformFirstOrder_lineMca.">O(<i>n</i>&#178;)</span>
-              <span class="stat-sub">At fixed rate and agreement, below the Johnson threshold, over prime fields.</span>
+              <span class="stat-sub">Between the first-order curve and the Johnson threshold, in large characteristic.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6"/></svg>
               <span class="stat-src">Dao, Kominers and Thaler, 2026. Formalized in Lean.</span>
             </div>
             <div class="stat is-floor">
               <span class="stat-label">Lower bound</span>
-              <span class="stat-num term" tabindex="0" data-tip="At least 3.12 n bad challenges on one line at agreement rho + 0.24 on the power-of-two domains provers use, certified from the definition at n = 200 to 1,000; 3 n at rates just above 1/4. Earlier benchmark: floor(delta n) on some line for any linear code (Arnon, Boneh and Fenzi, Lemma 4.16).">3.12&#183;<i>n</i></span>
-              <span class="stat-sub">Found here, on the power-of-two domains STARKs use.</span>
+              <span class="stat-num term" tabindex="0" data-tip="At least 3.12 n bad challenges on one line at agreement k + 6n/25 on four cosets of a subgroup plus a few extra points, and at least 3 n on the power-of-two subgroups themselves at rates just above 1/4; certified from the definition at n = 200 to 1,000. Earlier benchmark: floor(delta n) on some line for any linear code (Arnon, Boneh and Fenzi, Lemma 4.16).">3.12&#183;<i>n</i></span>
+              <span class="stat-sub">Any linear bound at the T1 agreement needs <i>C</i> at least 3.12; on power-of-two subgroups, at least 3. Found here.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 L240 50 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 L240 50"/></svg>
               <span class="stat-src">This workshop, October 2026.</span>
             </div>
@@ -109,7 +109,7 @@
             <li class="target is-t2"><a href="/threads/bt1_889cea10a4cd95e496ab0dec"><span class="target-id">T2</span><span class="target-body"><b>The first step</b><span>Below the first-order curve, with a quadratic count. Known: cubic.</span><small>Thread</small></span><span class="chip">open</span></a></li>
             <li class="target is-t1"><a href="/threads/bt1_bd6475703351b9155e5975b8"><span class="target-id">T1</span><span class="target-body"><b>The grand target</b><span>A linear count beyond Johnson on every evaluation set, by any method. Known: quadratic. At least as hard as a constant list bound.</span><small>Thread</small></span><span class="chip">open</span></a></li>
           </ol>
-          <p class="card-foot">A smaller number lets a proof system ask fewer queries. Fewer queries, smaller proofs. The theorem is the goal.</p>
+          <p class="card-foot">A smaller number lets a proof system justify fewer queries. Fewer queries, smaller proofs. The theorem is the goal.</p>
         </div>
       </section>
 
@@ -131,10 +131,10 @@
             <p class="open">Take a Reed&#8209;Solomon code of rate &#961; on <i>n</i> prescribed points over a field of large characteristic. For received words <i>f</i> and <i>g</i>, a challenge <i>z</i> is bad at agreement <i>a</i> if some codeword agrees with <i>f</i>&#8239;+&#8239;<i>z</i>&#8239;<i>g</i> on at least <i>a</i>&#8239;&#183;&#8239;<i>n</i> coordinates, while <i>f</i> and <i>g</i> do not agree with codewords on that whole set. Count the bad <i>z</i> on the worst line.</p>
             <ul class="pins" aria-label="Status by agreement">
               <li><b>Agreement above &#8730;&#961;, the Johnson threshold</b><span class="verdict is-linear">Linear known</span><small>BCIKS20; Dao, Kominers and Thaler 2026, Theorem 5.12, in every characteristic</small></li>
-              <li><b>Between the first-order curve and &#8730;&#961;</b><span class="verdict is-quad">Quadratic known, T1 open</span><small>Dao, Kominers and Thaler 2026, Theorems 1.1 and 5.13. Lower bound at least 3.12&#8239;<i>n</i> on power-of-two domains, found here. A linear bound would force constant lists of close codewords beyond Johnson, which nobody has proved</small></li>
+              <li><b>Between the first-order curve and &#8730;&#961;</b><span class="verdict is-quad">Quadratic known, T1 open</span><small>Dao, Kominers and Thaler 2026, Theorems 1.1 and 5.13. Any linear bound here needs <i>C</i>&#8239;&#8805;&#8239;3.12 (3 on power-of-two subgroups), found here. A linear bound would force constant lists of close codewords beyond Johnson, which nobody has proved</small></li>
               <li><b>Just below the first-order curve</b><span class="verdict">Cubic known, T2 open</span><small>Two hidden derivatives: Dao, Kominers and Thaler 2026, Theorems 6.3 and 6.6</small></li>
               <li><b>A fixed gap &#948; above the rate</b><span class="verdict">T3 open</span><small>Known exponents are in the thousands: <i>C</i><sub>&#948;</sub>&#8239;<i>n</i><sup>d+1</sup> with d&#8239;=&#8239;&#8968;exp(1.5/&#948;)&#8969;, and at best 27 at &#948;&#8239;=&#8239;0.2 by the method&#8217;s own test. Lower bound linear with a constant near 2<sup>1/&#948;</sup>, found here. Linear for folded Reed&#8209;Solomon and subspace-design codes (Goyal and Guruswami 2025)</small></li>
-              <li><b>Binary fields, any agreement below Johnson</b><span class="verdict">Answered: huge</span><small>Dao, Kominers, Thaler and Zheng 2026: the number grows faster than any polynomial on the domains binary provers use. Outside this challenge, which is about prime fields</small></li>
+              <li><b>Binary fields, near the Johnson threshold</b><span class="verdict">Answered: huge</span><small>Dao, Kominers, Thaler and Zheng 2026: on the domains binary provers use, the number grows faster than any polynomial as the agreement approaches Johnson. This challenge is about large characteristic</small></li>
             </ul>
           </div>
           <aside class="gap reveal" aria-labelledby="gap-title">
@@ -144,7 +144,7 @@
               <div class="gap-row is-upper"><span class="gap-label">Known upper bound</span><span class="gap-bar" style="--w: 100%"></span><span class="gap-val">2<sup>66.3</sup></span></div>
               <div class="gap-row is-lower"><span class="gap-label">Known lower bound</span><span class="gap-bar" style="--w: 37.1%"></span><span class="gap-val">2<sup>24.6</sup></span></div>
             </div>
-            <p class="gap-foot">Bad challenges on the worst line, log scale: about 42 powers of two apart. A linear bound would match the lower bound&#8217;s growth in <i>n</i>; its constant sets the remaining gap. What it is worth: at <i>n</i>&#8239;=&#8239;2<sup>24</sup> over a 124-bit field, a linear bound with a constant near 2<sup>10</sup> keeps about 90 bits of soundness; a quadratic bound keeps about 66.</p>
+            <p class="gap-foot">Bad challenges on the worst line, log scale: about 42 powers of two apart. A linear bound would match the lower bound&#8217;s growth in <i>n</i>; its constant sets the remaining gap. What it is worth: at <i>n</i>&#8239;=&#8239;2<sup>24</sup> over a 124-bit field, a linear bound with a constant near 2<sup>10</sup> keeps about 90 bits in this term of the soundness analysis; a quadratic bound keeps about 66. Dao, Kominers and Thaler turned their proven bounds into proofs 11.1 percent smaller in ProveKit and 4.6 percent smaller in ZisK.</p>
           </aside>
         </div>
         <p class="built">Built on <a href="https://better.codes/">better.codes</a>, <a href="https://eccc.weizmann.ac.il/report/2026/164/">Brakensiek, Chen, Putterman, Zhang and Zheng</a>, <a href="https://eccc.weizmann.ac.il/report/2026/169/">Jeronimo</a>, <a href="https://eprint.iacr.org/2026/2056">Dao, Kominers and Thaler</a>, <a href="https://eccc.weizmann.ac.il/report/2026/237/">Dao, Kominers, Thaler and Zheng</a>, <a href="https://eprint.iacr.org/2026/2048">Gabizon</a>, <a href="https://eprint.iacr.org/2026/1432">Jo</a> and <a href="https://eprint.iacr.org/2026/680">Arnon, Boneh and Fenzi</a>.</p>

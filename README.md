@@ -10,8 +10,9 @@ not. Over binary fields the number is huge below the Johnson threshold (Dao, Kom
 Zheng, ECCC TR26-237). Over the prime fields that STARK provers use, nobody knows: above Johnson
 the count is linear in the code length n; just below it the existing bound is quadratic,
 1,325,775 n^2 at agreement rho + 0.24 (Dao, Kominers and Thaler, ePrint 2026/2056, Theorem 5.13,
-formalized in ArkLib); at a fixed gap above the rate the known exponents are in the thousands. The
-lower bound found here is 3.12 n on power-of-two domains.
+formalized in ArkLib); at a fixed gap above the rate the known exponents are in the thousands. Lower
+bounds found here: any linear bound at the T1 agreement needs a constant of at least 3.12, and at
+least 3 on power-of-two subgroups.
 
 ## Targets
 
