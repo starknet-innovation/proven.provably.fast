@@ -380,7 +380,7 @@
       return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
         el("span", { class: "record-kind" }, cap(n.kind)),
         el("span", { class: "record-target" }, n.target),
-        el("span", { class: "record-title" }, el("a", { href: `/workshop#/workshop/threads/${t.thread_id}` }, t.title),
+        el("span", { class: "record-title" }, el("a", { href: `/threads/${t.thread_id}` }, t.title),
           el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a participant"} opened it · ${ago(t.updated_at)}`)),
         el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
     })));
