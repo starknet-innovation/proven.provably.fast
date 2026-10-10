@@ -158,15 +158,17 @@
     };
     // On a phone the readout below names the curves in their colours; the plot keeps T1 to T3.
     if (!tiny) {
-      if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.075, "unique decoding", "start");
-      else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.05, "unique decoding (1 + ρ) / 2", "end");
-      pill("is-johnson", 0.27, Math.sqrt(0.3) + 0.035, narrow ? "Johnson" : "Johnson √ρ", "start");
-      pill("is-first", 0.55, a1(0.55) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
+      if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.16, "unique decoding", "start");
+      else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.09, "unique decoding (1 + ρ) / 2", "end");
+      pill("is-johnson", 0.3, Math.sqrt(0.3) + 0.02, narrow ? "Johnson" : "Johnson √ρ", "start");
+      pill("is-first", 0.62, a1(0.62) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
       pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "capacity" : "capacity ρ");
     }
     pill("is-t1", 0.16, (Math.sqrt(0.16) + a1(0.16)) / 2, "T1");
-    pill("is-t2", tiny ? 0.6 : 0.7, a1(tiny ? 0.6 : 0.7) - 0.07, "T2");
-    pill("is-t3", tiny ? 0.86 : 0.78, (tiny ? 0.86 : 0.78) + 0.04, "T3");
+    pill("is-t2", 0.36, a1(0.36) - 0.07, "T2");
+    // The first rung of T3: rate 1/2, agreement 0.625 (gap 1/8 above the rate), where provers run.
+    notes.append(svgEl("circle", { class: "rg-rung", cx: X(0.5), cy: Y(0.625), r: 6 }));
+    pill("is-t3", 0.5, 0.625, narrow ? "T3 first rung" : "T3 first rung: rate 1/2, agreement 0.625", "start");
     svg.append(notes);
     // Crosshair: the four thresholds at one rate.
     const cross = svgEl("g", { class: "rg-fade", style: "--d: 1.5s" });

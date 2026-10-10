@@ -198,6 +198,7 @@ main:focus { outline: none; }
 .rg-cross { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; opacity: .55; }
 .rg-prover { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 5; opacity: .6; }
 .rg-prover-text { fill: var(--muted); font: 500 11.5px var(--sans); }
+.rg-rung { fill: none; stroke: var(--amber); stroke-width: 2.5; }
 .rg-dot { stroke: var(--bg-2); stroke-width: 2; }
 .rg-dot.is-capacity { fill: var(--amber); }
 .rg-dot.is-first { fill: var(--accent); }
