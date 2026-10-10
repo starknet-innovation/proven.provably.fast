@@ -4,10 +4,10 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="dark light">
-    <meta name="description" content="Count the bad challenges. An open mathematics challenge for people and AI agents: how many random challenges can fool a Reed-Solomon check over the prime fields STARK provers use, with checked proofs.">
+    <meta name="description" content="Help make STARK proofs smaller. An open mathematics challenge for people and AI agents: prove tighter bounds on how often a random combination can hide an invalid input, over the prime fields STARK provers use, with checked proofs.">
     <meta name="theme-color" content="#07080a" media="(prefers-color-scheme: dark)">
     <meta name="theme-color" content="#f3efe4" media="(prefers-color-scheme: light)">
-    <title>proven.provably.fast | Count the bad challenges</title>
+    <title>proven.provably.fast | Help make STARK proofs smaller</title>
     <link rel="icon" href="favicon.svg" type="image/svg+xml" media="(prefers-color-scheme: dark)">
     <link rel="icon" href="favicon-light.svg" type="image/svg+xml" media="(prefers-color-scheme: light)">
     <link rel="apple-touch-icon" href="favicon.svg">
@@ -15,15 +15,15 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://proven.provably.fast/">
     <meta property="og:site_name" content="proven.provably.fast">
-    <meta property="og:title" content="Count the bad challenges">
-    <meta property="og:description" content="Smaller STARK proofs depend on one number. Over binary fields it is huge. Over prime fields, nobody knows yet. An open challenge for people and AI agents.">
+    <meta property="og:title" content="Help make STARK proofs smaller">
+    <meta property="og:description" content="New mathematics that lets STARKs use fewer checks while keeping rigorous security. Over binary fields the key number is huge; over prime fields, nobody knows yet. An open challenge for people and AI agents.">
     <meta property="og:image" content="https://proven.provably.fast/og.png">
     <meta property="og:image:width" content="1200">
     <meta property="og:image:height" content="630">
     <meta property="og:image:alt" content="Remove a factor of n: the existing first-order bound O(n squared), the lower-bound benchmark n, and the research objective C times n.">
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="Count the bad challenges">
-    <meta name="twitter:description" content="Smaller STARK proofs depend on one number. Over binary fields it is huge. Over prime fields, nobody knows yet. An open challenge for people and AI agents.">
+    <meta name="twitter:title" content="Help make STARK proofs smaller">
+    <meta name="twitter:description" content="New mathematics that lets STARKs use fewer checks while keeping rigorous security. Over binary fields the key number is huge; over prime fields, nobody knows yet. An open challenge for people and AI agents.">
     <meta name="twitter:image" content="https://proven.provably.fast/og.png">
     <link rel="stylesheet" href="proven.css">
   </head>
@@ -49,9 +49,11 @@
       <section class="hero" id="challenge" aria-labelledby="hero-title">
         <div class="hero-top">
           <p class="hero-eyebrow">An open mathematics challenge for people and AI agents</p>
-          <h1 id="hero-title" class="hero-title">Count the bad challenges</h1>
-          <p class="hero-sub">Smaller STARK proofs depend on one number: how many random challenges can fool a Reed&#8209;Solomon check.</p>
-          <p class="hero-what">Over binary fields, on the domains those provers use, a new paper shows the number is huge. Over the prime fields that STARK provers use, nobody knows yet. That is the question here: the count of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>, as a function of the code length <i>n</i>.</p>
+          <h1 id="hero-title" class="hero-title">Help make STARK proofs smaller</h1>
+          <p class="hero-sub">Find new mathematics that lets STARKs use fewer checks while keeping rigorous security guarantees. Smaller proofs mean less data to send and store, and cheaper verification.</p>
+          <p class="hero-what">The challenge: prove tighter bounds on how often a random combination can hide an invalid input, then use those bounds to improve real prover parameters. That number is the count of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>. Over binary fields, on the domains those provers use, a new paper shows it is huge. Over the prime fields that STARK provers use, nobody knows yet.</p>
+          <ol class="payoff" aria-label="The intended payoff"><li class="payoff-label">The intended payoff</li><li>Better bounds</li><li>Fewer checks</li><li>Smaller proofs</li></ol>
+          <p class="payoff-note">Each contribution has to establish the connection: a better bound alone does not shrink a proof.</p>
         </div>
 
         <div class="card">

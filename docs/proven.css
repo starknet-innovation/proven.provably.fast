@@ -100,6 +100,12 @@ main:focus { outline: none; }
 .hero-title { margin: 0; color: var(--ink); font: 600 clamp(44px, 6.2vw, 84px)/1.02 var(--display); letter-spacing: -.035em; text-wrap: balance; }
 .hero-title i { letter-spacing: -.01em; padding-right: .04em; }
 .hero-sub { margin: 0; max-width: 46ch; color: var(--ink-2); font-size: clamp(18px, 1.6vw, 22px); line-height: 1.45; text-wrap: pretty; }
+.payoff { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 0; margin: 18px 0 0; padding: 0; list-style: none; font-size: 14px; color: var(--ink); }
+.payoff li { padding: 6px 12px; border: 1px solid var(--line-2); border-radius: 999px; background: var(--bg-2); }
+.payoff li + li::before { content: "\2192"; margin-right: 8px; color: var(--muted); }
+.payoff .payoff-label { padding-left: 0; border: 0; background: none; color: var(--muted); font-size: 13px; }
+.payoff .payoff-label + li::before { content: none; }
+.payoff-note { margin: 8px 0 0; font-size: 13px; color: var(--muted); }
 .hero-what { max-width: 64ch; margin: 2px 0 0; color: var(--muted); font-size: 15.5px; text-wrap: pretty; }
 @keyframes rise-in { from { opacity: 0; transform: translateY(18px); } }
 .hero-top > * { animation: rise-in 1s var(--spring-soft) both; }

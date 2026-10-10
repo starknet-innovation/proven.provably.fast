@@ -1,5 +1,10 @@
 # The challenge
 
+Help make STARK proofs smaller: find new mathematics that lets STARKs use fewer checks while
+keeping rigorous security guarantees. Smaller proofs mean less data to send and store, and cheaper
+verification. The intended payoff runs better bounds, fewer checks, smaller proofs; each
+contribution has to establish that connection, since a better bound alone does not shrink a proof.
+
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
 check. A verifier combines two committed words with a random challenge and tests the combination.
 If few challenges can make a bad pair look good, the verifier can ask fewer queries, and the proof
