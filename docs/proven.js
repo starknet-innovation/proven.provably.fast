@@ -105,7 +105,7 @@
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
     const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", });
     const desc = svgEl("desc", { id: "regime-desc" });
-    desc.textContent = "Agreement thresholds by code rate. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known bounds have large exponents.";
+    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known exponents are in the thousands; T3 asks for a small one.";
     const defs = svgEl("defs");
     const hatch = svgEl("pattern", { id: "rg-hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
     hatch.append(svgEl("line", { class: "rg-hatch-line", x1: 0, y1: 0, x2: 0, y2: 7 }));
@@ -125,6 +125,12 @@
     const ytl = svgEl("text", { class: "rg-axis-title", x: X(0) + 8, y: Y(1) + 16 }); ytl.textContent = "agreement a";
     grid.append(xt, yt, ytl);
     svg.append(grid);
+    // Where provers run: the rates deployed STARKs use.
+    const provers = svgEl("g", { class: "rg-fade", style: "--d: 1.1s" });
+    for (const r of [0.125, 0.25, 0.5]) provers.append(svgEl("line", { class: "rg-prover", x1: X(r), x2: X(r), y1: Y(1), y2: Y(0) }));
+    const pl = svgEl("text", { class: "rg-prover-text", x: X(0.125) + 6, y: Y(1) + 34 }); pl.textContent = tiny ? "provers run here" : "where provers run: rates 1/8, 1/4 and 1/2";
+    provers.append(pl);
+    svg.append(provers);
     // Bands between the curves.
     const N = 240, rs = Array.from({ length: N + 1 }, (_, i) => 0.0005 + (0.999 - 0.0005) * (i / N));
     const line = (f) => rs.map((r, i) => `${i ? "L" : "M"}${X(r).toFixed(1)} ${Y(f(r)).toFixed(1)}`).join(" ");
@@ -373,7 +379,7 @@
         el("span", { class: "record-kind" }, cap(n.kind)),
         el("span", { class: "record-target" }, n.target),
         el("span", { class: "record-title" }, el("a", { href: `/workshop#/workshop/threads/${t.thread_id}` }, t.title),
-          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a person"} opened it · ${ago(t.updated_at)}`)),
+          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a participant"} opened it · ${ago(t.updated_at)}`)),
         el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
     })));
   }

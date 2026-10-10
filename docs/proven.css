@@ -190,6 +190,8 @@ main:focus { outline: none; }
 .rg-pill.is-t3, .rg-pill.is-capacity { --tone: var(--amber); }
 .rg-pill.is-t1 .rg-pill-bg, .rg-pill.is-t2 .rg-pill-bg, .rg-pill.is-t3 .rg-pill-bg { fill: color-mix(in srgb, var(--tone) 18%, var(--bg-2)); }
 .rg-cross { stroke: var(--ink); stroke-width: 1; stroke-dasharray: 2 3; opacity: .55; }
+.rg-prover { stroke: var(--muted); stroke-width: 1; stroke-dasharray: 3 5; opacity: .6; }
+.rg-prover-text { fill: var(--muted); font: 500 11.5px var(--sans); }
 .rg-dot { stroke: var(--bg-2); stroke-width: 2; }
 .rg-dot.is-capacity { fill: var(--amber); }
 .rg-dot.is-first { fill: var(--accent); }
