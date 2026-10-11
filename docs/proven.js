@@ -565,7 +565,7 @@
       const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
       const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
       const last = QUERY_STEPS[QUERY_STEPS.length - 1];
-      const ts = svgEl("text", { class: "board-label", x: end.x + 10, y: (end.y + rungY) / 2 + 20 }); ts.textContent = `no proven step since ${last.year}`; svg.append(ts);
+      const ts = svgEl("text", { class: "board-label", x: X(y1) - 6, y: h - 24, "text-anchor": "end" }); ts.textContent = `no proven step since ${last.year}`; svg.append(ts);
       const ax0 = svgEl("text", { class: "board-axis", x: padL, y: h - 8 }); ax0.textContent = "2018";
       const ax1 = svgEl("text", { class: "board-axis", x: end.x, y: h - 8, "text-anchor": "middle" }); ax1.textContent = "today";
       svg.append(ax0, ax1);
