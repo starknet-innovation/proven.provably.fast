@@ -82,7 +82,7 @@
     { id: "unique", name: "unique decoding", formula: "(1 + ρ) / 2", f: (r) => (1 + r) / 2 },
     { id: "johnson", name: "Johnson", formula: "√ρ", f: (r) => Math.sqrt(r) },
     { id: "first", name: "first order", formula: "a₁(ρ)", f: a1 },
-    { id: "capacity", name: "capacity", formula: "ρ", f: (r) => r },
+    { id: "capacity", name: "limit", formula: "ρ", f: (r) => r },
   ];
 
   function regimeChart() {
@@ -105,7 +105,7 @@
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
     const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", });
     const desc = svgEl("desc", { id: "regime-desc" });
-    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known exponents are in the thousands; T3 asks for a small one.";
+    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between the limit and the first-order curve the known exponents are in the thousands; T3 asks for a small one.";
     const defs = svgEl("defs");
     const hatch = svgEl("pattern", { id: "rg-hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
     hatch.append(svgEl("line", { class: "rg-hatch-line", x1: 0, y1: 0, x2: 0, y2: 7 }));
@@ -162,13 +162,13 @@
       else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.09, "unique decoding (1 + ρ) / 2", "end");
       pill("is-johnson", 0.3, Math.sqrt(0.3) + 0.02, narrow ? "Johnson" : "Johnson √ρ", "start");
       pill("is-first", 0.62, a1(0.62) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
-      pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "capacity" : "capacity ρ");
+      pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "limit" : "limit ρ");
     }
     pill("is-t1", 0.16, (Math.sqrt(0.16) + a1(0.16)) / 2, "T1");
     pill("is-t2", 0.36, a1(0.36) - 0.07, "T2");
     // The first rung of T3: rate 1/2, agreement 0.625 (gap 1/8 above the rate), where provers run.
     notes.append(svgEl("circle", { class: "rg-rung", cx: X(0.5), cy: Y(0.625), r: 6 }));
-    pill("is-t3", 0.5, 0.625, narrow ? "T3 first rung" : "T3 first rung: rate 1/2, agreement 0.625", "start");
+    pill("is-t3", 0.5, 0.625, narrow ? "T3 goal" : "T3 goal: rate 1/2, agreement 0.625", "start");
     svg.append(notes);
     // Crosshair: the four thresholds at one rate.
     const cross = svgEl("g", { class: "rg-fade", style: "--d: 1.5s" });
@@ -447,7 +447,7 @@
     }
   }
   const TARGET_ORDER = ["T3", "T2", "T1", "other"];
-  const LEVEL_WORDS = { "headline target": "headline target", "first step": "first rung of T3", "grand target": "long run" };
+  const LEVEL_WORDS = { "headline target": "headline target", "first step": "first step of T3", "grand target": "long run" };
   const personName = (name) => {
     const m = /^participant_([0-9a-f]{12})$/.exec(name);
     return m ? `Participant ${m[1].slice(0, 4)}` : name;
@@ -531,7 +531,7 @@
       const qTop = 260, qBottom = 90;
       const X = (yr) => padL + ((yr - y0) / (y1 - y0)) * (w - padL - padR);
       const Y = (q) => padT + ((qTop - q) / (qTop - qBottom)) * (h - padT - padB);
-      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Queries for 100 bits at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} at the rung, ${CAPACITY_QUERIES} at capacity` });
+      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Queries for 100 bits at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} is the goal, ${CAPACITY_QUERIES} is the limit` });
       const defs = svgEl("defs");
       const pat = svgEl("pattern", { id: "board-dots", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
       pat.append(svgEl("circle", { class: "board-dot", cx: 4.5, cy: 4.5, r: 1.4 }));
@@ -560,8 +560,8 @@
       const end = { x: X(y1), y: Y(now) };
       svg.append(svgEl("circle", { class: "board-end", cx: end.x, cy: end.y, r: 5 }));
       const tn = svgEl("text", { class: "board-label is-now", x: end.x + 10, y: end.y + 4 }); tn.textContent = `${now} proven`; svg.append(tn);
-      const tr = svgEl("text", { class: "board-rung-label", x: end.x + 10, y: rungY + 4 }); tr.textContent = `${RUNG_QUERIES} · the rung`; svg.append(tr);
-      const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · capacity`; svg.append(tc);
+      const tr = svgEl("text", { class: "board-rung-label", x: end.x + 10, y: rungY + 4 }); tr.textContent = `${RUNG_QUERIES} · the goal`; svg.append(tr);
+      const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · the limit`; svg.append(tc);
       const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
       const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
       const last = QUERY_STEPS[QUERY_STEPS.length - 1];

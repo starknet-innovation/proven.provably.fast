@@ -65,16 +65,16 @@
           <div class="board-grid">
             <div class="board-copy">
               <p class="board-figure"><span class="board-num is-proven">200</span><span class="board-unit">queries, proven</span></p>
-              <p class="board-figure is-second"><span class="board-num is-rung">150</span><span class="board-unit">at the rung</span></p>
+              <p class="board-figure is-second"><span class="board-num is-rung">150</span><span class="board-unit">is the goal</span></p>
               <p class="board-line"><s>241</s> with unique decoding, 200 since Johnson, at rate 1/2. Provers run at <b>100</b> on a conjecture.</p>
               <p class="board-links"><a class="src-link" href="/threads/bt1_564c00dfef850321a5d7fb1b">T3 thread</a><a class="src-link" href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">Starter kit</a></p>
-              <p class="board-bold">The rung would make 150 of them real.</p>
+              <p class="board-bold">Prove the goal and 150 of them become real.</p>
               <div class="board-thanks" id="board-thanks"></div>
             </div>
             <div class="board-chart" id="board-chart"></div>
           </div>
           <div class="board-proved" id="board-proved"></div>
-          <p class="board-foot">FRI-style queries at rate 1/2, one proximity term, <i>n</i>&#8239;=&#8239;2<sup>20</sup>, a 124-bit field. A step on the line is a theorem someone else checked. The 100 is the capacity conjecture several provers use, not a proven bound; gaps below 1/16 are out of reach.</p>
+          <p class="board-foot">FRI-style queries at rate 1/2, one proximity term, <i>n</i>&#8239;=&#8239;2<sup>20</sup>, a 124-bit field. A step on the line is a theorem someone else checked. The 100 is the limit, which several provers assume without proof; gaps below 1/16 are out of reach.</p>
         </div>
 
         <div class="card">
@@ -89,21 +89,21 @@
 
           <div class="stats reveal" id="stats">
             <div class="stat is-known">
-              <span class="stat-label">Known today, at the rung</span>
+              <span class="stat-label">Known today</span>
               <span class="stat-num term" tabindex="0" data-tip="At rate 1/2 and gap 1/8 the only known bounds come from Dao, Kominers and Thaler's derivative method, whose exponent is in the thousands there and 27 at best (rate 1/4, gap 0.2). Just below the Johnson threshold their bound is 1,325,775 n squared, formalized in Lean in ArkLib."><i>n</i><sup>d</sup></span>
-              <span class="stat-sub"><i>d</i> in the thousands at the rung, 27 at best anywhere. An exponent, not a line.</span>
+              <span class="stat-sub"><i>d</i> in the thousands at rate 1/2 and gap 1/8; 27 at best anywhere. An exponent, not a line.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 C60 62 120 55 160 44 C190 35 215 24 240 6"/></svg>
               <span class="stat-src">Dao, Kominers and Thaler, 2026.</span>
             </div>
             <div class="stat is-floor">
-              <span class="stat-label">Lower bound, at the rung</span>
+              <span class="stat-label">Lower bound</span>
               <span class="stat-num term" tabindex="0" data-tip="At rate 1/2, gap 1/8 and the exact k = n/2, the best known line has 3n/8 + 1 bad challenges (56 at the smallest sizes). The larger families found here, 3.12 n at the T1 agreement and 35 n at gap 1/8, need k two above a multiple of n/s and vanish at exact k.">3<i>n</i>/8</span>
-              <span class="stat-sub">With <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly. Larger families exist at other <i>k</i>; found here.</span>
+              <span class="stat-sub">At rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly. Found here.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 L240 50 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 L240 50"/></svg>
               <span class="stat-src">This workshop, October 2026.</span>
             </div>
             <div class="stat is-target">
-              <span class="stat-label">Goal, at the rung</span>
+              <span class="stat-label">Goal</span>
               <span class="stat-num">16&#183;<i>n</i></span>
               <span class="stat-sub">100 bits at <i>n</i>&#8239;=&#8239;2<sup>20</sup>. Proof checked by someone else.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 L240 44 L240 64 Z"/><path class="spark-line is-dashed" pathLength="1" d="M0 63.5 L240 44"/></svg>
@@ -121,14 +121,14 @@
               </ul>
             </div>
             <div class="regime-plot" id="regime-plot">
-              <noscript><p class="loading">The chart needs JavaScript. Agreement thresholds by rate: capacity rho, the first-order curve, Johnson sqrt(rho), unique decoding (1 + rho) / 2.</p></noscript>
+              <noscript><p class="loading">The chart needs JavaScript. Agreement thresholds by rate: the limit rho, the first-order curve, Johnson sqrt(rho), unique decoding (1 + rho) / 2.</p></noscript>
             </div>
             <p class="regime-read" id="regime-read" aria-live="polite"></p>
             <p class="regime-note">Thresholds as n grows. Each bound holds at a positive margin above its curve, under its field conditions.</p>
           </figure>
 
           <ol class="targets" aria-label="Targets">
-            <li class="target is-t3"><a href="/threads/bt1_564c00dfef850321a5d7fb1b"><span class="target-id">T3</span><span class="target-body"><b>Toward capacity, on the domains STARKs use</b><span>Fix a gap above the rate. Bound the count by <i>C</i>&#183;<i>n</i><sup>c</sup> with the smallest <i>c</i>. Known: <i>c</i> from 27 up. <i>c</i>&#8239;=&#8239;1 is the prize.</span><small>Thread</small></span><span class="chip">open</span></a></li>
+            <li class="target is-t3"><a href="/threads/bt1_564c00dfef850321a5d7fb1b"><span class="target-id">T3</span><span class="target-body"><b>Toward the limit, on the domains STARKs use</b><span>Fix a gap above the rate. Bound the count by <i>C</i>&#183;<i>n</i><sup>c</sup> with the smallest <i>c</i>. Known: <i>c</i> from 27 up. <i>c</i>&#8239;=&#8239;1 is the prize.</span><small>Thread</small></span><span class="chip">open</span></a></li>
             <li class="target is-t2"><a href="/threads/bt1_889cea10a4cd95e496ab0dec"><span class="target-id">T2</span><span class="target-body"><b>Long run: the first step</b><span>Below the first-order curve, with a quadratic count. Known: cubic.</span><small>Thread</small></span><span class="chip">open</span></a></li>
             <li class="target is-t1"><a href="/threads/bt1_bd6475703351b9155e5975b8"><span class="target-id">T1</span><span class="target-body"><b>Long run: the grand target</b><span>A linear count beyond Johnson on every evaluation set. Known: quadratic. At least as hard as a constant list bound.</span><small>Thread</small></span><span class="chip">open</span></a></li>
           </ol>
@@ -140,13 +140,13 @@
         <div class="join-panel reveal">
           <div class="join-lead">
             <h2 id="start-title" class="chapter-title">Start here</h2>
-            <p class="join-sub">One problem, one first rung, three things to do. The rest of this page is background.</p>
-            <p class="join-sub"><b>The first rung.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/8&#8239;+&#8239;1; no upper bound below exponent 27. A proof keeps 100 bits and cuts a quarter of the queries.</p>
+            <p class="join-sub">One problem, one first goal, three things to do. The rest of this page is background.</p>
+            <p class="join-sub"><b>The first goal.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/8&#8239;+&#8239;1; no upper bound below exponent 27. A proof keeps 100 bits and cuts a quarter of the queries.</p>
             <p class="join-sub">Starter kit: <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">kit/</a>, two scripts that build a line on a BabyBear or KoalaBear subgroup and certify its bad challenges.</p>
           </div>
           <ol class="join-steps">
             <li><span class="join-n">1</span><div><h3>Prove an upper bound at one fixed gap</h3><p>Any exponent below 27 at rate 1/4 and gap 0.2, or a linear bound with its constant at rate 1/2 and gap 1/8, on subgroups of order 2<sup>m</sup>. Start with a list-size bound at that gap. <a href="/threads/bt1_564c00dfef850321a5d7fb1b">T3 thread</a>.</p></div></li>
-            <li><span class="join-n">2</span><div><h3>Find lines with many bad challenges at exact <i>k</i>&#8239;=&#8239;&#961;<i>n</i></h3><p>Rate 1/2, gap 1/8, a subgroup of order 2<sup>m</sup> in BabyBear or KoalaBear. More than 3<i>n</i>/8&#8239;+&#8239;1 raises the floor; a family with count over <i>n</i> unbounded refutes the rung. Certify with the kit; post the instance and its hash.</p></div></li>
+            <li><span class="join-n">2</span><div><h3>Find lines with many bad challenges at exact <i>k</i>&#8239;=&#8239;&#961;<i>n</i></h3><p>Rate 1/2, gap 1/8, a subgroup of order 2<sup>m</sup> in BabyBear or KoalaBear. More than 3<i>n</i>/8&#8239;+&#8239;1 raises the floor; a family with count over <i>n</i> unbounded refutes the goal. Certify with the kit; post the instance and its hash.</p></div></li>
             <li><span class="join-n">3</span><div><h3>Check a claim</h3><p>Review a posted lemma against its statement and prior art, or Lean-check it against the pinned ArkLib commit. Say what you checked. Checks are credited like theorems.</p></div></li>
           </ol>
         </div>
@@ -184,7 +184,7 @@
               <div class="gap-row is-upper"><span class="gap-label">Known upper bound</span><span class="gap-bar" style="--w: 100%"></span><span class="gap-val">2<sup>66.3</sup></span></div>
               <div class="gap-row is-lower"><span class="gap-label">Known lower bound</span><span class="gap-bar" style="--w: 37.1%"></span><span class="gap-val">2<sup>24.6</sup></span></div>
             </div>
-            <p class="gap-foot">Worst line, log scale: 42 powers of two apart. A linear bound would close the growth in <i>n</i>; its constant sets the rest. At <i>n</i>&#8239;=&#8239;2<sup>24</sup> over a 124-bit field, a linear bound with constant 2<sup>10</sup> keeps about 90 bits in this term; a quadratic one keeps 66. Dao, Kominers and Thaler turned their bounds into proofs 11.1 percent smaller in ProveKit and 4.6 percent in ZisK. At the rung (rate 1/2, gap 1/8) there is no finite upper bound to draw yet: the known exponents are in the thousands and the floor is 3<i>n</i>/8&#8239;+&#8239;1.</p>
+            <p class="gap-foot">Worst line, log scale: 42 powers of two apart. A linear bound would close the growth in <i>n</i>; its constant sets the rest. At <i>n</i>&#8239;=&#8239;2<sup>24</sup> over a 124-bit field, a linear bound with constant 2<sup>10</sup> keeps about 90 bits in this term; a quadratic one keeps 66. Dao, Kominers and Thaler turned their bounds into proofs 11.1 percent smaller in ProveKit and 4.6 percent in ZisK. At the goal (rate 1/2, gap 1/8) there is no finite upper bound to draw yet: the known exponents are in the thousands and the floor is 3<i>n</i>/8&#8239;+&#8239;1.</p>
           </aside>
         </div>
         <p class="built">Built on <a href="https://better.codes/">better.codes</a>, <a href="https://eccc.weizmann.ac.il/report/2026/164/">Brakensiek, Chen, Putterman, Zhang and Zheng</a>, <a href="https://eccc.weizmann.ac.il/report/2026/169/">Jeronimo</a>, <a href="https://eprint.iacr.org/2026/2056">Dao, Kominers and Thaler</a>, <a href="https://eccc.weizmann.ac.il/report/2026/237/">Dao, Kominers, Thaler and Zheng</a>, <a href="https://eprint.iacr.org/2026/2048">Gabizon</a>, <a href="https://eprint.iacr.org/2026/1432">Jo</a> and <a href="https://eprint.iacr.org/2026/680">Arnon, Boneh and Fenzi</a>.</p>
