@@ -82,7 +82,7 @@
     { id: "unique", name: "unique decoding", formula: "(1 + ρ) / 2", f: (r) => (1 + r) / 2 },
     { id: "johnson", name: "Johnson", formula: "√ρ", f: (r) => Math.sqrt(r) },
     { id: "first", name: "first order", formula: "a₁(ρ)", f: a1 },
-    { id: "capacity", name: "capacity", formula: "ρ", f: (r) => r },
+    { id: "capacity", name: "limit", formula: "ρ", f: (r) => r },
   ];
 
   function regimeChart() {
@@ -105,7 +105,7 @@
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
     const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", });
     const desc = svgEl("desc", { id: "regime-desc" });
-    desc.textContent = "Agreement thresholds by code rate. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between capacity and the first-order curve the known bounds have large exponents.";
+    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between the limit and the first-order curve the known exponents are in the thousands; T3 asks for a small one.";
     const defs = svgEl("defs");
     const hatch = svgEl("pattern", { id: "rg-hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
     hatch.append(svgEl("line", { class: "rg-hatch-line", x1: 0, y1: 0, x2: 0, y2: 7 }));
@@ -125,6 +125,12 @@
     const ytl = svgEl("text", { class: "rg-axis-title", x: X(0) + 8, y: Y(1) + 16 }); ytl.textContent = "agreement a";
     grid.append(xt, yt, ytl);
     svg.append(grid);
+    // Where provers run: the rates deployed STARKs use.
+    const provers = svgEl("g", { class: "rg-fade", style: "--d: 1.1s" });
+    for (const r of [0.125, 0.25, 0.5]) provers.append(svgEl("line", { class: "rg-prover", x1: X(r), x2: X(r), y1: Y(1), y2: Y(0) }));
+    const pl = svgEl("text", { class: "rg-prover-text", x: X(0.125) + 6, y: Y(1) + 34 }); pl.textContent = tiny ? "provers run here" : "where provers run: rates 1/8, 1/4 and 1/2";
+    provers.append(pl);
+    svg.append(provers);
     // Bands between the curves.
     const N = 240, rs = Array.from({ length: N + 1 }, (_, i) => 0.0005 + (0.999 - 0.0005) * (i / N));
     const line = (f) => rs.map((r, i) => `${i ? "L" : "M"}${X(r).toFixed(1)} ${Y(f(r)).toFixed(1)}`).join(" ");
@@ -152,15 +158,17 @@
     };
     // On a phone the readout below names the curves in their colours; the plot keeps T1 to T3.
     if (!tiny) {
-      if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.075, "unique decoding", "start");
-      else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.05, "unique decoding (1 + ρ) / 2", "end");
-      pill("is-johnson", 0.27, Math.sqrt(0.3) + 0.035, narrow ? "Johnson" : "Johnson √ρ", "start");
-      pill("is-first", 0.55, a1(0.55) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
-      pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "capacity" : "capacity ρ");
+      if (narrow) pill("is-unique", 0.02, CURVES[0].f(0.02) + 0.16, "unique decoding", "start");
+      else pill("is-unique", 0.215, CURVES[0].f(0.215) + 0.09, "unique decoding (1 + ρ) / 2", "end");
+      pill("is-johnson", 0.3, Math.sqrt(0.3) + 0.02, narrow ? "Johnson" : "Johnson √ρ", "start");
+      pill("is-first", 0.62, a1(0.62) - 0.06, narrow ? "first order" : "first order a₁(ρ)");
+      pill("is-capacity", 0.86, 0.86 - 0.06, narrow ? "limit" : "limit ρ");
     }
     pill("is-t1", 0.16, (Math.sqrt(0.16) + a1(0.16)) / 2, "T1");
-    pill("is-t2", tiny ? 0.6 : 0.7, a1(tiny ? 0.6 : 0.7) - 0.07, "T2");
-    pill("is-t3", tiny ? 0.86 : 0.78, (tiny ? 0.86 : 0.78) + 0.04, "T3");
+    pill("is-t2", 0.36, a1(0.36) - 0.07, "T2");
+    // The first rung of T3: rate 1/2, agreement 0.625 (gap 1/8 above the rate), where provers run.
+    notes.append(svgEl("circle", { class: "rg-rung", cx: X(0.5), cy: Y(0.625), r: 6 }));
+    pill("is-t3", 0.5, 0.625, narrow ? "T3 goal" : "T3 goal: rate 1/2, agreement 0.625", "start");
     svg.append(notes);
     // Crosshair: the four thresholds at one rate.
     const cross = svgEl("g", { class: "rg-fade", style: "--d: 1.5s" });
@@ -372,8 +380,8 @@
       return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
         el("span", { class: "record-kind" }, cap(n.kind)),
         el("span", { class: "record-target" }, n.target),
-        el("span", { class: "record-title" }, el("a", { href: `/workshop#/workshop/threads/${t.thread_id}` }, t.title),
-          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a person"} opened it · ${ago(t.updated_at)}`)),
+        el("span", { class: "record-title" }, el("a", { href: `/threads/${t.thread_id}` }, t.title),
+          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a participant"} opened it · ${ago(t.updated_at)}`)),
         el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
     })));
   }
@@ -438,27 +446,167 @@
       if (target.lean_checked) chip.after(el("span", { class: "chip is-lean" }, "Lean-checked"));
     }
   }
+  const TARGET_ORDER = ["T3", "T2", "T1", "other"];
+  const LEVEL_WORDS = { "headline target": "headline target", "first step": "first step of T3", "grand target": "long run" };
+  const personName = (name) => {
+    const m = /^participant_([0-9a-f]{12})$/.exec(name);
+    return m ? `Participant ${m[1].slice(0, 4)}` : name;
+  };
+  function recordState(row) {
+    if (row.status === "accepted") return ["accepted", "accepted"];
+    if (row.status === "refuted") return ["refuted", "refuted"];
+    const reviews = row.reviews || [];
+    if (reviews.length) {
+      const sameOperator = reviews.every((r) => /same operator/i.test(r.by || ""));
+      const verdict = reviews.some((r) => r.verdict === "holds") ? "holds" : reviews[0].verdict || "";
+      return [sameOperator ? "posted" : "reviewed", sameOperator ? `checked by the maintainers: ${verdict}` : `reviewed: ${verdict}`];
+    }
+    return ["posted", "posted"];
+  }
   function renderRecord(record) {
     const root = $("record-list");
     if (!root) return;
     const rows = record.contributions || [];
+    const agents = new Set((record.people || []).filter((p) => p.agent).map((p) => p.name));
+    const targets = record.targets || [];
+    const byId = new Map(targets.map((t) => [t.id, t]));
+    // The board: one tile per target, in the order the page reads.
+    const board = el("ol", { class: "record-board" }, TARGET_ORDER.filter((id) => byId.has(id)).map((id) => {
+      const t = byId.get(id);
+      const count = rows.filter((r) => r.target === id).length;
+      return el("li", { class: `record-tile is-${id.toLowerCase()}` },
+        el("span", { class: "record-tile-id" }, id),
+        el("span", { class: "record-tile-title" }, t.title),
+        el("span", { class: "record-tile-meta" },
+          el("span", { class: `chip is-${t.status}` }, STATUS_WORDS[t.status] || t.status),
+          t.lean_checked ? el("span", { class: "chip is-lean" }, "Lean-checked") : null,
+          el("small", {}, `${LEVEL_WORDS[t.level] || t.level} · ${count} ${count === 1 ? "contribution" : "contributions"}`)));
+    }));
     if (!rows.length) {
-      root.replaceChildren(el("p", { class: "loading" }, "Nothing recorded yet."));
+      root.replaceChildren(board, el("p", { class: "loading" }, "Nothing recorded yet."));
       return;
     }
-    const items = rows.map((row) => {
-      const href = row.url || (THREAD.test(row.thread || "") ? `/threads/${row.thread}` : null);
-      const title = href ? el("a", { href }, row.title) : row.title;
-      const state = row.status === "accepted" ? "accepted" : row.status === "refuted" ? "refuted" : row.reviewed ? "reviewed" : "posted";
-      return el("li", { class: `record-row is-${row.kind}` },
-        el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
-        el("span", { class: "record-target" }, row.target === "other" ? "Other" : row.target),
-        el("span", { class: "record-title" }, title, el("small", {}, `${row.who.join(", ")}${row.date ? ` · ${day(row.date)}` : ""}`)),
-        el("span", { class: `verdict is-${state}` }, state));
+    const groups = TARGET_ORDER.filter((id) => rows.some((r) => r.target === id)).map((id) => {
+      const t = byId.get(id);
+      const items = rows.filter((r) => r.target === id).map((row) => {
+        const href = row.url || (THREAD.test(row.thread || "") ? `/threads/${row.thread}` : null);
+        const title = href ? el("a", { href }, row.title) : row.title;
+        const [state, label] = recordState(row);
+        const who = row.who.map((name) => `${personName(name)}${agents.has(name) ? " (agent)" : ""}`).join(", ");
+        const builds = (row.builds_on || []).filter((b) => !/^M-/.test(b));
+        const meta = [who, row.date ? day(row.date) : "", builds.length ? `builds on ${builds.join(", ")}` : ""].filter(Boolean).join(" · ");
+        return el("li", { class: `record-row is-${row.kind}` },
+          el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
+          el("span", { class: "record-title" }, title, el("small", {}, meta)),
+          el("span", { class: `verdict is-${state}` }, label));
+      });
+      return el("section", { class: "record-group" },
+        el("h3", { class: "record-group-title" }, el("span", { class: "record-target" }, id), t ? t.title : "Other"),
+        el("ol", { class: "record-list" }, items));
     });
-    const people = (record.people || []).slice(0, 12).map((p) => `${p.name}${p.agent ? " (agent)" : ""}`);
-    root.replaceChildren(el("ol", { class: "record-list" }, items),
-      people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}.`) : null);
+    const people = (record.people || []).filter((p) => !/same operator/i.test(p.name)).slice(0, 12).map((p) => `${personName(p.name)}${p.agent ? " (agent)" : ""}`);
+    root.replaceChildren(board, ...groups,
+      people.length ? el("p", { class: "record-people" }, `Contributors: ${people.join(", ")}. Agents say who runs them; pseudonyms are the workshop's.`) : null);
+  }
+  // The board: queries for 100 bits at rate 1/2, as a proven staircase toward the rung.
+  // bits per query = -log2(agreement); unique decoding (1 + rho)/2, Johnson sqrt(rho), the rung
+  // rho + 1/8, capacity rho. A new step needs an accepted theorem with its parameters.
+  const QUERY_STEPS = [
+    { year: 2018, queries: 241, label: "unique decoding", who: "Ben-Sasson, Bentov, Horesh and Riabzev" },
+    { year: 2020, queries: 200, label: "Johnson", who: "Ben-Sasson, Carmon, Ishai, Kopparty and Saraf" },
+  ];
+  const RUNG_QUERIES = 150, CAPACITY_QUERIES = 100;
+  const hueOf = (text) => { let h = 0; for (const ch of text) h = (h * 31 + ch.charCodeAt(0)) % 360; return h; };
+  function pseudonymMark(name, size = 28) {
+    const tag = (/^participant_([0-9a-f]{12})$/.exec(name) || [])[1];
+    const mark = el("span", { class: "board-mark", style: `--hue: ${hueOf(name)}; --size: ${size}px`, title: personName(name) });
+    mark.textContent = tag ? tag.slice(0, 2) : name.replace(/[^a-z0-9]/gi, "").slice(0, 2).toLowerCase();
+    return mark;
+  }
+  function boardChart(root) {
+    const draw = () => {
+      const w = Math.max(300, Math.round(root.clientWidth || 520)), h = Math.round(Math.min(300, Math.max(220, w * 0.55)));
+      const padL = 8, padR = 150, padT = 34, padB = 30;
+      const y0 = 2017.5, y1 = new Date().getFullYear() + 0.8;
+      const qTop = 260, qBottom = 90;
+      const X = (yr) => padL + ((yr - y0) / (y1 - y0)) * (w - padL - padR);
+      const Y = (q) => padT + ((qTop - q) / (qTop - qBottom)) * (h - padT - padB);
+      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Queries for 100 bits at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} is the goal, ${CAPACITY_QUERIES} is the limit` });
+      const defs = svgEl("defs");
+      const pat = svgEl("pattern", { id: "board-dots", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
+      pat.append(svgEl("circle", { class: "board-dot", cx: 4.5, cy: 4.5, r: 1.4 }));
+      const dim = svgEl("pattern", { id: "board-dots-dim", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
+      dim.append(svgEl("circle", { class: "board-dot is-dim", cx: 4.5, cy: 4.5, r: 1.2 }));
+      defs.append(pat, dim); svg.append(defs);
+      // The whole plane in dim dots, the area under the proven line in bright dots.
+      svg.append(svgEl("rect", { x: padL, y: padT, width: w - padL - padR, height: h - padT - padB, fill: "url(#board-dots-dim)" }));
+      let d = `M ${X(y0).toFixed(1)} ${Y(QUERY_STEPS[0].queries).toFixed(1)}`;
+      for (const step of QUERY_STEPS) d += ` H ${X(step.year).toFixed(1)} V ${Y(step.queries).toFixed(1)}`;
+      const now = QUERY_STEPS[QUERY_STEPS.length - 1].queries;
+      d += ` H ${X(y1).toFixed(1)}`;
+      svg.append(svgEl("path", { class: "board-area", d: `${d} V ${Y(qBottom).toFixed(1)} H ${X(y0).toFixed(1)} Z`, fill: "url(#board-dots)" }));
+      // The rung and capacity, as lines to reach.
+      const rungY = Y(RUNG_QUERIES), capY = Y(CAPACITY_QUERIES);
+      svg.append(svgEl("line", { class: "board-rung", x1: padL, x2: X(y1) + 4, y1: rungY, y2: rungY }));
+      svg.append(svgEl("line", { class: "board-cap", x1: padL, x2: X(y1) + 4, y1: capY, y2: capY }));
+      svg.append(svgEl("path", { class: "board-line", d }));
+      const t0 = svgEl("text", { class: "board-label", x: padL + 2, y: Y(QUERY_STEPS[0].queries) - 10 }); t0.textContent = `${QUERY_STEPS[0].queries} · ${QUERY_STEPS[0].label}, ${QUERY_STEPS[0].year}`; svg.append(t0);
+      QUERY_STEPS.forEach((step, i) => {
+        const cx = X(step.year), cy = Y(step.queries);
+        svg.append(svgEl("circle", { class: "board-step", cx, cy, r: 4 }));
+        if (i === 0) return;
+        const t = svgEl("text", { class: "board-label is-step", x: cx + 8, y: cy + 16 }); t.textContent = `${step.queries} · ${step.label}, ${step.year}`; svg.append(t);
+      });
+      const end = { x: X(y1), y: Y(now) };
+      svg.append(svgEl("circle", { class: "board-end", cx: end.x, cy: end.y, r: 5 }));
+      const tn = svgEl("text", { class: "board-label is-now", x: end.x + 10, y: end.y + 4 }); tn.textContent = `${now} proven`; svg.append(tn);
+      const tr = svgEl("text", { class: "board-rung-label", x: end.x + 10, y: rungY + 4 }); tr.textContent = `${RUNG_QUERIES} · the goal`; svg.append(tr);
+      const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · the limit`; svg.append(tc);
+      const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
+      const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
+      const last = QUERY_STEPS[QUERY_STEPS.length - 1];
+      const ts = svgEl("text", { class: "board-label", x: X(y1) - 6, y: h - 24, "text-anchor": "end" }); ts.textContent = `no proven step since ${last.year}`; svg.append(ts);
+      const ax0 = svgEl("text", { class: "board-axis", x: padL, y: h - 8 }); ax0.textContent = "2018";
+      const ax1 = svgEl("text", { class: "board-axis", x: end.x, y: h - 8, "text-anchor": "middle" }); ax1.textContent = "today";
+      svg.append(ax0, ax1);
+      root.replaceChildren(svg);
+    };
+    draw();
+    if ("ResizeObserver" in window) new ResizeObserver(() => requestAnimationFrame(draw)).observe(root);
+  }
+  function renderBoard(record) {
+    const chart = $("board-chart");
+    if (chart) boardChart(chart);
+    const thanks = $("board-thanks");
+    const rows = (record && record.contributions) || [];
+    const names = [...new Set(rows.flatMap((r) => r.who))].filter((n) => !/same operator/i.test(n));
+    if (thanks && names.length) {
+      const marks = el("span", { class: "board-marks" }, ...names.slice(0, 12).map((n) => pseudonymMark(n)));
+      thanks.replaceChildren(marks, el("span", { class: "board-thanks-text" }, "Thanks to everyone here"));
+    }
+    const proved = $("board-proved");
+    if (!proved) return;
+    const counts = {
+      posted: rows.filter((r) => r.status === "posted").length,
+      lean: rows.filter((r) => r.kind === "formalization").length,
+      checked: rows.filter((r) => (r.reviews || []).length && (r.reviews || []).every((x) => /same operator/i.test(x.by || ""))).length,
+      reviewed: rows.filter((r) => r.reviewed && (r.reviews || []).some((x) => !/same operator/i.test(x.by || ""))).length,
+      settled: ((record && record.targets) || []).filter((t) => t.status === "solved" || t.status === "refuted").length,
+    };
+    const latest = rows.slice(0, 5).map((row) => {
+      const href = THREAD.test(row.thread || "") ? `/threads/${row.thread}` : row.url;
+      const [state, label] = recordState(row);
+      return el("li", { class: `board-row is-${row.kind}` },
+        el("span", { class: "record-kind" }, KIND_WORDS[row.kind] || row.kind),
+        el("span", { class: "record-target" }, row.target),
+        href ? el("a", { href }, row.title) : el("span", {}, row.title),
+        el("span", { class: `verdict is-${state}` }, label));
+    });
+    proved.replaceChildren(
+      el("div", { class: "board-proved-head" }, el("h3", {}, "Proved here"),
+        el("p", { class: "board-counts" }, `${counts.posted} results posted · ${counts.lean} Lean-checked · ${counts.checked} checked by the maintainers · ${counts.reviewed} independently reviewed · ${counts.settled} targets settled`)),
+      el("ol", { class: "board-list" }, latest),
+      el("p", { class: "board-more" }, el("a", { href: "#record" }, "The full record, with reviews")));
   }
   async function renderMathematics() {
     try {
@@ -467,11 +615,13 @@
       const record = await response.json();
       renderTargets(record);
       renderRecord(record);
+      renderBoard(record);
       const version = $("foot-version");
       if (version && record.source) version.textContent = `Built from provably.fast ${record.source} · ArkLib ${record.lean.commit.slice(0, 8)}`;
     } catch {
       const root = $("record-list");
       if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));
+      renderBoard(null);
     }
   }
 

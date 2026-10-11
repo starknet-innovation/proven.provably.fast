@@ -8,8 +8,8 @@
  "targets": [
   {
    "id": "T1",
-   "title": "Improve the length dependence",
-   "level": "first objective",
+   "title": "The grand target: a linear count beyond Johnson",
+   "level": "grand target",
    "statement": "For 0 < rho < 1 and agreement a above the first-order curve a1(rho) of DKT equation 31: at most C(rho, a) n bad challenges on every line, C explicit, for every Reed-Solomon code of rate rho on any prescribed evaluation set over a field of characteristic 0 or above a stated bound, by any method.",
    "lean": [
     "MCAChallenge.T1"
@@ -30,8 +30,8 @@
   },
   {
    "id": "T2",
-   "title": "Push the agreement threshold",
-   "level": "next step",
+   "title": "The first rung of T3",
+   "level": "first step",
    "statement": "An explicit threshold curve strictly between capacity and the first-order curve a1(rho) at every rate, with a count at most quadratic in n.",
    "lean": [
     "MCAChallenge.T2"
@@ -46,9 +46,9 @@
   },
   {
    "id": "T3",
-   "title": "Approach capacity",
-   "level": "larger ambition",
-   "statement": "At every fixed gap delta > 0 above capacity, on smooth domains (cosets of the subgroup of order 2^m): at most C(delta) n bad challenges once n >= N(delta), with N and C explicit. Milestone: an exponent independent of delta.",
+   "title": "Toward capacity, on the domains STARKs use",
+   "level": "headline target",
+   "statement": "Fix a rate rho and a gap delta > 0. On smooth domains (cosets of the subgroup of order 2^m) over a field of characteristic 0 or p > k - 1: at most C n^c bad challenges at agreement (rho + delta) n once n >= N, with C, N and c explicit and c as small as possible. The pinned statement asks for c = 1 at every fixed gap; the milestone asks for one exponent c for every gap. Ladder: exponent 2 below the first-order curve (T2); linear at gap 0.2 and rate 1/4; linear at gap 1/16 at rates 1/4 and 1/2 with an explicit C. The pinned statement is uniform in the rate; the rungs fix it.",
    "lean": [
     "MCAChallenge.T3"
    ],
@@ -56,10 +56,11 @@
     "MCAChallenge.T3Exponent"
    ],
    "baseline": {
-    "bound": "C_delta n^(d + 1) on any domain, d = ceil(exp(1.5 / delta)) for delta < 0.24",
+    "bound": "C_delta n^(d + 1) on any domain, d = ceil(exp(1.5 / delta)) for delta < 0.24 (exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1); the method's own sharper test gives exponents 27 at delta = 0.2 and about 2,200 at delta = 0.1 at rate 1/4. Lower bound on mu_n: at least C(s - 1, d + 1) n at gap 1/s, about 2^(1/delta) n.",
     "sources": [
      "DKT26",
-     "JER26"
+     "JER26",
+     "KKH26"
     ],
     "lean": [
      "ReedSolomon.exists_capacity_lineAgreement"
@@ -122,6 +123,11 @@
    "title": "ArkLib: formally verified arguments of knowledge in Lean",
    "authors": "ArkLib contributors",
    "url": "https://github.com/Verified-zkEVM/ArkLib"
+  },
+  "DKTZ26": {
+   "title": "Counterexamples to beyond-Johnson proximity gaps over binary fields",
+   "authors": "Dao, Kominers, Thaler and Zheng",
+   "url": "https://eccc.weizmann.ac.il/report/2026/237/"
   }
  }
 }
