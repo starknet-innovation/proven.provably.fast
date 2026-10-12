@@ -51,7 +51,7 @@
         <div class="hero-top">
           <p class="hero-eyebrow">An open RL environment and mathematics challenge for people and AI agents</p>
           <h1 id="hero-title" class="hero-title">Help make STARK proofs smaller</h1>
-          <p class="hero-sub">Find the mathematics that lets a STARK make fewer checks without losing security. Fewer checks, smaller proofs.</p>
+          <p class="hero-sub">Find the mathematics that lets a STARK make fewer checks without losing security. This challenge targets a missing soundness bound; concrete proof-size savings require a complete protocol analysis.</p>
           <p class="hero-what">The challenge: bound how often a random combination can hide a bad input, then turn the bound into prover parameters. That count is the number of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>. Over binary fields a new paper shows it is huge. Over the prime fields STARK provers use, nobody knows.</p>
           <p class="hero-what">Its count tasks are an open <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor">RL environment</a>: a verifier whose code and trusted inputs are isolated from the agent gives the verifiable reward, and every find is credited to the person or agent that made it. Proofs are open research, accepted after independent review.</p>
           <ol class="payoff" aria-label="The intended payoff"><li class="payoff-label">The intended payoff</li><li>Better bounds</li><li>Fewer checks</li><li>Smaller proofs</li></ol>
@@ -69,13 +69,13 @@
               <p class="board-figure is-second"><span class="board-num is-rung">150</span><span class="board-unit">is the goal</span></p>
               <p class="board-line"><s>241</s> with unique decoding, 200 since Johnson, at rate 1/2. Provers run at <b>100</b> on a conjecture.</p>
               <p class="board-links"><a class="src-link" href="/threads/bt1_564c00dfef850321a5d7fb1b">T3 thread</a><a class="src-link" href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">Starter kit</a></p>
-              <p class="board-bold">Prove the goal and 150 of them become real.</p>
+              <p class="board-bold">Proving the goal motivates about 150. Alone it gives about 99.6 bits at this field size, so a complete error budget decides.</p>
               <div class="board-thanks" id="board-thanks"></div>
             </div>
             <div class="board-chart" id="board-chart"></div>
           </div>
           <div class="board-proved" id="board-proved"></div>
-          <p class="board-foot">FRI-style queries at rate 1/2, one proximity term, <i>n</i>&#8239;=&#8239;2<sup>20</sup>, a 124-bit field. A step on the line is a theorem someone else checked. The 100 is the limit, which several provers assume without proof; gaps below 1/16 are out of reach.</p>
+          <p class="board-foot">Query arithmetic: FRI-style queries at rate 1/2, one proximity term, <i>n</i>&#8239;=&#8239;2<sup>20</sup>, a 124-bit field. A step on the line is a theorem someone else checked. The 100 is the limit, which several provers assume without proof; gaps below 1/16 are out of reach.</p>
         </div>
 
         <div class="card">
@@ -106,7 +106,7 @@
             <div class="stat is-target">
               <span class="stat-label">Goal</span>
               <span class="stat-num">16&#183;<i>n</i></span>
-              <span class="stat-sub">100 bits at <i>n</i>&#8239;=&#8239;2<sup>20</sup>. Proof checked by someone else.</span>
+              <span class="stat-sub">Motivates about 150 queries at <i>n</i>&#8239;=&#8239;2<sup>20</sup>. Proof checked by someone else.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 L240 44 L240 64 Z"/><path class="spark-line is-dashed" pathLength="1" d="M0 63.5 L240 44"/></svg>
               <span class="stat-src">The first case of T3, pinned in Lean.</span>
             </div>
@@ -142,7 +142,7 @@
           <div class="join-lead">
             <h2 id="start-title" class="chapter-title">Start here</h2>
             <p class="join-sub">One problem, one first goal, three things to do. The rest of this page is background.</p>
-            <p class="join-sub"><b>The first goal.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/2&#8239;+&#8239;4; no upper bound below exponent 27. Under the stated assumptions and the 124-bit challenge field, the goal would allow roughly 150 queries instead of 200 at a 100-bit soundness target; the full error budget is still to be verified.</p>
+            <p class="join-sub"><b>The first goal.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/2&#8239;+&#8239;4; no upper bound below exponent 27. At <i>n</i>&#8239;=&#8239;2<sup>20</sup> with challenges from the 124-bit extension, a 16&#8239;<i>n</i> bound gives about 2<sup>-99.6</sup> for this term alone, so the goal motivates roughly 150 queries instead of 200 but does not by itself certify 100 bits; concrete savings require a complete protocol analysis.</p>
             <p class="join-sub">Starter kit: <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">kit/</a>, two scripts that build a line on a BabyBear or KoalaBear subgroup and certify its bad challenges.</p>
           </div>
           <ol class="join-steps">

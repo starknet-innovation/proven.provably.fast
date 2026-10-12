@@ -155,8 +155,11 @@ def validate(inst: dict, task: dict) -> tuple[np.ndarray, np.ndarray, np.ndarray
         if not isinstance(z, int) or isinstance(z, bool) or not 0 <= z < p:
             raise Rejected(f"challenge {idx}: z must be an integer in [0, {p})")
         w = ch["witness"]
-        if (not isinstance(w, list) or len(w) != k or len(set(w)) != k
-                or not all(isinstance(i, int) and not isinstance(i, bool) and 0 <= i < n for i in w)):
+        # Check element types before anything hashes them: a composite entry must be a rejection,
+        # not a grading error.
+        if (not isinstance(w, list) or len(w) != k
+                or not all(isinstance(i, int) and not isinstance(i, bool) and 0 <= i < n for i in w)
+                or len(set(w)) != k):
             raise Rejected(f"challenge {idx}: the witness must be {k} distinct domain indices")
         out.append((z, w))
     return dom, f, g, out
