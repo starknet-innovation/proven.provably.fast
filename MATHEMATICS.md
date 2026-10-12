@@ -31,9 +31,9 @@ bounds into proofs 11.1 percent smaller in ProveKit and 4.6 percent smaller in Z
 
 Open research on mutual correlated agreement (MCA) for Reed-Solomon codes on prescribed evaluation
 sets, over fields of large characteristic, with received words and challenges allowed in an
-extension field. The headline target is quantitative: at a fixed gap above the rate, on the
+extension field. T3, bounds on prover domains, is quantitative: at a fixed gap above the rate, on the
 power-of-two domains that provers use, bound the number of bad challenges by C n^c with the
-smallest c you can, and C written down. The grand target is a linear count beyond the Johnson
+smallest c you can, and C written down. T1, removing a factor of n, is a linear count beyond the Johnson
 threshold on every evaluation set. A result at one level is not a result at another.
 
 ## The problem
@@ -159,7 +159,7 @@ milestone is partial progress: credited, but the target stays open.
 
 ### T3
 
-**The headline target: toward capacity, on the domains STARKs use.** Fix a rate rho, a gap delta > 0
+**T3, bounds on prover domains: toward the limit, on the domains STARKs use.** Fix a rate rho, a gap delta > 0
 and the smooth domains (cosets of the multiplicative subgroup of order n = 2^m) over a field of
 characteristic 0 or p > k - 1. T3(rho, delta, c): E_C(rho + delta) <= C n^c once n >= N, with C, N
 and c explicit. The pinned statement asks for c = 1 at every fixed gap (`MCAChallenge.T3 N C`);
