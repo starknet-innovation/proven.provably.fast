@@ -31,7 +31,7 @@ grade = load("count_grade", COUNT / "tests" / "grade.py") if HAVE_NUMPY else Non
 
 def task_for(inst: dict) -> dict:
     n = len(inst["domain"])
-    return {"p": inst["p"], "n": n, "k": inst["k"], "A": inst["A"], "floor": n - inst["A"] + 1,
+    return {"p": inst["p"], "n": n, "k": inst["k"], "A": inst["A"], "floor": 4 * (n - inst["A"] + 1),
             "goal_per_n": 16, "max_listed": 24 * n}
 
 
@@ -63,18 +63,28 @@ class Generated(unittest.TestCase):
             self.assertEqual((task / "tests" / "Challenge.lean").read_text(), template)
             self.assertEqual(json.loads((task / "tests" / "task.json").read_text())["comparator"]["definition_names"], spec["holes"])
 
+    def test_lean_controls_share_the_challenge_statement(self):
+        controls = HARBOR / "controls"
+        challenge = (controls / "Control.lean").read_text()
+        statement = challenge[challenge.index("theorem solution"):challenge.index(":= sorry", challenge.index("theorem solution"))]
+        for name in ("ok", "choice"):
+            self.assertIn(statement, (controls / "solutions" / f"{name}.lean").read_text(), name)
+        self.assertNotIn(statement, (controls / "solutions" / "weak.lean").read_text())
+        config = json.loads((controls / "config.json").read_text())
+        self.assertEqual((config["theorem_names"], config["definition_names"]), (["solution"], ["C"]))
+
     def test_public_prose_has_no_em_dash(self):
         for path in [*HARBOR.rglob("*.md"), *HARBOR.rglob("*.toml")]:
             self.assertNotIn("—", path.read_text(), path)
 
 
 class Floor(unittest.TestCase):
-    def test_kit_certifies_n_minus_A_plus_one(self):
+    def test_kit_certifies_four_times_n_minus_A_plus_one(self):
         inst = baseline.build(5)
         bad, failures = kit.check(inst)
         self.assertEqual(failures, [])
-        self.assertEqual(len(bad), 32 - 20 + 1)
-        self.assertEqual(len(inst["challenges"]), 13)
+        self.assertEqual(len(bad), 4 * (32 - 20 + 1))
+        self.assertEqual(len(inst["challenges"]), 52)
 
     def test_kit_refuses_a_witness_above_k(self):
         inst = baseline.build(5)
@@ -96,7 +106,7 @@ class Grader(unittest.TestCase):
     def test_agrees_with_the_kit_on_the_floor(self):
         (bad, failures), (kbad, kfail) = self.certify_both(baseline.build(5))
         self.assertEqual(bad, kbad)
-        self.assertEqual(len(bad), 13)
+        self.assertEqual(len(bad), 52)
         self.assertEqual(failures, [])
 
     def test_agrees_with_the_kit_on_random_challenges(self):
@@ -104,8 +114,8 @@ class Grader(unittest.TestCase):
         inst = baseline.build(5, seed=3)
         n, k, p = 32, inst["k"], inst["p"]
         chal = []
-        for ch in inst["challenges"][:6]:          # true challenges with other witnesses from S
-            chal.append({"z": ch["z"], "witness": rng.sample(range(inst["A"] - 1), k)})
+        for ch in inst["challenges"][:6]:          # true challenges, witness in another order
+            chal.append({"z": ch["z"], "witness": rng.sample(ch["witness"], k)})
         for ch in inst["challenges"][:4]:          # a witness touching a point outside S
             chal.append({"z": ch["z"], "witness": rng.sample(range(n), k)})
         for _ in range(12):                        # random challenges
@@ -142,17 +152,17 @@ class Grader(unittest.TestCase):
             grade.TESTS, grade.VERIFIER_DIR, grade.INSTANCE = tmp / "tests", tmp / "verifier", tmp / "artifacts" / "instance.json"
             self.assertEqual(grade.main(), 0)
             reward = json.loads((tmp / "verifier" / "reward.json").read_text())
-            self.assertEqual(reward["certified_bad"], 13)
+            self.assertEqual(reward["certified_bad"], 52)
             self.assertEqual(reward["beats_floor"], 0)
-            self.assertAlmostEqual(reward["reward"], 13 / (16 * 32), places=6)
+            self.assertEqual(reward["reward"], round(52 / (16 * 32), 6))
             # a second bad challenge per point would beat the floor
             inst["challenges"] += [{"z": (c["z"] + 1) % inst["p"], "witness": c["witness"]} for c in inst["challenges"]]
             (tmp / "artifacts" / "instance.json").write_text(json.dumps(inst))
             grade.main()
             again = json.loads((tmp / "verifier" / "reward.json").read_text())
-            self.assertEqual(again["certified_bad"], 13)
+            self.assertEqual(again["certified_bad"], 52)
             details = json.loads((tmp / "verifier" / "grading.json").read_text())
-            self.assertEqual(details["failed"], 13)
+            self.assertEqual(details["failed"], 52)
             # tampering with the domain scores 0 with a reason
             inst["domain"][0] = 5
             (tmp / "artifacts" / "instance.json").write_text(json.dumps(inst))
