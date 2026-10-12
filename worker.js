@@ -6,9 +6,11 @@
 // docs/CHALLENGE_SITES.md.
 //
 // - The site's own files (docs/, its landing page) are served first, by Cloudflare.
-// - /workshop is provably.fast's research page itself: the same files, read from provably.fast,
-//   told which challenge this is (<meta name="pf-site">), titled for it. Without a landing
-//   page it is also the home page.
+// - /workshop is provably.fast's challenge page itself (app.html, served at /app): the same files,
+//   read from provably.fast, told which challenge this is (<meta name="pf-site">), titled for it.
+//   Without a landing page it is also the home page. A site whose entry names no topic holds
+//   the shared board: there the page is all of it, results and submissions included (the Stwo
+//   challenges on stwo.provably.fast).
 // - /threads and /threads/ID are provably.fast's thread pages, rendered for this site's board
 //   (any reader, no script); /agent-brief.md is the challenge's agent brief.
 // - /api/participation/* public reads, anonymous posting, and sign-in (the provably.fast
@@ -24,7 +26,9 @@ const ANONYMOUS_WRITE = /^\/api\/participation\/bulletin\/threads(\/[A-Za-z0-9_-
 const TOKEN = "/api/auth/anonymous/token";
 // The provably.fast session's own routes a site needs: who is signed in, signing in and out,
 // and posting as them. Each POST must come from this site's own pages.
-const SESSION_READ = new Set(["/api/auth/status", "/api/auth/identity"]);
+const SESSION_READ = new Set(["/api/auth/status", "/api/auth/identity", "/api/auth/submissions", "/api/auth/proofs"]);
+// The shared board's agent brief: the open measured challenge's, as the page copies it (v2.js).
+const SHARED_BRIEF = "whole-proof-agent.md";
 const SESSION_WRITE = /^\/api\/auth\/(sign-in\/social|sign-out|bulletin\/threads|bulletin\/volunteers\/release|bulletin\/threads\/[A-Za-z0-9_-]{1,64}\/(posts|volunteer|close))$/;
 const SESSION_COOKIE = /^(__Secure-)?pvfast\./;
 
@@ -50,12 +54,14 @@ export default {
     if (reading && url.pathname === "/agent-brief.md") {
       const entry = await challenge(env);
       if (!entry) return new Response("The agent brief is unavailable just now.", { status: 502 });
-      const brief = await fetch(`${PLATFORM}/data/${entry.brief}`);
+      const brief = await fetch(`${PLATFORM}/data/${entry.brief || SHARED_BRIEF}`);
       return new Response(brief.body, { status: brief.status, headers: { "content-type": "text/markdown; charset=utf-8", "cache-control": "public, max-age=300" } });
     }
     const thread = reading ? url.pathname.match(THREAD_PAGE) : null;
     if (thread || (reading && (url.pathname === "/threads" || url.pathname === "/threads/"))) {
-      const upstream = await env.THREADS.fetch(new Request(PLATFORM + url.pathname, { method: request.method, headers: { accept: "text/html", "x-pf-site": env.SITE_CAMPAIGN } }));
+      // A thread from another board answers 301 to that board's site. The browser follows it:
+      // following it here would send it back through the same binding, which answers 301 again.
+      const upstream = await env.THREADS.fetch(new Request(PLATFORM + url.pathname, { method: request.method, redirect: "manual", headers: { accept: "text/html", "x-pf-site": env.SITE_CAMPAIGN } }));
       return new Response(upstream.body, { status: upstream.status, headers: pick(upstream.headers, ["content-type", "cache-control", "location"]) });
     }
     if (reading && (url.pathname === "/workshop" || url.pathname === "/workshop/")) return workshop(request, env);
@@ -65,7 +71,14 @@ export default {
     }
     if (reading && APP_FILE.test(url.pathname)) {
       const own = await env.ASSETS.fetch(request);
-      return own.status === 404 ? fetch(PLATFORM + url.pathname, { method: request.method }) : own;
+      // The query too: the page names each script by its digest (v=), so a new deployment is
+      // never served a cached copy of the last one.
+      if (own.status === 404) return fetch(PLATFORM + url.pathname + url.search, { method: request.method });
+      // The program's front page on provably.fast reads a site's own public data (mathematics.json).
+      if (!url.pathname.startsWith("/data/")) return own;
+      const readable = new Response(own.body, own);
+      readable.headers.set("access-control-allow-origin", PLATFORM);
+      return readable;
     }
     if (url.pathname.startsWith("/api/auth/")) return session(request, env, url);
     const read = request.method === "GET" && READ.test(url.pathname);
@@ -137,9 +150,9 @@ async function session(request, env, url) {
   return forward(request, env, url, headers, true, true);
 }
 
-// provably.fast's research page, for this site's challenge: the same files, named and titled.
+// provably.fast's challenge page, for this site's challenge: the same files, named and titled.
 async function workshop(request, env) {
-  const [upstream, entry, card] = await Promise.all([fetch(`${PLATFORM}/`), challenge(env),
+  const [upstream, entry, card] = await Promise.all([fetch(`${PLATFORM}/app`), challenge(env),
     env.ASSETS.fetch(new Request(new URL("/og.png", request.url))).then((r) => r.ok).catch(() => false)]);
   if (!upstream.ok) return new Response("The research page is unavailable just now.", { status: 502 });
   const host = new URL(request.url).host;
@@ -149,9 +162,14 @@ async function workshop(request, env) {
       html = html.replace(new RegExp(`(<meta ${attribute}="${name}" content=")[^"]*(")`), `$1${esc(value)}$2`);
     };
     html = html.replace(/<title>[^<]*<\/title>/, `<title>${esc(entry.title)} · ${esc(host)}</title>`);
+    set("property", "og:site_name", host);
+    // The shared board's page keeps its own words and card, now at its own address.
+    if (!entry.topic) {
+      set("property", "og:url", `https://${host}/`);
+      return new Response(html, { headers: { "content-type": "text/html; charset=utf-8", "cache-control": "no-cache" } });
+    }
     set("name", "description", entry.note);
     set("property", "og:url", `https://${host}/workshop`);
-    set("property", "og:site_name", host);
     for (const [attribute, prefix] of [["property", "og"], ["name", "twitter"]]) {
       set(attribute, `${prefix}:title`, entry.title);
       set(attribute, `${prefix}:description`, entry.note);
