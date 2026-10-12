@@ -8,8 +8,8 @@
  "targets": [
   {
    "id": "T1",
-   "title": "The grand target: a linear count beyond Johnson",
-   "level": "grand target",
+   "title": "Remove a factor of n",
+   "level": "open",
    "statement": "For 0 < rho < 1 and agreement a above the first-order curve a1(rho) of DKT equation 31: at most C(rho, a) n bad challenges on every line, C explicit, for every Reed-Solomon code of rate rho on any prescribed evaluation set over a field of characteristic 0 or above a stated bound, by any method.",
    "lean": [
     "MCAChallenge.T1"
@@ -30,8 +30,8 @@
   },
   {
    "id": "T2",
-   "title": "The first rung of T3",
-   "level": "first step",
+   "title": "A quadratic bound in a wider range",
+   "level": "open",
    "statement": "An explicit threshold curve strictly between capacity and the first-order curve a1(rho) at every rate, with a count at most quadratic in n.",
    "lean": [
     "MCAChallenge.T2"
@@ -46,8 +46,8 @@
   },
   {
    "id": "T3",
-   "title": "Toward capacity, on the domains STARKs use",
-   "level": "headline target",
+   "title": "Bounds on prover domains",
+   "level": "open, with a first goal pinned in Lean",
    "statement": "Fix a rate rho and a gap delta > 0. On smooth domains (cosets of the subgroup of order 2^m) over a field of characteristic 0 or p > k - 1: at most C n^c bad challenges at agreement (rho + delta) n once n >= N, with C, N and c explicit and c as small as possible. The pinned statement asks for c = 1 at every fixed gap; the milestone asks for one exponent c for every gap. Ladder: exponent 2 below the first-order curve (T2); linear at gap 0.2 and rate 1/4; linear at gap 1/16 at rates 1/4 and 1/2 with an explicit C. The pinned statement is uniform in the rate; the rungs fix it.",
    "lean": [
     "MCAChallenge.T3"

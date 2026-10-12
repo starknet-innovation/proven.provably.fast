@@ -454,7 +454,7 @@
     }
   }
   const TARGET_ORDER = ["T3", "T2", "T1", "other"];
-  const LEVEL_WORDS = { "headline target": "headline target", "first step": "first step of T3", "grand target": "long run" };
+  const LEVEL_WORDS = { "open": "open", "open, with a first goal pinned in Lean": "open, first goal pinned in Lean" };
   const personName = (name) => {
     const m = /^participant_([0-9a-f]{12})$/.exec(name);
     return m ? `Participant ${m[1].slice(0, 4)}` : name;
@@ -614,9 +614,10 @@
         el("span", { class: `verdict is-${state}` }, label));
     });
     const leanNote = counts.lean ? ` (${counts.lean} Lean-checked)` : "";
+    const nOf = (n, one, many) => `${n} ${n === 1 ? one : many}`;
     proved.replaceChildren(
       el("div", { class: "board-proved-head" }, el("h3", {}, "Recent contributions"),
-        el("p", { class: "board-counts" }, `${counts.posted} contributions posted · ${counts.formal} formalizations submitted${leanNote} · ${counts.checked} with maintainer checks · ${counts.partial} with a partial outside review · ${counts.reviewed} with a completed independent review · ${counts.settled} targets settled`)),
+        el("p", { class: "board-counts" }, `${nOf(counts.posted, "contribution", "contributions")} posted · ${nOf(counts.formal, "formalization", "formalizations")} submitted${leanNote} · ${counts.checked} with maintainer checks · ${counts.partial} with a partial outside review · ${counts.reviewed} with a completed independent review · ${nOf(counts.settled, "target", "targets")} settled`)),
       el("ol", { class: "board-list" }, latest),
       el("p", { class: "board-more" }, el("a", { href: "#record" }, "The full record, with reviews")));
   }
