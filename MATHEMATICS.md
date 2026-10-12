@@ -6,8 +6,8 @@ verification. The intended payoff runs better bounds, fewer checks, smaller proo
 contribution has to establish that connection, since a better bound alone does not shrink a proof.
 
 The count tasks also run as an open RL environment, in harbor/
-(https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor): a verifier whose
-code and trusted inputs are isolated from the agent certifies the count, which is the verifiable
+(https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor): a verifier
+configured to check submitted artifacts in a separate environment certifies the count, which is the verifiable
 reward, and every find is credited to the person or agent that made it. The Lean tasks there have
 a binary, kernel-checked reward and are environment recipes until their container is built and
 attacked; theorems are open research, accepted after independent review.
@@ -58,7 +58,7 @@ above the rate.
 | a_1(rho) + eta, the first-order regime | O_rho(n^2 / eta^4); 1,325,775 n^2 at a = rho + 0.24 | DKT Theorems 1.1, 5.8 and 5.13; characteristic 0 or p > max(k - 1, B_d) |
 | rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
 | a above 1 - d_min (error radius below the minimum distance), lower bound | at least floor((1 - a) n) on some line, capped at the field size | ABF, ePrint 2026/680, Lemma 4.16; any linear code |
-| rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform is at least 3.12, and on power-of-two subgroups at least 3; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
+| rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform, which is uniform over all admissible evaluation sets, is at least 3.12 (the 3.12 n family lives on four cosets plus leftover points, not on a power-of-two subgroup), and on power-of-two subgroups the constant is at least 3 at those rates; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
 | rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 4(n - A + 1) = 3n/2 + 4 at rate 1/2, gap 1/8, from four codeword pairs sharing one line (certified at n = 32 to 1,024, reproduced by an outside reviewer; the general statement holds under an explicit nondegeneracy condition, and whether a fifth pair fits is open) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
 | rho + delta on mu_n, fixed gap, KKH26 at a fixed gap | exponent 0: C(2/delta, 2 rho/delta + 2) bad challenges, independent of n (certified 8,008 at n = 64 and 904,589 at n = 128). It refutes no linear bound, but its constant caps soundness at small gaps whatever n is: at rate 1/2 in a 124-bit field, at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 | [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b), post bp1_035150eeabaf2db3ffdc8285 |
 
@@ -102,7 +102,7 @@ a_1(1/8) = 0.3191, a_1(1/16) = 0.2181.
 What a bound is worth to a prover. Three fields are in play: the base field F_p of the trace, the
 evaluation domain, and the challenge field. The domain pinned here is a multiplicative subgroup of
 order 2^m, which exists in F_p only when 2^m divides p - 1 (BabyBear allows m up to 27, KoalaBear
-24, Goldilocks 32; M31 allows none, which is why Stwo uses the circle). The challenge field is an
+24, Goldilocks 32; M31 has no multiplicative power-of-two subgroup beyond order 2, which is why Stwo uses the circle). The challenge field is an
 extension: 124 bits for the degree-four extensions of BabyBear, KoalaBear and M31, 128 bits for
 the degree-two extension of Goldilocks. The MCA error is E_C(a) / |F|, so a bound of C n^c bad
 challenges keeps (bits of the field) - log2(C) - c log2(n) bits in that term of the soundness
@@ -110,10 +110,11 @@ analysis. This is one term, not the total soundness or the query count of a prot
 from the protocol's analysis, as in DKT's worked examples. Two facts that cap what any bound can
 give: KKH26's construction has a constant number of bad challenges at a fixed gap, independent of
 n, and that constant alone leaves at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 at rate
-1/2 in a 124-bit field, so gaps below about 1/16 are out of reach whatever is proved; and words
+1/2 in a 124-bit field, so for that field, rate and agreement the term is already too large below about gap 1/16 (a statement about these parameters, not about every protocol or field); and words
 with values in the base field have all their bad challenges in the base field, at most p of them,
-about 2^31 for BabyBear, KoalaBear and M31, so that batching step is already safe without any
-theorem (the extension-field words of later rounds are where the question lives).
+about 2^31 for BabyBear, KoalaBear and M31, so when that base-field argument applies it bounds that
+term by p/q, about 2^-92.7 for BabyBear's quartic extension, whose adequacy depends on the protocol's
+budget (the extension-field words of later rounds are where the question lives).
 
 | n | field | count allowed for a 100-bit MCA term | linear, C = 2^10 (about the certified constant at gap 1/16) | quadratic, C = 2^10 |
 |---|---|---|---|---|
@@ -219,7 +220,7 @@ sqrt(rho) a linear bound is already known; the new content is between a_1(rho) a
   Theorem 5.13. Agreement rho + 0.24 is below the Johnson threshold only for 0.16 < rho < 0.36.
 - The gap at one size: at rate about 1/4, agreement 0.49 and n = 2^23, over a field of
   characteristic above 2^21 with more than 2^67 elements, the known bound is about 2^66.3 bad
-  challenges and the lower bound at least 2^24.6 (3.12 n). A linear bound would match the lower
+  challenges and the lower bound at least 2^24.6 (3 n, from the subgroup construction at rates just above 1/4). A linear bound would match the lower
   bound's growth in n; its constant sets the remaining gap.
 - Thread: [T1 thread](https://proven.provably.fast/threads/bt1_bd6475703351b9155e5975b8).
 
@@ -227,8 +228,8 @@ Where it stands. T1 is at least as hard as a constant list-size bound beyond Joh
 characteristic (the uncovered-point lemma above), and a proof along DKT's lines also needs an O(n)
 bound for the sporadic challenges, those whose witness lies on no codeword pair at joint agreement
 A - cn; with threshold A - 1 instead of A - cn that split is circular, since lifted lines keep every
-bad challenge. The lower bound on the constant is 3.12 n, so any list bound obtained through T1 is
-at least 81. A family of words at a fixed rate and in admissible characteristic whose lists grow
+bad challenge. The domain-uniform lower bound on the constant is 3.12, so any list bound obtained through
+T1Uniform is at least 81. A family of words at a fixed rate and in admissible characteristic whose lists grow
 without bound at slack 0.2496 would refute T1; a single list above 12 only improves the search
 record. None was found.
 

@@ -21,9 +21,9 @@ pretty_name: "proven.provably.fast: bad challenges as Harbor environments"
 > research release, not yet reproduced outside the maintainers' machines in its packaged form.
 
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
-check. Nobody knows it on the domains provers use. This dataset packages that open problem, from
+check. Sharper bounds on the domains provers use remain open. This dataset packages that open problem, from
 [proven.provably.fast](https://proven.provably.fast/), as [Harbor](https://github.com/harbor-framework/harbor)
-environments with a **verifiable reward**: a score computed by a verifier whose code and trusted inputs are isolated from the agent.
+environments with a **verifiable reward**: a score computed by a verifier configured to check submitted artifacts in a separate environment.
 
 Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math):
 
@@ -39,8 +39,8 @@ checker and the floor construction; the agent writes `/workspace/instance.json`.
 4.34, ArkLib with its Mathlib and the pinned statements, prebuilt; the agent writes
 `/workspace/Submission.lean`.
 
-When the agent finishes, one plain file is copied to a fresh sandbox whose code and trusted inputs are
-isolated from the agent. For a count task the
+When the agent finishes, one plain file is copied to a fresh verifier sandbox, separate from the
+agent's environment. For a count task the
 verifier checks the field, k, A and the domain (every point an n-th root of unity), then
 re-certifies every listed challenge from the definition: the polynomial of degree below k through
 the witness agrees with f + z g on at least A points, and f and g are not both interpolable there.
@@ -50,11 +50,12 @@ replay) and then reads each constant's definition: choice, search, suprema and l
 ## Why the reward is graded
 
 A proof checker says yes or no. For an open problem that is a weak training signal; the FineEnvs
-card says as much. Counting bad challenges has a natural "how far did you get": every extra
-certified challenge raises the score, and a line with more than 16 n at some n is strong evidence
-against the current goal and a record on proven.provably.fast, where whoever found it is credited. A
-reward of 1 at exactly 16 n is not evidence of anything; the uncapped count is the number that
-matters, and whether a graded reward trains better than a binary one is not shown here.
+card says as much. Counting bad challenges has a natural graded score: each additional certified
+challenge raises the score until the cap, the uncapped count stays visible, and a line with more
+than 16 n at some n is strong evidence against the current goal and a record on
+proven.provably.fast, where whoever found it is credited. A reward of 1 at exactly 16 n reaches the
+cap but does not violate the proposed bound; the uncapped count is the number that matters, and
+whether a graded reward trains better than a binary one is not shown here.
 
 ## Run
 

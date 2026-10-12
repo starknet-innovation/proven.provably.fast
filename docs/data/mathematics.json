@@ -1,6 +1,6 @@
 {
  "schema": "proven-mathematics/0",
- "generated": "2026-10-12T04:42:31+00:00",
+ "generated": "2026-10-12T05:17:56+00:00",
  "lean": {
   "file": "lean/MCAChallenge.lean",
   "library": "https://github.com/Verified-zkEVM/ArkLib",
@@ -49,7 +49,7 @@
    "id": "M-0011",
    "target": "T3",
    "kind": "lemma",
-   "title": "Four codeword pairs on one line: 4(n - A + 1) = 3n/2 + 4 bad challenges at the exact k = n/2, gap 1/8 (counts reproduced independently; general statement under a nondegeneracy condition)",
+   "title": "Four codeword pairs on one line: 4(n - A + 1) = 3n/2 + 4 bad challenges at the exact k = n/2, gap 1/8",
    "status": "posted",
    "date": "2026-10-11",
    "url": null,
@@ -360,5 +360,5 @@
    ]
   }
  ],
- "source": "4365a5e1"
+ "source": "4676f8cc"
 }

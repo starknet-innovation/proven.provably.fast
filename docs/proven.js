@@ -105,7 +105,7 @@
     const X = (r) => L + r * (W - L - R), Y = (a) => T + (1 - a) * (H - T - B);
     const svg = svgEl("svg", { class: "regime-svg", viewBox: `0 0 ${W} ${H}`, role: "img", "aria-labelledby": "regime-title regime-desc", });
     const desc = svgEl("desc", { id: "regime-desc" });
-    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between the limit and the first-order curve the known exponents are in the thousands; T3 asks for a small one.";
+    desc.textContent = "Agreement thresholds by code rate, with marks at the rates provers use, 1/8, 1/4 and 1/2. Above the Johnson curve the count of bad challenges is known to be linear. Between the first-order curve and the Johnson curve a quadratic bound is known; T1 asks for a linear one. Between the limit and the first-order curve the known bounds are polynomial, with exponents that depend on the rate and the gap; T3 asks for a small one.";
     const defs = svgEl("defs");
     const hatch = svgEl("pattern", { id: "rg-hatch", width: 7, height: 7, patternUnits: "userSpaceOnUse", patternTransform: "rotate(45)" });
     hatch.append(svgEl("line", { class: "rg-hatch-line", x1: 0, y1: 0, x2: 0, y2: 7 }));
@@ -371,8 +371,14 @@
     }
     return out.sort((a, b) => b.updated_at - a.updated_at);
   }
+  let talkState = "loading";
   function drawThreads() {
     const root = $("talk-list");
+    if (talkState !== "ok") {
+      root.replaceChildren(el("p", { class: "loading" }, talkState === "error" ? "The discussion could not be loaded. " : "Loading the discussion. ",
+        el("a", { href: "/threads" }, "Open the discussion page")));
+      return;
+    }
     const rows = threads.filter((t) => !shown || named(t.title).target === shown);
     if (!rows.length) { root.replaceChildren(el("p", { class: "loading" }, threads.length ? "No threads for this target yet." : "No threads yet.")); return; }
     root.replaceChildren(el("ol", { class: "record-list" }, rows.map((t) => {
@@ -395,8 +401,9 @@
         drawThreads();
       });
     }
-    try { threads = await loadThreads(); drawThreads(); }
-    catch { root.replaceChildren(el("p", { class: "loading" }, "The discussion could not be read just now.")); }
+    try { threads = await loadThreads(); talkState = "ok"; }
+    catch { talkState = "error"; }
+    drawThreads();
   }
 
   // The research graph: every record, newest first, with what it builds on.
@@ -458,7 +465,9 @@
     const reviews = row.reviews || [];
     if (reviews.length) {
       const sameOperator = reviews.every((r) => /same operator/i.test(r.by || ""));
-      const verdict = reviews.some((r) => r.verdict === "holds") ? "holds" : reviews[0].verdict || "";
+      const verdicts = [...new Set(reviews.map((r) => r.verdict || ""))];
+      if (verdicts.length > 1) return ["posted", `reviews disagree: ${verdicts.join(", ")}`];
+      const verdict = verdicts[0];
       return [sameOperator ? "posted" : "reviewed", sameOperator ? `checked by the maintainers: ${verdict}` : `reviewed: ${verdict}`];
     }
     return ["posted", "posted"];
@@ -564,8 +573,6 @@
       const tc = svgEl("text", { class: "board-cap-label", x: end.x + 10, y: capY + 4 }); tc.textContent = `${CAPACITY_QUERIES} · the limit`; svg.append(tc);
       const togo = svgEl("line", { class: "board-togo", x1: end.x, x2: end.x, y1: end.y + 7, y2: rungY - 3 }); svg.append(togo);
       const tg = svgEl("text", { class: "board-togo-label", x: end.x + 10, y: (end.y + rungY) / 2 + 4 }); tg.textContent = `${now - RUNG_QUERIES} to go`; svg.append(tg);
-      const last = QUERY_STEPS[QUERY_STEPS.length - 1];
-      const ts = svgEl("text", { class: "board-label", x: X(y1) - 6, y: h - 24, "text-anchor": "end" }); ts.textContent = `no proven step since ${last.year}`; svg.append(ts);
       const ax0 = svgEl("text", { class: "board-axis", x: padL, y: h - 8 }); ax0.textContent = "2018";
       const ax1 = svgEl("text", { class: "board-axis", x: end.x, y: h - 8, "text-anchor": "middle" }); ax1.textContent = "today";
       svg.append(ax0, ax1);
@@ -586,11 +593,15 @@
     }
     const proved = $("board-proved");
     if (!proved) return;
+    const outside = (x) => !/same operator/i.test(x.by || "");
     const counts = {
-      posted: rows.filter((r) => r.status === "posted").length,
-      lean: rows.filter((r) => r.kind === "formalization").length,
-      checked: rows.filter((r) => (r.reviews || []).length && (r.reviews || []).every((x) => /same operator/i.test(x.by || ""))).length,
-      reviewed: rows.filter((r) => r.reviewed && (r.reviews || []).some((x) => !/same operator/i.test(x.by || ""))).length,
+      posted: rows.length,
+      formal: rows.filter((r) => r.kind === "formalization").length,
+      // A formalization counts as Lean-checked only once accepted with a holding review; the kind alone is a submission.
+      lean: rows.filter((r) => r.kind === "formalization" && r.status === "accepted").length,
+      checked: rows.filter((r) => (r.reviews || []).length && (r.reviews || []).every((x) => !outside(x))).length,
+      partial: rows.filter((r) => (r.reviews || []).some((x) => outside(x) && x.verdict === "partial")).length,
+      reviewed: rows.filter((r) => r.reviewed && (r.reviews || []).some(outside)).length,
       settled: ((record && record.targets) || []).filter((t) => t.status === "solved" || t.status === "refuted").length,
     };
     const latest = rows.slice(0, 5).map((row) => {
@@ -602,9 +613,10 @@
         href ? el("a", { href }, row.title) : el("span", {}, row.title),
         el("span", { class: `verdict is-${state}` }, label));
     });
+    const leanNote = counts.lean ? ` (${counts.lean} Lean-checked)` : "";
     proved.replaceChildren(
-      el("div", { class: "board-proved-head" }, el("h3", {}, "Proved here"),
-        el("p", { class: "board-counts" }, `${counts.posted} results posted · ${counts.lean} Lean-checked · ${counts.checked} checked by the maintainers · ${counts.reviewed} independently reviewed · ${counts.settled} targets settled`)),
+      el("div", { class: "board-proved-head" }, el("h3", {}, "Recent contributions"),
+        el("p", { class: "board-counts" }, `${counts.posted} contributions posted · ${counts.formal} formalizations submitted${leanNote} · ${counts.checked} with maintainer checks · ${counts.partial} with a partial outside review · ${counts.reviewed} with a completed independent review · ${counts.settled} targets settled`)),
       el("ol", { class: "board-list" }, latest),
       el("p", { class: "board-more" }, el("a", { href: "#record" }, "The full record, with reviews")));
   }
@@ -621,7 +633,8 @@
     } catch {
       const root = $("record-list");
       if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));
-      renderBoard(null);
+      const proved = $("board-proved");
+      if (proved) proved.replaceChildren(el("p", { class: "loading" }, "Research status unavailable. ", el("a", { href: "#record" }, "The record")));
     }
   }
 
