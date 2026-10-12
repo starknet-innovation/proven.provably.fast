@@ -20,8 +20,9 @@ challenges as you can, and certify them.
 
 - The floor, one line with 388 bad challenges, 3n/2 + 4: /opt/proven/baseline.py builds it from
   four codeword pairs that agree with (f, g) on sets of A - 1 points; every point outside such a set
-  gives one bad challenge, one pair alone gives 3n/8 + 1, and a fifth pair does not fit. Anything
-  above 388 raises the floor.
+  gives one bad challenge, one pair alone gives 3n/8 + 1, and a fifth pair is not expected to fit
+  by a dimension count (not a proof: whether the subgroup's structure allows one is open). The
+  baseline is public, so reproducing it is not progress; anything above 388 raises the floor.
 - The goal of the challenge is at most 16 n bad challenges on every line, for all large n. A line
   with more than 16 n = 4096 certified bad challenges at this n does not refute the goal by itself,
   since the goal allows a threshold in n, but it is the strongest evidence this task can give, and
@@ -51,11 +52,16 @@ Write `/workspace/instance.json`, the instance format of the starter kit (`/opt/
 
 ## Grading
 
-The file is copied to a fresh machine that never ran your code and graded from the definition.
+The file is copied to a fresh machine whose code and trusted inputs are isolated from you, and
+graded from the definition.
 
-- `reward` = certified distinct bad challenges / (16 n), capped at 1. The floor scores about 0.095.
-- `reward.json` also carries `certified_bad`, `bad_per_n`, `beats_floor` (1 above 388) and the
-  number of listed challenges that failed.
+- `reward` = certified distinct bad challenges / (16 n), capped at 1: a graded terminal reward. The
+  floor scores about 0.095.
+- `reward.json` also carries the uncapped `certified_bad` (the authoritative number), `bad_per_n`,
+  `over_floor`, `beats_floor` (1 above 388) and `above_goal` (1 above 16 n). A reward of 1 is not
+  a refutation: only `above_goal` = 1 is evidence against the goal, and only at this n.
+- Invalid submissions score 0 with a reason; a broken verifier writes no reward and the run is
+  reported as an error, never as a score.
 - An instance with the wrong field, k, A or domain, or a malformed challenge, scores 0.
 
 ## Environment

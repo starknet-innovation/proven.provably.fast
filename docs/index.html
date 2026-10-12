@@ -53,7 +53,7 @@
           <h1 id="hero-title" class="hero-title">Help make STARK proofs smaller</h1>
           <p class="hero-sub">Find the mathematics that lets a STARK make fewer checks without losing security. Fewer checks, smaller proofs.</p>
           <p class="hero-what">The challenge: bound how often a random combination can hide a bad input, then turn the bound into prover parameters. That count is the number of <span class="term" tabindex="0" data-tip="Mutual correlated agreement: a verifier combines two words with a random challenge z. A bad z makes the combination agree with a codeword on many coordinates while the two words have no joint codeword explanation there. The bound counts the bad z on one line.">bad challenges</span>. Over binary fields a new paper shows it is huge. Over the prime fields STARK provers use, nobody knows.</p>
-          <p class="hero-what">Its count tasks are an open <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor">RL environment</a>: a checker the agent never touches gives the verifiable reward, and every find is credited to the person or agent that made it. Proofs are open research, accepted after independent review.</p>
+          <p class="hero-what">Its count tasks are an open <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor">RL environment</a>: a verifier whose code and trusted inputs are isolated from the agent gives the verifiable reward, and every find is credited to the person or agent that made it. Proofs are open research, accepted after independent review.</p>
           <ol class="payoff" aria-label="The intended payoff"><li class="payoff-label">The intended payoff</li><li>Better bounds</li><li>Fewer checks</li><li>Smaller proofs</li></ol>
           <p class="payoff-note">A bound alone shrinks nothing. Each result has to make the connection.</p>
         </div>
@@ -98,7 +98,7 @@
             </div>
             <div class="stat is-floor">
               <span class="stat-label">Lower bound</span>
-              <span class="stat-num term" tabindex="0" data-tip="At rate 1/2, gap 1/8 and the exact k = n/2, the best known line has 3n/2 + 4 bad challenges, from four codeword pairs on one line. The larger families found here, 3.12 n at the T1 agreement and 35 n at gap 1/8, need k two above a multiple of n/s and vanish at exact k.">3<i>n</i>/2</span>
+              <span class="stat-num term" tabindex="0" data-tip="The previously displayed baseline was incomplete. Earlier workshop work gives 9n/8 + 3; the new four-pair instances certify 3n/2 + 4, reproduced by an outside reviewer; the general statement is conditional and no optimality is claimed.">3<i>n</i>/2</span>
               <span class="stat-sub">At rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly. Found here.</span>
               <svg class="spark" viewBox="0 0 240 64" preserveAspectRatio="none" aria-hidden="true"><path class="spark-area" d="M0 64 L0 63.5 L240 50 L240 64 Z"/><path class="spark-line" pathLength="1" d="M0 63.5 L240 50"/></svg>
               <span class="stat-src">This workshop, October 2026.</span>
@@ -142,7 +142,7 @@
           <div class="join-lead">
             <h2 id="start-title" class="chapter-title">Start here</h2>
             <p class="join-sub">One problem, one first goal, three things to do. The rest of this page is background.</p>
-            <p class="join-sub"><b>The first goal.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/2&#8239;+&#8239;4; no upper bound below exponent 27. A proof keeps 100 bits and cuts a quarter of the queries.</p>
+            <p class="join-sub"><b>The first goal.</b> Subgroup of order 2<sup>20</sup> in a 31-bit field, rate 1/2, gap 1/8, <i>k</i>&#8239;=&#8239;<i>n</i>/2 exactly: show at most 16&#8239;<i>n</i> bad challenges, or show many more. Known: at least 3<i>n</i>/2&#8239;+&#8239;4; no upper bound below exponent 27. Under the stated assumptions and the 124-bit challenge field, the goal would allow roughly 150 queries instead of 200 at a 100-bit soundness target; the full error budget is still to be verified.</p>
             <p class="join-sub">Starter kit: <a href="https://github.com/starknet-innovation/proven.provably.fast/tree/main/kit">kit/</a>, two scripts that build a line on a BabyBear or KoalaBear subgroup and certify its bad challenges.</p>
           </div>
           <ol class="join-steps">

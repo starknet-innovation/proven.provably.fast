@@ -126,6 +126,18 @@ class Grader(unittest.TestCase):
         self.assertEqual(sorted(z for z, _ in failures), sorted(z for z, _ in kfail))
         self.assertGreaterEqual(len(bad), 6)
 
+    def test_arithmetic_next_to_the_prime(self):
+        # Values at p - 1 everywhere: no product may overflow int64 and the two checkers must agree.
+        inst = baseline.build(4, seed=5)
+        p, n = inst["p"], 16
+        inst["f"] = [p - 1] * n
+        inst["g"] = [p - 1 - (i % 3) for i in range(n)]
+        inst["challenges"] = [{"z": p - 1, "witness": list(range(inst["k"]))},
+                              {"z": p - 2, "witness": list(range(1, inst["k"] + 1))}]
+        (bad, failures), (kbad, kfail) = self.certify_both(inst)
+        self.assertEqual(bad, kbad)
+        self.assertEqual(len(failures), len(kfail))
+
     def test_rejects_a_tampered_instance(self):
         inst = baseline.build(4)
         task = task_for(inst)
@@ -153,7 +165,7 @@ class Grader(unittest.TestCase):
             self.assertEqual(grade.main(), 0)
             reward = json.loads((tmp / "verifier" / "reward.json").read_text())
             self.assertEqual(reward["certified_bad"], 52)
-            self.assertEqual(reward["beats_floor"], 0)
+            self.assertEqual((reward["over_floor"], reward["beats_floor"], reward["above_goal"]), (0, 0, 0))
             self.assertEqual(reward["reward"], round(52 / (16 * 32), 6))
             # a second bad challenge per point would beat the floor
             inst["challenges"] += [{"z": (c["z"] + 1) % inst["p"], "witness": c["witness"]} for c in inst["challenges"]]

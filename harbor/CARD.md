@@ -17,19 +17,20 @@ pretty_name: "proven.provably.fast: bad challenges as Harbor environments"
 # Bad challenges for Reed-Solomon checks, as Harbor environments
 
 > A dataset card ready for Hugging Face. Publishing is a maintainers' decision; until then this
-> file documents the environment in the form that audience expects.
+> file documents the environment in the form that audience expects. Experimental: an agent-assisted
+> research release, not yet reproduced outside the maintainers' machines in its packaged form.
 
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
 check. Nobody knows it on the domains provers use. This dataset packages that open problem, from
 [proven.provably.fast](https://proven.provably.fast/), as [Harbor](https://github.com/harbor-framework/harbor)
-environments with a **verifiable reward**: a score computed in a sandbox the agent never touches.
+environments with a **verifiable reward**: a score computed by a verifier whose code and trusted inputs are isolated from the agent.
 
 Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math):
 
 | Task | Reward | Known |
 |---|---|---|
-| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded score | floor 3n/2 + 4 from four codeword pairs (reward 0.095); the challenge's first goal says at most 16 n |
-| `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 | all open; expect 0 |
+| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded terminal reward; the uncapped count and the flags over the public baseline and over 16 n are reported too | public baseline 3n/2 + 4 from four codeword pairs (reward 0.095); the challenge's first goal says at most 16 n |
+| `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 (binary) | all open; expect 0; recipes until the container is built and attacked |
 
 ## How a task works
 
@@ -38,7 +39,8 @@ checker and the floor construction; the agent writes `/workspace/instance.json`.
 4.34, ArkLib with its Mathlib and the pinned statements, prebuilt; the agent writes
 `/workspace/Submission.lean`.
 
-When the agent finishes, one plain file is copied to a fresh sandbox. For a count task the
+When the agent finishes, one plain file is copied to a fresh sandbox whose code and trusted inputs are
+isolated from the agent. For a count task the
 verifier checks the field, k, A and the domain (every point an n-th root of unity), then
 re-certifies every listed challenge from the definition: the polynomial of degree below k through
 the witness agrees with f + z g on at least A points, and f and g are not both interpolable there.
@@ -50,7 +52,9 @@ replay) and then reads each constant's definition: choice, search, suprema and l
 A proof checker says yes or no. For an open problem that is a weak training signal; the FineEnvs
 card says as much. Counting bad challenges has a natural "how far did you get": every extra
 certified challenge raises the score, and a line with more than 16 n at some n is strong evidence
-against the current goal and a record on proven.provably.fast, where whoever found it is credited.
+against the current goal and a record on proven.provably.fast, where whoever found it is credited. A
+reward of 1 at exactly 16 n is not evidence of anything; the uncapped count is the number that
+matters, and whether a graded reward trains better than a binary one is not shown here.
 
 ## Run
 
@@ -71,7 +75,18 @@ Count tasks need a small Python image; Lean tasks build a 13 GB image and need a
   challenges) score 0 or the floor, each with the intended reason.
 - The verifier agrees with the kit's pure-Python checker on every instance in the test suite.
 - The Lean grader is FineEnvs/openai-math's, adapted; the closed-form check was run on six sample
-  constants. The Lean image recipe is written and not yet built.
+  constants and the whole verifier flow natively on four controls. The Lean image recipe is written
+  and not yet built; those tasks are recipes until a container has been built and attacked.
+- An outside reviewer rebuilt the four-pair baseline independently and checked 2,852 certificates
+  at n = 32 to 1,024.
+
+## Public baselines, in place of a contamination note
+
+The statements, the baseline construction, its script and score, and the discussion are public.
+An agent that reproduces the baseline scores 0.095 without any new mathematics; `beats_floor` and
+`above_goal` separate reproduction from improvement. Three fixed sizes are a release, not a
+generalisation benchmark: held-out parameters would be needed before any learning claim, and none
+is made here.
 
 ## Credit and license
 
