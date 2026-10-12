@@ -18,6 +18,7 @@ is solved by an independently reviewed proof, with or without Lean.
 | T2 | `MCAChallenge.T2 a2 C B` | a curve a2 strictly between capacity and a1 at every rate, with at most `C rho eta * n ^ 2` | nothing below a1 with a quadratic count |
 | T3 | `MCAChallenge.T3 N C` | smooth domains (cosets of the subgroup of order 2^m), every gap delta above capacity, n at least `N delta`: at most `C delta * n` | `ReedSolomon.exists_capacity_lineAgreement`: C n^(d + 1) on any domain, d depending on delta |
 | T3 milestone | `MCAChallenge.T3Exponent c N C` | as T3, with at most `C delta * n ^ c` for one exponent c | as above |
+| T3 first goal | `MCAChallenge.T3Goal N` | rate 1/2 with the exact k = n/2, agreement at least 5n/8, smooth domains, n at least N: at most `16 * n`; `T3Goal_of_T3` derives it from any T3 result with C(1/8) at most 16 | nothing below the exponents of DKT's method |
 
 a1 is `MCAChallenge.firstOrderCurve`, the first-order curve of Dao, Kominers and Thaler (ePrint
 2026/2056, equation 31), with the lower branch in closed form; `firstOrderCurve_lower_branch` proves
@@ -31,6 +32,15 @@ All statements use ArkLib's `LineExactAgreementBound`. For every received line f
 exceptional set of at most B challenges. Outside it, every polynomial of degree below k that agrees
 with the line in at least A places splits as P0 + z P1, where f agrees with P0 and g with P1 on
 that whole agreement set.
+
+## Challenge templates
+
+[`challenges/`](challenges/) holds one template per pinned declaration, with the statement's
+parameters as definition holes (`def N : ℕ := sorry`) and `theorem solution.{u}` to prove. A result
+is a copy of the template with every `sorry` replaced; [`challenges/index.json`](challenges/index.json)
+lists the holes comparator checks. The same templates are the Lean tasks of the Harbor environment
+in [`../harbor/`](../harbor/), where a sandboxed verifier runs comparator and then reads the holes
+for closed form.
 
 ## How a Lean result is checked
 

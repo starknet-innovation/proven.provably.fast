@@ -1,0 +1,6 @@
+harbor/ adapts code from FineEnvs/openai-math (https://huggingface.co/datasets/FineEnvs/openai-math),
+Apache License 2.0: the separate-verifier design, templates/lean/tests/grade.py (the Comparator
+grader, modified for the pinned ArkLib package and the closed-form check) and
+templates/lean/environment/pack_submission.py (unchanged) and tests/test_harbor_lean_grader.py (its
+unit tests, paths changed). The count tasks, their grader, the hole
+check and the generator are this repository's own, under its license.

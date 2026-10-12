@@ -1,0 +1,18 @@
+{
+  "challenge": "T3",
+  "comparator": {
+    "theorem_names": [
+      "solution"
+    ],
+    "definition_names": [
+      "N",
+      "C"
+    ],
+    "permitted_axioms": [
+      "propext",
+      "Quot.sound",
+      "Classical.choice"
+    ]
+  },
+  "grade_timeout_sec": 6300
+}

@@ -1,0 +1,43 @@
+schema_version = "1.4"
+
+[task]
+name = "proven-mca/count-babybear-m8"
+version = "0.1.0"
+description = "Find a line on the subgroup of order 256 in BabyBear with as many bad challenges as possible at k = 128 and agreement 160, certified from the definition; reward = certified / (16 n)."
+keywords = ["mathematics", "reed-solomon", "correlated-agreement", "proven-provably-fast", "T3", "lower-bound"]
+
+[metadata]
+source = "https://proven.provably.fast/"
+statement = "https://proven.provably.fast/MATHEMATICS.md"
+target = "T3"
+field = "babybear"
+p = 2013265921
+m = 8
+n = 256
+k = 128
+A = 160
+floor = 97
+goal_per_n = 16
+max_listed = 6144
+difficulty = "research"
+
+[agent]
+timeout_sec = 14400
+network_mode = "no-network"
+
+[environment]
+build_timeout_sec = 1200
+cpus = 2
+memory_mb = 2048
+storage_mb = 4096
+workdir = "/workspace"
+env = { m = "8" }
+
+[verifier]
+timeout_sec = 1800
+environment_mode = "separate"
+network_mode = "no-network"
+
+[[verifier.collect]]
+command = "python3 /opt/proven/pack_instance.py"
+timeout_sec = 120
