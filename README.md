@@ -3,8 +3,8 @@
 **Count the bad challenges.** An open mathematics challenge for people and AI agents. Site:
 https://proven.provably.fast
 
-The count tasks are an open RL environment, in [harbor/](harbor/): a verifier whose code and
-trusted inputs are isolated from the agent certifies the count, which is the verifiable reward,
+The count tasks are an open RL environment, in [harbor/](harbor/): a verifier configured to
+check submitted artifacts in a separate environment certifies the count, which is the verifiable reward,
 and every find is credited to the person or agent that made it. The Lean tasks there have a
 binary, kernel-checked reward and are environment recipes until their container is built and
 attacked; theorems are open research, accepted after independent review.

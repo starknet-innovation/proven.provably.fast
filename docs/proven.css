@@ -165,7 +165,7 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .board-list { margin: 0; padding: 0; list-style: none; display: grid; gap: 6px; }
 .board-row { --tone: var(--accent); display: grid; grid-template-columns: 92px 30px minmax(0, 1fr) auto; align-items: center; gap: 10px; font-size: 14px; }
 .board-row.is-lemma { --tone: var(--violet); } .board-row.is-formalization { --tone: var(--platform); } .board-row.is-counterexample { --tone: var(--coral); } .board-row.is-proof { --tone: var(--record); }
-.board-row a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.board-row a { color: var(--ink); text-decoration-color: color-mix(in srgb, var(--ink) 30%, transparent); text-underline-offset: 2px; }
 .board-more { margin: 10px 0 0; font-size: 13.5px; }
 .board-foot { margin: 0; color: var(--muted); font-size: 12.5px; }
 @media (max-width: 860px) { .board-grid { grid-template-columns: 1fr; } .board-row { grid-template-columns: auto auto minmax(0, 1fr); } .board-row .verdict { grid-column: 1 / -1; justify-self: start; } .board-row a { white-space: normal; } }
@@ -340,7 +340,9 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .loop.is-armed.is-in .loop-fail { opacity: 1; }
 
 /* What is known: status rows beside the gap at one size. */
-.known-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(280px, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; }
+/* One column since the T1 gap chart left the homepage. */
+.known-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: clamp(28px, 4vw, 64px); align-items: start; }
+.known-text { max-width: 860px; }
 .pins { display: grid; max-width: 76ch; margin: 24px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
 .pins li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 3px 16px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
 .pins b { grid-column: 1; grid-row: 1; color: var(--ink); font-weight: 600; font-size: 15px; }
@@ -383,7 +385,7 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .prompt-name:hover { color: var(--ink); }
 .prompt-copy { padding: 7px 16px; border: 0; border-radius: 999px; background: var(--record); color: var(--record-ink); font: 600 13px var(--sans); cursor: pointer; transition: transform .45s var(--spring), background-color .25s, color .25s; }
 .prompt-copy.is-done { transform: scale(1.06); background: var(--ink); color: var(--bg); }
-.prompt-text { margin: 0; padding: 16px 16px 4px; max-height: 8.4em; overflow: hidden; color: var(--ink-2); font: 13px/1.6 var(--code); white-space: pre-wrap; -webkit-mask-image: linear-gradient(#000 55%, transparent); mask-image: linear-gradient(#000 55%, transparent); }
+.prompt-text { margin: 0; padding: 16px 16px 12px; color: var(--ink-2); font: 13px/1.6 var(--code); white-space: pre-wrap; }
 .prompt-status { margin: 0; padding: 0 16px 12px; color: var(--muted); font-size: 13px; }
 .prompt-status:empty { display: none; }
 .join-steps { list-style: none; margin: 0; padding: 0; display: grid; align-content: start; }
@@ -395,6 +397,9 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .join-n { display: grid; place-items: center; width: 28px; height: 28px; border: 1px solid color-mix(in srgb, var(--tone) 55%, transparent); border-radius: 50%; background: color-mix(in srgb, var(--tone) 14%, var(--bg-2)); color: var(--tone); font-size: 13px; font-weight: 600; font-variant-numeric: tabular-nums; }
 .join-steps h3 { margin: 2px 0 0; color: var(--ink); font-size: 17px; font-weight: 600; }
 .join-steps p { margin: 6px 0 0; color: var(--muted); font-size: 15px; line-height: 1.5; }
+/* A panel without steps (Bring your agent) keeps its prompt in one column. */
+.join-panel:not(:has(.join-steps)) { grid-template-columns: minmax(0, 1fr); }
+.join-panel:not(:has(.join-steps)) .join-lead { max-width: 760px; }
 @media (max-width: 760px) { .join-panel { grid-template-columns: 1fr; } }
 
 /* The record: every contribution, newest first. */
@@ -478,3 +483,6 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .record-row.is-thread { --tone: var(--accent); }
 .record-row.is-lead { --tone: var(--violet); }
 .record-row.is-experiment { --tone: var(--record); }
+.join-details { margin: 10px 0 0; color: var(--muted); font-size: 14.5px; line-height: 1.55; }
+.join-details summary { cursor: pointer; color: var(--ink-2); font-weight: 500; }
+.join-details p { margin: 8px 0 0; }
