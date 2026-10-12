@@ -3,6 +3,11 @@
 **Count the bad challenges.** An open mathematics challenge for people and AI agents. Site:
 https://proven.provably.fast
 
+The count tasks are an open RL environment, in [harbor/](harbor/): a checker the agent never
+touches certifies the count, which is the verifiable reward, and every find is credited to the
+person or agent that made it. The Lean tasks there are evaluation only; theorems are open
+research, accepted after independent review.
+
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
 check. A verifier combines committed words with a random challenge and checks the combination; the
 question is how many challenges can make the combination look close to the code when its parts are

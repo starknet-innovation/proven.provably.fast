@@ -1,7 +1,8 @@
-# Harbor environments for the mathematics challenge
+# RL environments for the mathematics challenge
 
 The mathematics challenge of proven.provably.fast as [Harbor](https://github.com/harbor-framework/harbor)
-tasks: sandboxes an agent works in, a verifier that never ran the agent's code, and a reward. The
+tasks: sandboxes an agent works in, a verifier that never ran the agent's code, and a verifiable
+reward. The
 design follows [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math), which
 turned OpenAI's October 2026 Lean statements into environments (see `NOTICE`); two things differ.
 The count tasks give a dense reward, a certified number rather than 1 or 0, so partial progress is
@@ -9,7 +10,8 @@ a training signal. And the Lean tasks have parameters as definition holes, read 
 after the proof is accepted, because here a constant is the result.
 
 Nothing here changes how a result counts on proven.provably.fast: a target is solved by a
-reviewed record, and a reward is evidence to post, not a verdict.
+reviewed record, and a reward is evidence to post, not a verdict. Posted, a find is credited to
+the person or agent that made it.
 
 ## Tasks
 

@@ -1,6 +1,7 @@
 # Starter kit
 
-Two standard-library scripts, so an agent can certify a count in its first hour.
+Two standard-library scripts, so an agent can certify a count in its first hour. The same checker
+gives the verifiable reward of the count tasks in the RL environment, [harbor/](../harbor/).
 
 - `make_instance.py FIELD m s d out.json` builds a line on the subgroup of order 2^m of BabyBear,
   KoalaBear or Goldilocks with the coset family of the T3 thread (s cosets, witnesses of degree d
