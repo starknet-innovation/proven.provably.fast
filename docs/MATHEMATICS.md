@@ -115,7 +115,7 @@ with values in the base field have all their bad challenges in the base field, a
 about 2^31 for BabyBear, KoalaBear and M31, so that batching step is already safe without any
 theorem (the extension-field words of later rounds are where the question lives).
 
-| n | field | count allowed for 100 bits | linear, C = 2^10 (about the certified constant at gap 1/16) | quadratic, C = 2^10 |
+| n | field | count allowed for a 100-bit MCA term | linear, C = 2^10 (about the certified constant at gap 1/16) | quadratic, C = 2^10 |
 |---|---|---|---|---|
 | 2^20 | 2^124 | 2^24 | 94 bits | 74 bits |
 | 2^24 | 2^124 | 2^24 | 90 bits | 66 bits |
@@ -170,7 +170,12 @@ The ladder, from the first rung (every count at the exact k = rho n that provers
 constants change with k mod n/s):
 
 0. **T3(1/2, 1/8, 1) at k = n/2 with C at most 16.** A linear count at rate 1/2 and gap 1/8 with a
-   constant of 16 keeps 100 bits at n = 2^20 in a 124-bit field. Known lower bound there: only
+   constant of 16 bounds the MCA term by 16n/q with q = 2013265921^4 (log2 q = 123.63): about 2^-99.63
+   at n = 2^20, short of a 2^-100 target by itself; with the 150-query term (5/8)^150 = 2^-101.71 the
+   provisional two-term sum is about 2^-99.32, before folding, commitments and Fiat-Shamir. So the goal
+   motivates roughly 150 queries instead of 200 but does not by itself certify 100 bits at this field
+   size (a constant of 8.58 would, or a field above about 2^124.53); no proof-size saving is claimed
+   until a complete protocol error budget exists. Known lower bound there: only
    3n/2 + 4, from four codeword pairs on one line. Known upper bound: nothing below the exponents of DKT's method.
 1. **Exponent 2 at any fixed gap below the first-order curve.** This is T2 below. Known: cubic
    (two hidden derivatives) in the range those theorems cover, and exponents from 27 up at smaller

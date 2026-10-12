@@ -62,6 +62,10 @@ PROBES = {
         "more challenges than the cap",
         edit("inst['challenges'] = inst['challenges'] * (24 * len(inst['domain']) // len(inst['challenges']) + 1)"),
         "rejected: at most"),
+    "composite-witness": (
+        "a witness entry that is a list, which must be a rejection, not a grading error",
+        edit("inst['challenges'] = [{'z': 1, 'witness': [[0]] + list(range(1, inst['k']))}]"),
+        "rejected: challenge 0: the witness must be"),
     "random-challenges": (
         "random z with random witnesses: nothing certifies",
         edit("rng = random.Random(2); n = len(inst['domain']); k = inst['k']\n"

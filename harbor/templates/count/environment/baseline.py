@@ -8,7 +8,8 @@ Usage: python3 baseline.py m out.json [seed]
 
 The mechanism, one bad challenge per point: if codewords F, G agree with f, g on a set S of A - 1
 points, then at every point i outside S the challenge z_i = (F(x_i) - f_i) / (g_i - G(x_i)) makes
-f + z_i g agree with F + z_i G on S and at i, A points, while f alone is no codeword there. One pair
+f + z_i g agree with F + z_i G on S and at i, A points, while g is not interpolable there (any
+interpolant would be G on the A - 1 >= k points of S, and g_i differs from G(x_i)). One pair
 with random words elsewhere gives n - A + 1 = 3 n / 8 + 1. Here four pairs share one line:
 
   F_r = F_0 + Z_T h_r,  G_r = G_0 + Z_T h'_r   (r = 0..3, h_0 = h'_0 = 0),

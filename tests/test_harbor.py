@@ -147,6 +147,8 @@ class Grader(unittest.TestCase):
             "short f": dict(f=inst["f"][:-1]),
             "witness size": dict(challenges=[{"z": 1, "witness": list(range(inst["k"] + 1))}]),
             "witness repeat": dict(challenges=[{"z": 1, "witness": [0] * inst["k"]}]),
+            "composite witness entry": dict(challenges=[{"z": 1, "witness": [[0]] + list(range(1, inst["k"]))}]),
+            "string z": dict(challenges=[{"z": "1", "witness": list(range(inst["k"]))}]),
             "bool z": dict(challenges=[{"z": True, "witness": list(range(inst["k"]))}]),
             "too many": dict(challenges=[{"z": 1, "witness": list(range(inst["k"]))}] * (24 * 16 + 1)),
         }

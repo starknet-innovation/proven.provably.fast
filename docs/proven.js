@@ -531,7 +531,7 @@
       const qTop = 260, qBottom = 90;
       const X = (yr) => padL + ((yr - y0) / (y1 - y0)) * (w - padL - padR);
       const Y = (q) => padT + ((qTop - q) / (qTop - qBottom)) * (h - padT - padB);
-      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Queries for 100 bits at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} is the goal, ${CAPACITY_QUERIES} is the limit` });
+      const svg = svgEl("svg", { class: "board-svg", viewBox: `0 0 ${w} ${h}`, role: "img", "aria-label": `Query arithmetic, queries for a 100-bit query term at rate 1/2: ${QUERY_STEPS[0].queries} with unique decoding, ${QUERY_STEPS[QUERY_STEPS.length - 1].queries} proven today, ${RUNG_QUERIES} is the goal, ${CAPACITY_QUERIES} is the limit` });
       const defs = svgEl("defs");
       const pat = svgEl("pattern", { id: "board-dots", width: 9, height: 9, patternUnits: "userSpaceOnUse" });
       pat.append(svgEl("circle", { class: "board-dot", cx: 4.5, cy: 4.5, r: 1.4 }));
