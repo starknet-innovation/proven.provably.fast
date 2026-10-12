@@ -9,10 +9,10 @@
    "n": 256,
    "k": 128,
    "A": 160,
-   "floor": 97,
+   "floor": 388,
    "goal_per_n": 16,
-   "oracle": "floor construction",
-   "oracle_reward": 0.0237
+   "oracle": "four-pair floor construction",
+   "oracle_reward": 0.0947
   },
   {
    "task": "count-babybear-m9",
@@ -21,10 +21,10 @@
    "n": 512,
    "k": 256,
    "A": 320,
-   "floor": 193,
+   "floor": 772,
    "goal_per_n": 16,
-   "oracle": "floor construction",
-   "oracle_reward": 0.0236
+   "oracle": "four-pair floor construction",
+   "oracle_reward": 0.0942
   },
   {
    "task": "count-babybear-m10",
@@ -33,10 +33,10 @@
    "n": 1024,
    "k": 512,
    "A": 640,
-   "floor": 385,
+   "floor": 1540,
    "goal_per_n": 16,
-   "oracle": "floor construction",
-   "oracle_reward": 0.0235
+   "oracle": "four-pair floor construction",
+   "oracle_reward": 0.094
   },
   {
    "task": "lean-t3-goal",

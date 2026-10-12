@@ -5,7 +5,9 @@
   "name": "proven-provably-fast",
   "main": "worker.js",
   "compatibility_date": "2026-10-01",
-  "assets": { "directory": "./docs", "binding": "ASSETS" },
+  // Static files are served without running the Worker, except the site's own /data files: the
+  // Worker adds the CORS header provably.fast's front page reads them with.
+  "assets": { "directory": "./docs", "binding": "ASSETS", "run_worker_first": ["/data/*"] },
   // The provably.fast platform Worker (services/auth), which serves the participation API, and the
   // thread pages every board shares (research/discovery/thread-pages).
   "services": [

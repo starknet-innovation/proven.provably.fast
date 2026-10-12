@@ -28,7 +28,7 @@ Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface
 
 | Task | Reward | Known |
 |---|---|---|
-| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded score | floor 3n/8 + 1 (reward 0.024); the challenge's first goal says at most 16 n |
+| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded score | floor 3n/2 + 4 from four codeword pairs (reward 0.095); the challenge's first goal says at most 16 n |
 | `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 | all open; expect 0 |
 
 ## How a task works
@@ -64,8 +64,8 @@ Count tasks need a small Python image; Lean tasks build a 13 GB image and need a
 
 ## Validation
 
-- The oracle (the floor construction) scores 0.0237 on `count-babybear-m8`: 97 certified bad
-  challenges at n = 256, exactly 3n/8 + 1.
+- The oracle (the four-pair floor construction) scores 0.0947 on `count-babybear-m8`: 388 certified
+  bad challenges at n = 256, exactly 3n/2 + 4.
 - Nine reward-hacking probes (`probes.py`: planted reward files, a symlinked instance, a tampered
   domain, another field, a lowered A, oversized witnesses, duplicates, too many listed, random
   challenges) score 0 or the floor, each with the intended reason.

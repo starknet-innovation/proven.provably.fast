@@ -18,9 +18,10 @@ challenges as you can, and certify them.
 
 ## What is known
 
-- The floor, one line with 193 bad challenges: /opt/proven/baseline.py builds it (two codewords
-  F, G and a set S of A - 1 points; f = F and g = G on S; every point outside S gives one bad
-  challenge). Anything above 193 raises the floor.
+- The floor, one line with 772 bad challenges, 3n/2 + 4: /opt/proven/baseline.py builds it from
+  four codeword pairs that agree with (f, g) on sets of A - 1 points; every point outside such a set
+  gives one bad challenge, one pair alone gives 3n/8 + 1, and a fifth pair does not fit. Anything
+  above 772 raises the floor.
 - The goal of the challenge is at most 16 n bad challenges on every line, for all large n. A line
   with more than 16 n = 8192 certified bad challenges at this n does not refute the goal by itself,
   since the goal allows a threshold in n, but it is the strongest evidence this task can give, and
@@ -52,8 +53,8 @@ Write `/workspace/instance.json`, the instance format of the starter kit (`/opt/
 
 The file is copied to a fresh machine that never ran your code and graded from the definition.
 
-- `reward` = certified distinct bad challenges / (16 n), capped at 1. The floor scores about 0.023.
-- `reward.json` also carries `certified_bad`, `bad_per_n`, `beats_floor` (1 above 193) and the
+- `reward` = certified distinct bad challenges / (16 n), capped at 1. The floor scores about 0.095.
+- `reward.json` also carries `certified_bad`, `bad_per_n`, `beats_floor` (1 above 772) and the
   number of listed challenges that failed.
 - An instance with the wrong field, k, A or domain, or a malformed challenge, scores 0.
 

@@ -20,9 +20,9 @@ reviewed record, and a reward is evidence to post, not a verdict.
 | `lean-t3`, `lean-t3-exponent` | Lean | T3 and its exponent milestone, holes `N C` and `c N C` | same |
 | `lean-t1-uniform`, `lean-t1`, `lean-t2` | Lean | the long-run targets, holes `C`, `C B`, `a₂ C B` | same |
 
-The count tasks' floor construction (3n/8 + 1 bad challenges, `templates/count/environment/baseline.py`)
-is the oracle: it scores about 0.024 and `beats_floor = 0`, which validates the pipeline, not the
-task. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
+The count tasks' floor construction (four codeword pairs, 3n/2 + 4 bad challenges,
+`templates/count/environment/baseline.py`) is the oracle: it scores about 0.095 and `beats_floor = 0`,
+which validates the pipeline, not the task. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
 strong evidence against the first goal, not a refutation. The Lean tasks have no oracle, the
 targets are open; their `solve.sh` submits the unchanged challenge and must score 0.
 
@@ -31,7 +31,7 @@ targets are open; their `solve.sh` submits the unchanged challenge and must scor
 ```bash
 pip install "harbor[docker]>=0.24"
 cd research/proven/harbor
-harbor run -p tasks/count-babybear-m8 -a oracle -e docker        # the floor: reward 0.0237
+harbor run -p tasks/count-babybear-m8 -a oracle -e docker        # the floor: reward 0.0947
 harbor run -p tasks -i count-babybear-m8 -a claude-code -m anthropic/claude-sonnet-5-5
 harbor run -p tasks -i lean-t3-goal -a oracle -e docker          # negative control: reward 0
 ```
@@ -84,9 +84,10 @@ Face expects, should the maintainers publish there.
 
 ## Status, 2026-10-11
 
-- Count tasks, through `harbor run` in Docker: the oracle certifies exactly 3n/8 + 1 on all three
-  sizes (97, 193 and 385 at n = 256, 512 and 1024; rewards 0.0237, 0.0236, 0.0235; grading 1 s,
-  5 s and 19 s). The nine probes: seven rejected with the intended reason, duplicates counted once
+- Count tasks, through `harbor run` in Docker: the one-pair oracle certified exactly 3n/8 + 1 on all
+  three sizes (97, 193 and 385 at n = 256, 512 and 1024; grading 1 s, 5 s and 19 s); the four-pair
+  oracle that replaced it certifies 4 (n - A + 1) = 3n/2 + 4 (100 at n = 64, 388 at n = 256, reward
+  0.0947). The nine probes: seven rejected with the intended reason, duplicates counted once
   (the floor's score), random challenges certify nothing. The grader agrees with the kit's
   `certify.py` on every instance in `tests/test_harbor.py`.
 - Lean tasks: the grader is the validated FineEnvs grader with the package swapped and the hole
@@ -94,7 +95,10 @@ Face expects, should the maintainers publish there.
   (`tests/test_harbor_lean_grader.py`). `HoleCheck.lean` was run natively against Mathlib on six
   parameters (two closed forms accepted; choice, search, a supremum and a hidden choice refused).
   Every challenge template elaborates against the pinned file with only `sorry` warnings. The
-  image recipe is written and not yet built: the Docker VM on the development machine is too small.
+  verifier flow itself ran natively on four controls (`controls/`): a real proof accepted with its
+  constant read as closed form, `sorry` and a changed statement refused by Comparator, a constant
+  set by choice accepted by Comparator and refused by the hole check. The image recipe is written
+  and not yet built: the Docker VM on the development machine is too small.
 - `MCAChallenge.T3Goal` and `T3Goal_of_T3` compile against the pinned ArkLib (45 s, no warnings).
 
 ## Regenerate

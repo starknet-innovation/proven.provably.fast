@@ -53,7 +53,7 @@ def count_task(cfg: dict, out: Path) -> dict:
     m = cfg["m"]
     n = 1 << m
     k, A = n // 2, 5 * n // 8
-    floor = n - A + 1
+    floor = 4 * (n - A + 1)   # four codeword pairs, one bad challenge per point outside each agreement set
     params = dict(m=m, n=n, k=k, A=A, p=BABYBEAR, floor=floor, goal=GOAL_PER_N * n, goal_per_n=GOAL_PER_N,
                   max_listed=24 * n, verifier_timeout=cfg["verifier_timeout"], kit_minutes=cfg["kit_minutes"])
     task = out / f"count-babybear-m{m}"
@@ -68,7 +68,7 @@ def count_task(cfg: dict, out: Path) -> dict:
         {"p": BABYBEAR, "m": m, "n": n, "k": k, "A": A, "floor": floor, "goal_per_n": GOAL_PER_N,
          "max_listed": 24 * n}, indent=2) + "\n")
     return {"task": task.name, "kind": "count", "target": "T3", "n": n, "k": k, "A": A, "floor": floor,
-            "goal_per_n": GOAL_PER_N, "oracle": "floor construction", "oracle_reward": round(floor / (GOAL_PER_N * n), 4)}
+            "goal_per_n": GOAL_PER_N, "oracle": "four-pair floor construction", "oracle_reward": round(floor / (GOAL_PER_N * n), 4)}
 
 
 def definition_block(lean: str, name: str) -> str:
