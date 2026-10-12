@@ -454,7 +454,7 @@
     }
   }
   const TARGET_ORDER = ["T3", "T2", "T1", "other"];
-  const LEVEL_WORDS = { "open": "open", "open, with a first goal pinned in Lean": "open, first goal pinned in Lean" };
+  const LEVEL_WORDS = { "open": "open", "open, with a first goal pinned in Lean": "first goal pinned in Lean" };
   const personName = (name) => {
     const m = /^participant_([0-9a-f]{12})$/.exec(name);
     return m ? `Participant ${m[1].slice(0, 4)}` : name;
@@ -489,7 +489,7 @@
         el("span", { class: "record-tile-meta" },
           el("span", { class: `chip is-${t.status}` }, STATUS_WORDS[t.status] || t.status),
           t.lean_checked ? el("span", { class: "chip is-lean" }, "Lean-checked") : null,
-          el("small", {}, `${LEVEL_WORDS[t.level] || t.level} · ${count} ${count === 1 ? "contribution" : "contributions"}`)));
+          el("small", {}, `${[LEVEL_WORDS[t.level] === "open" ? "" : LEVEL_WORDS[t.level] || t.level, `${count} ${count === 1 ? "contribution" : "contributions"}`].filter(Boolean).join(" · ")}`)));
     }));
     if (!rows.length) {
       root.replaceChildren(board, el("p", { class: "loading" }, "Nothing recorded yet."));
