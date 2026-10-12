@@ -128,6 +128,27 @@ smooth domains, once `n ≥ N δ`. A result supplies `N` and `C`. -/
 def T3 (N : ℝ → ℕ) (C : ℝ → ℝ) : Prop :=
   T3Exponent.{u} 1 N C
 
+/-- The first goal of T3, in the numbers the page states: rate `1/2` with the exact `k = n / 2`
+that provers use, gap `1/8` (`A ≥ 5 n / 8`), constant `16`, on smooth domains, once `n ≥ N`. A
+result supplies `N`. `T3Goal_of_T3` shows that a T3 result with `C (1/8) ≤ 16` gives it. -/
+def T3Goal (N : ℕ) : Prop :=
+  ∀ (n k A : ℕ), N ≤ n → 0 < k → 2 * k = n → 5 * n ≤ 8 * A → A ≤ n →
+    ∀ (F : Type u) [Field F] [DecidableEq F], (ringChar F = 0 ∨ k - 1 < ringChar F) →
+      ∀ domain : Fin n ↪ F, IsSmoothDomain domain →
+        LineExactAgreementBound domain k A (16 * n)
+
+theorem T3Goal_of_T3 {N : ℝ → ℕ} {C : ℝ → ℝ} (h : T3.{u} N C) (hC : C (1 / 8) ≤ 16) :
+    T3Goal.{u} (N (1 / 8)) := by
+  intro n k A hN hk0 hk hA hAn F _ _ hchar domain hsmooth
+  have hgap : (k : ℝ) + (1 / 8 : ℝ) * n ≤ A := by
+    have hk' : (2 * k : ℝ) = n := by exact_mod_cast hk
+    have hA' : (5 * n : ℝ) ≤ 8 * A := by exact_mod_cast hA
+    linarith
+  have hn : (0 : ℝ) ≤ n := Nat.cast_nonneg n
+  have := h (1 / 8) n k A (by norm_num) hN hk0 hgap hAn F hchar domain hsmooth
+  rw [pow_one] at this
+  exact this.mono (mul_le_mul_of_nonneg_right hC hn)
+
 /-! ## Baselines: what ArkLib proves today, in the same shape -/
 
 /-- `LineExactAgreementBound` does not depend on the decidable-equality instance. -/

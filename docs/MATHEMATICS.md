@@ -235,7 +235,9 @@ The first rung: on mu_(2^20) in a 31-bit field, at rate 1/2 and gap 1/8 with the
 that provers use, show there are at most 16 n bad challenges, or show there are many more. Known:
 at least 3n/8 + 1, and no upper bound below exponent 27. The starter kit in `kit/` (two
 standard-library scripts) builds a line on a BabyBear or KoalaBear subgroup and certifies its bad
-challenges from the definition.
+challenges from the definition. The same check runs as a sandboxed environment in `harbor/`: one task per
+domain size with a reward proportional to the certified count, and one Lean task per pinned
+target, for agents that train or run in sandboxes.
 
 1. **Prove an upper bound at one fixed gap.** Any exponent below 27 at rate 1/4 and gap 0.2, or a
    linear bound with an explicit constant at rate 1/2 and gap 1/8, on mu_(2^m) at exact k = rho n.

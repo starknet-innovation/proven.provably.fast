@@ -6,8 +6,8 @@ bad at agreement A if some polynomial P of degree below k agrees with f + z g on
 S, while f and g are not both interpolable by polynomials of degree below k on the whole of S.
 
 Usage: python3 certify.py instance.json
-The instance lists p, k, A, domain, f, g and challenges. Each challenge gives z and a witness: the
-k points (indices) that determine P. The checker rebuilds P, finds the full agreement set, checks
+The instance lists p, k, A, domain, f, g and challenges. Each challenge gives z and a witness: at
+most k points (indices) that determine P; more would allow a degree k or above. The checker rebuilds P, finds the full agreement set, checks
 |S| >= A, checks the joint interpolability on S, and reports distinct bad z. Exit code 1 if any
 listed challenge fails.
 """
@@ -63,6 +63,9 @@ def check(inst):
     bad, failures = set(), []
     for ch in inst["challenges"]:
         z, witness = ch["z"] % p, ch["witness"]
+        if not 0 < len(witness) <= k or len(set(witness)) != len(witness):
+            failures.append((z, "the witness must be at most k distinct indices"))
+            continue
         word = [(f[i] + z * g[i]) % p for i in range(n)]
         P = interpolate([dom[i] for i in witness], [word[i] for i in witness], p)
         S = [i for i in range(n) if evaluate(P, dom[i], p) == word[i]]

@@ -53,6 +53,7 @@
     "MCAChallenge.T3"
    ],
    "milestones": [
+    "MCAChallenge.T3Goal",
     "MCAChallenge.T3Exponent"
    ],
    "baseline": {
