@@ -2,22 +2,25 @@
 
 The mathematics challenge of proven.provably.fast as [Harbor](https://github.com/harbor-framework/harbor)
 tasks: sandboxes an agent works in, a verifier that never ran the agent's code, and a verifiable
-reward. The
-design follows [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math), which
+reward. The design follows [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math), which
 turned OpenAI's October 2026 Lean statements into environments (see `NOTICE`); two things differ.
-The count tasks give a dense reward, a certified number rather than 1 or 0, so partial progress is
-a training signal. And the Lean tasks have parameters as definition holes, read for closed form
+The count tasks give a graded terminal reward, a certified count rather than 1 or 0, so partial
+progress registers; whether it trains better than a binary reward is not demonstrated here. And the Lean tasks have parameters as definition holes, read for closed form
 after the proof is accepted, because here a constant is the result.
 
 Nothing here changes how a result counts on proven.provably.fast: a target is solved by a
-reviewed record, and a reward is evidence to post, not a verdict. Posted, a find is credited to
-the person or agent that made it.
+reviewed record, and a reward is evidence to post, not a verdict. Posted, submissions and reviews
+are recorded with attribution. Labels, precisely: the count tasks are experimental agent
+environments with graded, certificate-checked rewards; the Lean tasks are environment recipes
+with a binary, kernel-checked reward, whose native verifier is tested and whose container
+validation is pending; the discussion and reviews are an open research workshop. No training
+experiment has been run; the results here came from agent-assisted research.
 
 ## Tasks
 
 | Task | Kind | What the agent does | Reward |
 |---|---|---|---|
-| `count-babybear-m8`, `-m9`, `-m10` | count | finds a line on the subgroup of order 2^m in BabyBear with many bad challenges at k = n/2, A = 5n/8, and lists witnesses | certified distinct bad challenges / (16 n), capped at 1; plus `certified_bad`, `bad_per_n`, `beats_floor` |
+| `count-babybear-m8`, `-m9`, `-m10` | count | finds a line on the subgroup of order 2^m in BabyBear with many bad challenges at k = n/2, A = 5n/8, and lists witnesses | certified distinct bad challenges / (16 n), capped at 1; plus the uncapped `certified_bad`, `bad_per_n`, `over_floor`, `beats_floor`, `above_goal` |
 | `lean-t3-goal` | Lean | proves `MCAChallenge.T3Goal N`, the first goal (rate 1/2, gap 1/8, constant 16, smooth domains) | 1 if Comparator accepts the proof and `N` is a closed form |
 | `lean-t3`, `lean-t3-exponent` | Lean | T3 and its exponent milestone, holes `N C` and `c N C` | same |
 | `lean-t1-uniform`, `lean-t1`, `lean-t2` | Lean | the long-run targets, holes `C`, `C B`, `a₂ C B` | same |
@@ -25,8 +28,10 @@ the person or agent that made it.
 The count tasks' floor construction (four codeword pairs, 3n/2 + 4 bad challenges,
 `templates/count/environment/baseline.py`) is the oracle: it scores about 0.095 and `beats_floor = 0`,
 which validates the pipeline, not the task. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
-strong evidence against the first goal, not a refutation. The Lean tasks have no oracle, the
-targets are open; their `solve.sh` submits the unchanged challenge and must score 0.
+strong evidence against the first goal, not a refutation; a reward of 1 at exactly 16 n is not even
+that. The baseline and its score are public, so a reproduction is not an improvement: `beats_floor`
+and `above_goal` carry that distinction. The Lean tasks have no oracle, the targets are open; their
+`solve.sh` submits the unchanged challenge and must score 0.
 
 ## Run
 
@@ -68,8 +73,10 @@ runs the packer in the agent's sandbox after it finishes.
 | A domain that is not the subgroup, another field, k or A | `validate()`: p, k, A exact, every point an n-th root of unity, distinct | probe, reward 0 |
 | A witness of more than k points (it would certify any z) | exactly k distinct indices; the kit's `certify.py` now refuses more than k too | probe, reward 0 |
 | Spam challenges to run out the clock | at most 24 n listed; numpy certification, minutes at n = 1024 | by construction |
+| Overflow in the numpy arithmetic | every product is reduced before the next operation and no sum of products is formed; p < 2^31 keeps each product below 2^62 | unit test with values next to p |
+| A broken verifier mistaken for a wrong submission | a grading error writes no reward and Harbor reports the trial as an error | by construction |
 | Lean: `sorry`, new axioms, `native_decide`, a weaker statement, a redefined definition | Comparator: exact statement, three axioms, kernel replay | as in FineEnvs/openai-math |
-| Lean: a constant set by choice, search, supremum or limit | `HoleCheck.lean` walks each hole's value; denied constants fail, unknown ones are listed for review | native test, six samples |
+| Lean: a constant set by choice, search, supremum or limit | `HoleCheck.lean` walks each hole's elaborated value, expanding the submission's own definitions; a constant outside the allow list fails (closed), the deny list names the known offenders | native test, six samples |
 | Lean: code run at build time | landrun, the unprivileged grader user, iptables, as in FineEnvs/openai-math | not run here |
 
 Trusted and not re-checked: the Lean kernel, Comparator, lean4export, landrun, Docker's boundary.
@@ -102,6 +109,10 @@ Face expects, should the maintainers publish there.
   set by choice accepted by Comparator and refused by the hole check. The image recipe is written
   and not yet built: the Docker VM on the development machine is too small.
 - `MCAChallenge.T3Goal` and `T3Goal_of_T3` compile against the pinned ArkLib (45 s, no warnings).
+- An outside reviewer rebuilt the four-pair construction independently and checked 2,852
+  certificates at n = 32 to 1,024 (52, 100, 388, 772, 1,540), confirming the three baselines and
+  the reward 0.0947. The general proposition is stated under an explicit nondegeneracy condition;
+  whether a fifth pair can fit on the subgroup is open.
 
 ## Regenerate
 

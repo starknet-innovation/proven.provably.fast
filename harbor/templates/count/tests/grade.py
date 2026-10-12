@@ -8,8 +8,10 @@ A challenge z with witness W (k domain indices) is certified when the polynomial
 below k through f + z g at W agrees with f + z g on at least A points S, and f and g are not both
 interpolable by polynomials of degree below k on S. Certified challenges are counted once each.
 
-reward = min(1, certified / (goal_per_n * n)). reward.json also reports certified_bad, bad_per_n,
-beats_floor and how many listed challenges failed. A malformed instance (wrong field, k, A or
+reward = min(1, certified / (goal_per_n * n)), a graded terminal reward. reward.json also reports the
+uncapped count certified_bad (the authoritative number), bad_per_n, over_floor (certified minus the
+public baseline), beats_floor and above_goal (certified > goal_per_n * n). A reward of 1 is not a
+refutation of anything: only above_goal = 1 is evidence against the goal at this n. A malformed instance (wrong field, k, A or
 domain, a bad witness) scores 0. A broken grading setup writes no reward, so Harbor reports an
 error rather than a score.
 
@@ -208,19 +210,21 @@ def main() -> int:
             "reward": round(reward, 6),
             "certified_bad": certified,
             "bad_per_n": round(certified / n, 4),
+            "over_floor": certified - floor,
             "beats_floor": int(certified > floor),
+            "above_goal": int(certified > goal),
         }
         details.update(metrics, floor=floor, goal=goal, listed=len(chal), failed=len(failures),
                        failures=failures[:10], reason="graded from the definition")
     except Rejected as exc:
         reward = 0.0
-        metrics = {"reward": 0.0, "certified_bad": 0, "bad_per_n": 0.0, "beats_floor": 0}
+        metrics = {"reward": 0.0, "certified_bad": 0, "bad_per_n": 0.0, "over_floor": 0, "beats_floor": 0, "above_goal": 0}
         details["reason"] = f"rejected: {exc}"
     except GradingError as exc:
         details["reason"] = f"grading error: {exc}"
     except MemoryError:
         reward = 0.0
-        metrics = {"reward": 0.0, "certified_bad": 0, "bad_per_n": 0.0, "beats_floor": 0}
+        metrics = {"reward": 0.0, "certified_bad": 0, "bad_per_n": 0.0, "over_floor": 0, "beats_floor": 0, "above_goal": 0}
         details["reason"] = "rejected: the instance needs more memory than the verifier has"
     except Exception as exc:  # a bug in this grader, never the agent's fault
         details["reason"] = f"grading error: {type(exc).__name__}: {exc}"

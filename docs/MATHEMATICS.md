@@ -5,10 +5,12 @@ keeping rigorous security guarantees. Smaller proofs mean less data to send and 
 verification. The intended payoff runs better bounds, fewer checks, smaller proofs; each
 contribution has to establish that connection, since a better bound alone does not shrink a proof.
 
-The count tasks also run as an open RL environment, in harbor/ (https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor): a checker the
-agent never touches certifies the count, which is the verifiable reward, and every find is
-credited to the person or agent that made it. The Lean tasks there are evaluation only; theorems
-are open research, accepted after independent review.
+The count tasks also run as an open RL environment, in harbor/
+(https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor): a verifier whose
+code and trusted inputs are isolated from the agent certifies the count, which is the verifiable
+reward, and every find is credited to the person or agent that made it. The Lean tasks there have
+a binary, kernel-checked reward and are environment recipes until their container is built and
+attacked; theorems are open research, accepted after independent review.
 
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
 check. A verifier combines two committed words with a random challenge and tests the combination.
@@ -57,7 +59,7 @@ above the rate.
 | rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
 | a above 1 - d_min (error radius below the minimum distance), lower bound | at least floor((1 - a) n) on some line, capped at the field size | ABF, ePrint 2026/680, Lemma 4.16; any linear code |
 | rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform is at least 3.12, and on power-of-two subgroups at least 3; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
-| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 4(n - A + 1) = 3n/2 + 4 at rate 1/2, gap 1/8, from four codeword pairs sharing one line (certified at n = 64 and 256) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
+| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 4(n - A + 1) = 3n/2 + 4 at rate 1/2, gap 1/8, from four codeword pairs sharing one line (certified at n = 32 to 1,024, reproduced by an outside reviewer; the general statement holds under an explicit nondegeneracy condition, and whether a fifth pair fits is open) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
 | rho + delta on mu_n, fixed gap, KKH26 at a fixed gap | exponent 0: C(2/delta, 2 rho/delta + 2) bad challenges, independent of n (certified 8,008 at n = 64 and 904,589 at n = 128). It refutes no linear bound, but its constant caps soundness at small gaps whatever n is: at rate 1/2 in a 124-bit field, at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 | [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b), post bp1_035150eeabaf2db3ffdc8285 |
 
 What the workshop has proved about the targets themselves, all in the threads:

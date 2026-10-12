@@ -20,8 +20,9 @@ h's, nine unknowns for six conditions), and h'_r - h'_s is made to vanish there 
 three points x_rs of r, and private points up to A - 1; the four S_r cover all but one point of
 the domain. f = F_r and g = G_r on S_r, consistently. Pair r gives one challenge per point outside
 S_r, z = -(h_r - h_s)(x) / (h'_r - h'_s)(x) at a point of S_s, distinct because the two quadratics
-share one root and nothing else. Total 4 (n - A + 1). Five pairs do not fit: the sets would need
-more shared points than the shifts have freedom for, once n >= 64.
+share one root and nothing else. Total 4 (n - A + 1). A fifth pair is not expected to fit: by a
+dimension count the sets would need more shared points than the shifts have freedom for once
+n >= 64. That is a heuristic, not a proof; dependent conditions on the subgroup could change it.
 """
 import json, random, sys
 

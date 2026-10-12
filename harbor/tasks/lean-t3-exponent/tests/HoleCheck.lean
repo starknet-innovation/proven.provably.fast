@@ -5,9 +5,10 @@ accepted the proof: `lake env lean /tests/HoleCheck.lean`, in the graded project
 
 Comparator checks a definition hole's name, type, universes and safety, never its body, so a
 result could set a constant by choice. This walks each hole's value: constants declared in the
-submission are expanded; every other constant must not be on the deny list (choice, searches,
-suprema, limits). Constants whose root namespace is not on the allow list are reported for the
-reviewer and do not fail the check. Exit code 1 if any hole is denied.
+submission are expanded; every other constant must be on the allow list of closed-form
+primitives, and never on the deny list (choice, searches, suprema, limits). A constant outside the
+allow list fails the check (closed), and is printed so a maintainer can extend the list for a
+legitimate closed form. Exit code 1 if any hole is denied.
 -/
 import Lean
 import Submission
@@ -24,7 +25,7 @@ def denied : List Name :=
    `Filter.limsup, `Filter.liminf, `Filter.Tendsto, `Finset.sup', `Finset.inf', `Set.image,
    `Set.range, `Subtype.val, `Quot.out, `Quotient.out, `Trunc.out]
 
-/-- Root namespaces a closed form draws on. Anything else is reported, not refused. -/
+/-- Root namespaces a closed form draws on. Anything else is refused and printed. -/
 def allowedRoots : List Name :=
   [`Nat, `Int, `Rat, `Real, `NNReal, `MCAChallenge, `HAdd, `HSub, `HMul, `HDiv, `HPow, `HMod,
    `Neg, `Inv, `Add, `Sub, `Mul, `Div, `Pow, `Mod, `Zero, `One, `OfNat, `OfScientific, `Max, `Min,
@@ -95,9 +96,9 @@ def checkHole (env : Environment) (h : Name) : IO Bool := do
     IO.println s!"hole {h} : {d.type}"
     IO.println s!"  value: {d.value}"
     IO.println s!"  constants: {r.seen.toList}"
-    if !r.unknown.isEmpty then IO.println s!"  REVIEW (outside the allow list): {r.unknown.toList}"
+    if !r.unknown.isEmpty then IO.println s!"  DENIED (outside the allow list): {r.unknown.toList}"
     if !r.denied.isEmpty then IO.println s!"  DENIED: {r.denied.toList}"
-    pure r.denied.isEmpty
+    pure (r.denied.isEmpty && r.unknown.isEmpty)
   | some _ => IO.println s!"hole {h}: DENIED, not a definition"; pure false
   | none => IO.println s!"hole {h}: DENIED, not found"; pure false
 
