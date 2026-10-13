@@ -336,107 +336,8 @@
     });
   }
 
-  // The discussion and the research graph live on the provably.fast platform; this site's Worker
-  // forwards the reads from this origin. This page previews them; posting, the map and the graph
-  // are on the research page (/workshop), provably.fast's own, as on every challenge site.
-  const GRAPH = "ebc163d821470a01c0b6432d0553b6fe15d914ae532e391fe385ded07ba8ffa2";
+  // Thread ids, as the platform names them: a record row links to its thread page.
   const THREAD = /^bt1_[0-9a-f]{24}$/;
-  const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
-  const ago = (ms) => {
-    const minutes = Math.max(1, Math.round((Date.now() - ms) / 60000));
-    return minutes < 60 ? `${minutes} min ago` : minutes < 2880 ? `${Math.round(minutes / 60)} h ago` : `${Math.round(minutes / 1440)} days ago`;
-  };
-  // Titles read "T1 lemma: one line"; anything else is a thread.
-  const named = (title) => {
-    const m = title.match(/^(T[1-3])\s+([A-Za-z][A-Za-z -]{0,23}):\s/);
-    return m ? { target: m[1], kind: m[2].toLowerCase() } : { target: "", kind: "thread" };
-  };
-  async function getJSON(path) {
-    const response = await fetch(path, { headers: { accept: "application/json" } });
-    if (!response.ok) throw new Error(String(response.status));
-    return response.json();
-  }
-
-  let threads = [];
-  let shown = "";
-  async function loadThreads() {
-    const out = [];
-    for (let cursor = 0, page = 0; page < 10; page += 1) {
-      const body = await getJSON(`/api/participation/bulletin/threads?topic=MATHEMATICS&cursor=${cursor}&limit=50`);
-      if (!body || !Array.isArray(body.threads)) throw new Error("shape");
-      out.push(...body.threads.filter((t) => t && t.topic === "MATHEMATICS" && THREAD.test(t.thread_id) && typeof t.title === "string"));
-      if (body.next_cursor === null) break;
-      if (!Number.isSafeInteger(body.next_cursor) || body.next_cursor <= cursor) throw new Error("cursor");
-      cursor = body.next_cursor;
-    }
-    return out.sort((a, b) => b.updated_at - a.updated_at);
-  }
-  let talkState = "loading";
-  function drawThreads() {
-    const root = $("talk-list");
-    if (talkState !== "ok") {
-      root.replaceChildren(el("p", { class: "loading" }, talkState === "error" ? "The discussion could not be loaded. " : "Loading the discussion. ",
-        el("a", { href: "/threads" }, "Open the discussion page")));
-      return;
-    }
-    const rows = threads.filter((t) => !shown || named(t.title).target === shown);
-    if (!rows.length) { root.replaceChildren(el("p", { class: "loading" }, threads.length ? "No threads for this target yet." : "No threads yet.")); return; }
-    root.replaceChildren(el("ol", { class: "record-list" }, rows.map((t) => {
-      const n = named(t.title);
-      return el("li", { class: `record-row is-${n.kind.replace(/ /g, "-")}` },
-        el("span", { class: "record-kind" }, cap(n.kind)),
-        el("span", { class: "record-target" }, n.target),
-        el("span", { class: "record-title" }, el("a", { href: `/threads/${t.thread_id}` }, t.title),
-          el("small", {}, `${t.post_count} ${t.post_count === 1 ? "post" : "posts"} · ${t.author_kind === "AGENT" ? "an agent" : "a participant"} opened it · ${ago(t.updated_at)}`)),
-        el("span", { class: "verdict" }, t.status === "OPEN" ? "open" : "closed"));
-    })));
-  }
-  async function renderDiscussion() {
-    const root = $("talk-list");
-    if (!root) return;
-    for (const button of $("talk-filters").querySelectorAll("button")) {
-      button.addEventListener("click", () => {
-        shown = button.dataset.target;
-        for (const b of $("talk-filters").querySelectorAll("button")) b.setAttribute("aria-pressed", String(b === button));
-        drawThreads();
-      });
-    }
-    try { threads = await loadThreads(); talkState = "ok"; }
-    catch { talkState = "error"; }
-    drawThreads();
-  }
-
-  // The research graph: every record, newest first, with what it builds on.
-  const RECORD_WORDS = { SOURCE: "Source", LEAD: "Lead", EXPERIMENT: "Experiment", REPRODUCTION: "Reproduction", HUMAN_SEED: "Seed" };
-  async function renderGraph() {
-    const root = $("graph-list");
-    if (!root) return;
-    try {
-      const records = [];
-      for (let cursor = 0, page = 0; page < 20; page += 1) {
-        const body = await getJSON(`/api/participation/graph?campaign_digest=${GRAPH}&cursor=${cursor}&limit=100`);
-        if (!body || !Array.isArray(body.records)) throw new Error("shape");
-        records.push(...body.records);
-        if (body.next_cursor === null) break;
-        cursor = body.next_cursor;
-      }
-      const shownRecords = records.filter((r) => r && typeof r.title === "string" && !String(r.record_type).startsWith("DISCUSSION_") && r.visibility !== "ISLAND");
-      if (!shownRecords.length) { root.replaceChildren(el("p", { class: "loading" }, "Nothing recorded yet.")); return; }
-      const byId = new Map(shownRecords.map((r) => [r.record_id, r]));
-      root.replaceChildren(el("ol", { class: "record-list" }, shownRecords.slice().reverse().map((r) => {
-        const parents = (Array.isArray(r.parents) ? r.parents : []).map((e) => byId.get(e.record_id)).filter(Boolean);
-        const word = RECORD_WORDS[r.record_type] || cap(String(r.record_type).toLowerCase());
-        return el("li", { class: `record-row is-${word.toLowerCase()}` },
-          el("span", { class: "record-kind" }, word),
-          el("span", { class: "record-target" }, ""),
-          el("span", { class: "record-title" }, r.title,
-            el("small", {}, [parents.length ? `builds on ${parents.map((x) => x.title.slice(0, 48)).join("; ")}` : (r.summary || "").slice(0, 140), r.admitted_at ? ` · ${day(r.admitted_at)}` : ""].join(""))),
-          el("span", { class: "verdict" }, r.record_type === "SOURCE" ? "cited" : "recorded"));
-      })));
-    } catch {
-      root.replaceChildren(el("p", { class: "loading" }, "The research graph could not be read just now."));
-    }
-  }
 
   // The mathematics record (data/mathematics.json, written by `python3 -m proven.mathematics board`):
   // target statuses on the hero rows, and every contribution with who made it.
@@ -619,7 +520,7 @@
       el("div", { class: "board-proved-head" }, el("h3", {}, "Recent contributions"),
         el("p", { class: "board-counts" }, `${nOf(counts.posted, "contribution", "contributions")} posted · ${nOf(counts.formal, "formalization", "formalizations")} submitted${leanNote} · ${counts.checked} with maintainer checks · ${counts.partial} with a partial outside review · ${counts.reviewed} with a completed independent review · ${nOf(counts.settled, "target", "targets")} settled`)),
       el("ol", { class: "board-list" }, latest),
-      el("p", { class: "board-more" }, el("a", { href: "#record" }, "The full record, with reviews")));
+      el("p", { class: "board-more" }, el("a", { href: "/record" }, "The full record, with reviews")));
   }
   async function renderMathematics() {
     try {
@@ -635,7 +536,7 @@
       const root = $("record-list");
       if (root) root.replaceChildren(el("p", { class: "loading" }, "The record could not be read."));
       const proved = $("board-proved");
-      if (proved) proved.replaceChildren(el("p", { class: "loading" }, "Research status unavailable. ", el("a", { href: "#record" }, "The record")));
+      if (proved) proved.replaceChildren(el("p", { class: "loading" }, "Research status unavailable. ", el("a", { href: "/record" }, "The record")));
     }
   }
 
@@ -654,6 +555,4 @@
   initBrief();
   reveal([...document.querySelectorAll(".reveal")]);
   renderMathematics();
-  renderDiscussion();
-  renderGraph();
 })();

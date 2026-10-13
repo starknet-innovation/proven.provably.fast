@@ -1,6 +1,6 @@
 {
  "schema": "proven-mathematics/0",
- "generated": "2026-10-12T06:10:12+00:00",
+ "generated": "2026-10-13T03:44:29+00:00",
  "lean": {
   "file": "lean/MCAChallenge.lean",
   "library": "https://github.com/Verified-zkEVM/ArkLib",
@@ -360,5 +360,5 @@
    ]
   }
  ],
- "source": "d1a0cbf6"
+ "source": "a634ac98"
 }
