@@ -69,4 +69,6 @@ graded from the definition.
 
 - Python 3.12 with numpy; `/opt/proven/certify.py` (the kit's checker, standard library only) and
   `/opt/proven/baseline.py` (the floor). No internet.
-- Certifying at n = $n takes the kit about $kit_minutes minutes per 1,000 challenges in pure Python.
+- Certifying at n = $n takes the kit about $kit_minutes minutes per 1,000 challenges in pure Python when
+  every challenge has its own witness; challenges that share a witness add almost nothing, since the kit
+  interpolates each witness once.

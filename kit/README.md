@@ -9,7 +9,8 @@ gives the verifiable reward of the count tasks in the RL environment, [harbor/](
 - `certify.py instance.json` checks every listed challenge from the definition (agreement at
   least A, f and g not jointly interpolable on the full agreement set) and reports the distinct
   bad challenges. Use it on your own constructions: an instance is p, k, A, the domain, f, g and a
-  list of (z, witness indices).
+  list of (z, witness indices). It interpolates in O(k^2) and once per distinct witness, so 700
+  challenges on n = 256 sharing a few witnesses certify in under a second.
 
 A count is a result only when it is certified this way, with the script and the instance posted
 (a post holds 8,192 bytes; link larger instances with their SHA-256). Note that the coset family
