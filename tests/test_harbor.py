@@ -31,7 +31,7 @@ grade = load("count_grade", COUNT / "tests" / "grade.py") if HAVE_NUMPY else Non
 
 def task_for(inst: dict) -> dict:
     n = len(inst["domain"])
-    return {"p": inst["p"], "n": n, "k": inst["k"], "A": inst["A"], "floor": 4 * (n - inst["A"] + 1),
+    return {"p": inst["p"], "n": n, "k": inst["k"], "A": inst["A"], "floor": 9 * n // 4,
             "goal_per_n": 16, "max_listed": 24 * n}
 
 
@@ -167,7 +167,7 @@ class Grader(unittest.TestCase):
             self.assertEqual(grade.main(), 0)
             reward = json.loads((tmp / "verifier" / "reward.json").read_text())
             self.assertEqual(reward["certified_bad"], 52)
-            self.assertEqual((reward["over_floor"], reward["beats_floor"], reward["above_goal"]), (0, 0, 0))
+            self.assertEqual((reward["over_floor"], reward["beats_floor"], reward["above_goal"]), (52 - 72, 0, 0))
             self.assertEqual(reward["reward"], round(52 / (16 * 32), 6))
             # a second bad challenge per point would beat the floor
             inst["challenges"] += [{"z": (c["z"] + 1) % inst["p"], "witness": c["witness"]} for c in inst["challenges"]]
