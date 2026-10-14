@@ -26,10 +26,12 @@ TEMPLATES = ROOT / "templates"
 DATASET, VERSION = "proven-mca", "0.1"
 BABYBEAR = 2**31 - 2**27 + 1
 GOAL_PER_N = 16
-# Domain sizes and the verifier's time: certifying grows with n^2 per challenge.
-COUNT_TASKS = [dict(m=8, verifier_timeout=1800, kit_minutes="0.5"),
-               dict(m=9, verifier_timeout=3600, kit_minutes="2"),
-               dict(m=10, verifier_timeout=10800, kit_minutes="8")]
+# Domain sizes and the verifier's time: certifying grows with n^2 per challenge. The kit's minutes
+# per 1,000 challenges are its worst case, every challenge with its own witness (2026-10-14, after
+# the kit moved to quadratic interpolation shared per witness).
+COUNT_TASKS = [dict(m=8, verifier_timeout=1800, kit_minutes="0.7"),
+               dict(m=9, verifier_timeout=3600, kit_minutes="2.6"),
+               dict(m=10, verifier_timeout=10800, kit_minutes="5.6")]
 
 
 def toml_str(value: str) -> str:
