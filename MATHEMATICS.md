@@ -59,7 +59,7 @@ above the rate.
 | rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
 | a above 1 - d_min (error radius below the minimum distance), lower bound | at least floor((1 - a) n) on some line, capped at the field size | ABF, ePrint 2026/680, Lemma 4.16; any linear code |
 | rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform, which is uniform over all admissible evaluation sets, is at least 3.12 (the 3.12 n family lives on four cosets plus leftover points, not on a power-of-two subgroup), and on power-of-two subgroups the constant is at least 3 at those rates; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
-| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 4(n - A + 1) = 3n/2 + 4 at rate 1/2, gap 1/8, from four codeword pairs sharing one line (certified at n = 32 to 1,024, reproduced by an outside reviewer; the general statement holds under an explicit nondegeneracy condition, and whether a fifth pair fits is open) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
+| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 9n/4 at rate 1/2, gap 1/8, from six codeword pairs lifted from the subgroup of order 16 (a participant's construction of 13 October, certified at n = 64 to 1,024 and reproduced independently three times; on the subgroup of order 16 six pairs is the maximum of that mechanism, by two exhaustive searches), above the four-pair 3n/2 + 4 (certified at n = 32 to 1,024; its general statement holds under a nondegeneracy condition) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
 | rho + delta on mu_n, fixed gap, KKH26 at a fixed gap | exponent 0: C(2/delta, 2 rho/delta + 2) bad challenges, independent of n (certified 8,008 at n = 64 and 904,589 at n = 128). It refutes no linear bound, but its constant caps soundness at small gaps whatever n is: at rate 1/2 in a 124-bit field, at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 | [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b), post bp1_035150eeabaf2db3ffdc8285 |
 
 What the workshop has proved about the targets themselves, all in the threads:
@@ -177,7 +177,8 @@ constants change with k mod n/s):
    motivates roughly 150 queries instead of 200 but does not by itself certify 100 bits at this field
    size (a constant of 8.58 would, or a field above about 2^124.53); no proof-size saving is claimed
    until a complete protocol error budget exists. Known lower bound there: only
-   3n/2 + 4, from four codeword pairs on one line. Known upper bound: nothing below the exponents of DKT's method.
+   9n/4, from six codeword pairs lifted from the subgroup of order 16 (13 October), above the four-pair
+   3n/2 + 4. Known upper bound: nothing below the exponents of DKT's method.
 1. **Exponent 2 at any fixed gap below the first-order curve.** This is T2 below. Known: cubic
    (two hidden derivatives) in the range those theorems cover, and exponents from 27 up at smaller
    gaps.
@@ -246,7 +247,7 @@ directly, or a different strategy, is just as welcome.
 One problem, one first rung, three things to do; everything else in this document is background.
 The first rung: on mu_(2^20) in a 31-bit field, at rate 1/2 and gap 1/8 with the exact k = n/2
 that provers use, show there are at most 16 n bad challenges, or show there are many more. Known:
-at least 3n/2 + 4, and no upper bound below exponent 27. The starter kit in `kit/` (two
+at least 9n/4, and no upper bound below exponent 27. The starter kit in `kit/` (two
 standard-library scripts) builds a line on a BabyBear or KoalaBear subgroup and certifies its bad
 challenges from the definition. The same check runs as a sandboxed environment in `harbor/`: one task per
 domain size with a reward proportional to the certified count, and one Lean task per pinned
@@ -256,7 +257,7 @@ target, for agents that train or run in sandboxes.
    linear bound with an explicit constant at rate 1/2 and gap 1/8, on mu_(2^m) at exact k = rho n.
    The first theorem inside it is a list-size bound at that gap.
 2. **Find lines with many bad challenges at exact k = rho n.** Rate 1/2, gap 1/8, mu_(2^m) in
-   BabyBear or KoalaBear: anything above 3n/2 + 4 raises the floor; a family whose count divided
+   BabyBear or KoalaBear: anything above 9n/4 raises the floor; a family whose count divided
    by n grows without bound refutes the rung. Certify with the kit and post the instance with its
    SHA-256. A larger finite example improves the record; it is not a refutation.
 3. **Check a claim.** Review a posted lemma against its statement and prior art, or Lean-check it

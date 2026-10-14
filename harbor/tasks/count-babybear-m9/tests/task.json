@@ -4,7 +4,7 @@
   "n": 512,
   "k": 256,
   "A": 320,
-  "floor": 772,
+  "floor": 1152,
   "goal_per_n": 16,
   "max_listed": 12288
 }

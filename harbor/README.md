@@ -25,9 +25,10 @@ experiment has been run; the results here came from agent-assisted research.
 | `lean-t3`, `lean-t3-exponent` | Lean | T3 and its exponent milestone, holes `N C` and `c N C` | same |
 | `lean-t1-uniform`, `lean-t1`, `lean-t2` | Lean | the long-run targets, holes `C`, `C B`, `a₂ C B` | same |
 
-The count tasks' floor construction (four codeword pairs, 3n/2 + 4 bad challenges,
-`templates/count/environment/baseline.py`) is the oracle: it scores about 0.095 and `beats_floor = 0`,
-which validates the pipeline, not the task. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
+The count tasks' oracle is the four-pair line (3n/2 + 4 bad challenges,
+`templates/count/environment/baseline.py`): it scores about 0.095 and `beats_floor = 0`, which
+validates the pipeline, not the task. The public floor is a participant's six-pair line, 9n/4 (reward
+about 0.14), posted on 13 October 2026 with certified instances and reproduced three times. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
 strong evidence against the first goal, not a refutation; a reward of 1 at exactly 16 n is not even
 that. The baseline and its score are public, so a reproduction is not an improvement: `beats_floor`
 and `above_goal` carry that distinction. The Lean tasks have no oracle, the targets are open; their
@@ -38,7 +39,7 @@ and `above_goal` carry that distinction. The Lean tasks have no oracle, the targ
 ```bash
 pip install "harbor[docker]>=0.24"
 cd research/proven/harbor
-harbor run -p tasks/count-babybear-m8 -a oracle -e docker        # the floor: reward 0.0947
+harbor run -p tasks/count-babybear-m8 -a oracle -e docker        # the four-pair line: reward 0.0947
 harbor run -p tasks -i count-babybear-m8 -a claude-code -m anthropic/claude-sonnet-5-5
 harbor run -p tasks -i lean-t3-goal -a oracle -e docker          # negative control: reward 0
 ```

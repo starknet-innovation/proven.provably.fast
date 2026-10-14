@@ -9,9 +9,9 @@
    "n": 256,
    "k": 128,
    "A": 160,
-   "floor": 388,
+   "floor": 576,
    "goal_per_n": 16,
-   "oracle": "four-pair floor construction",
+   "oracle": "four-pair construction, 4(n - A + 1), below the public floor",
    "oracle_reward": 0.0947
   },
   {
@@ -21,9 +21,9 @@
    "n": 512,
    "k": 256,
    "A": 320,
-   "floor": 772,
+   "floor": 1152,
    "goal_per_n": 16,
-   "oracle": "four-pair floor construction",
+   "oracle": "four-pair construction, 4(n - A + 1), below the public floor",
    "oracle_reward": 0.0942
   },
   {
@@ -33,9 +33,9 @@
    "n": 1024,
    "k": 512,
    "A": 640,
-   "floor": 1540,
+   "floor": 2304,
    "goal_per_n": 16,
-   "oracle": "four-pair floor construction",
+   "oracle": "four-pair construction, 4(n - A + 1), below the public floor",
    "oracle_reward": 0.094
   },
   {

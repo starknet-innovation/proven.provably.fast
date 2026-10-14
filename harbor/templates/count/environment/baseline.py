@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
-"""The known floor on one line: four codeword pairs, 4 (n - A + 1) = 3 n / 2 + 4 bad challenges.
+"""The four-pair line: 4 (n - A + 1) = 3 n / 2 + 4 bad challenges, the environment's oracle. The public
+floor is higher since 13 October 2026: six codeword pairs lifted from the subgroup of order 16 give 9 n / 4
+(thread bt1_772dc68e4cc75797c2455e58, a participant's construction).
 Standard library only; writes an instance for certify.py.
 
 Usage: python3 baseline.py m out.json [seed]
