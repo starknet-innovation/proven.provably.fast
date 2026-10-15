@@ -73,6 +73,22 @@ class Generated(unittest.TestCase):
         config = json.loads((controls / "config.json").read_text())
         self.assertEqual((config["theorem_names"], config["definition_names"]), (["solution"], ["C"]))
 
+    def test_only_the_lean_verifier_gets_net_admin(self):
+        # grade.py's iptables rule needs NET_ADMIN. Harbor reads tests/docker-compose.yaml for the
+        # separate verifier alone; an environment/docker-compose.yaml would also reach the agent,
+        # whose root could then lift the no-network policy of the namespace it shares.
+        for task in sorted((HARBOR / "tasks").iterdir()):
+            self.assertFalse((task / "environment" / "docker-compose.yaml").exists(), task.name)
+            compose = task / "tests" / "docker-compose.yaml"
+            if not task.name.startswith("lean-"):
+                self.assertFalse(compose.exists(), task.name)
+                continue
+            text = compose.read_text()
+            self.assertRegex(text, r"(?m)^    cap_add:\n      - NET_ADMIN$", task.name)
+            self.assertRegex(text, r"(?m)^      context: \.\./environment$", task.name)
+            self.assertRegex(text, r"(?m)^      - \./:/tests:ro$", task.name)
+            self.assertEqual(text.count("cap_add"), 1, task.name)
+
     def test_public_prose_has_no_em_dash(self):
         for path in [*HARBOR.rglob("*.md"), *HARBOR.rglob("*.toml")]:
             self.assertNotIn("—", path.read_text(), path)

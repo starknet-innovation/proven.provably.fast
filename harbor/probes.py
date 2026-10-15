@@ -72,8 +72,9 @@ PROBES = {
              "inst['challenges'] = [{'z': rng.randrange(inst['p']), 'witness': rng.sample(range(n), k)} for _ in range(100)]"),
         "graded from the definition"),
 }
-# Probes that are graded rather than rejected must still certify nothing new: duplicate-challenges
-# scores the floor (0.0237 at m = 8) and random-challenges scores 0.
+# Probes that are graded rather than rejected must still certify nothing new:
+# duplicate-challenges scores exactly what the task's own baseline scores (the four-pair line,
+# 0.0947 with 388 certified at m = 8) and random-challenges scores 0.
 
 
 def make_probe(task_dir: Path, out_dir: Path, name: str) -> Path:

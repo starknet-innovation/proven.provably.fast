@@ -11,9 +11,9 @@ after the proof is accepted, because here a constant is the result.
 Nothing here changes how a result counts on proven.provably.fast: a target is solved by a
 reviewed record, and a reward is evidence to post, not a verdict. Posted, submissions and reviews
 are recorded with attribution. Labels, precisely: the count tasks are experimental agent
-environments with graded, certificate-checked rewards; the Lean tasks are environment recipes
-with a binary, kernel-checked reward, whose native verifier is tested and whose container
-validation is pending; the discussion and reviews are an open research workshop. No training
+environments with graded, certificate-checked rewards; the Lean tasks are environments with a
+binary, kernel-checked reward, whose container verifier passes four controls and has not been
+attacked; the discussion and reviews are an open research workshop. No training
 experiment has been run; the results here came from agent-assisted research.
 
 ## Tasks
@@ -46,7 +46,9 @@ harbor run -p tasks -i lean-t3-goal -a oracle -e docker          # negative cont
 
 Count tasks need only the small Python image. Lean tasks build the pinned package (Lean 4.34.0,
 ArkLib with its Mathlib, Comparator, lean4export, landrun; about 13 GB): give the sandbox 20 GB of
-disk and 12 GB of memory, or trim as `lean_setup.sh` notes.
+disk and 12 GB of memory, or trim as `lean_setup.sh` notes. In Docker, each Lean task's
+`tests/docker-compose.yaml` gives the separate verifier, and only it, `NET_ADMIN` for the grader's
+iptables rule; without it every grade ends in a grading error, never a score.
 
 ## How a trial runs
 
@@ -76,9 +78,10 @@ runs the packer in the agent's sandbox after it finishes.
 | Spam challenges to run out the clock | at most 24 n listed; numpy certification, minutes at n = 1024 | by construction |
 | Overflow in the numpy arithmetic | every product is reduced before the next operation and no sum of products is formed; p < 2^31 keeps each product below 2^62 | unit test with values next to p |
 | A broken verifier mistaken for a wrong submission | a grading error writes no reward and Harbor reports the trial as an error | by construction |
-| Lean: `sorry`, new axioms, `native_decide`, a weaker statement, a redefined definition | Comparator: exact statement, three axioms, kernel replay | as in FineEnvs/openai-math |
-| Lean: a constant set by choice, search, supremum or limit | `HoleCheck.lean` walks each hole's elaborated value, expanding the submission's own definitions; a constant outside the allow list fails (closed), the deny list names the known offenders | native test, six samples |
-| Lean: code run at build time | landrun, the unprivileged grader user, iptables, as in FineEnvs/openai-math | not run here |
+| Lean: `sorry`, new axioms, `native_decide`, a weaker statement, a redefined definition | Comparator: exact statement, three axioms, kernel replay | as in FineEnvs/openai-math; in Docker, `sorry` and a changed statement refused |
+| Lean: a constant set by choice, search, supremum or limit | `HoleCheck.lean` walks each hole's elaborated value, expanding the submission's own definitions; a constant outside the allow list fails (closed), the deny list names the known offenders | native test, six samples; in Docker, choice refused |
+| Lean: code run at build time | landrun, the unprivileged grader user, and an iptables rule on the grader's sockets, as in FineEnvs/openai-math | in place for every Docker grade; not attacked |
+| Lean: lift the no-network policy from inside the agent's sandbox | the agent's sandbox has no `NET_ADMIN`; only the verifier's `tests/docker-compose.yaml` adds it | unit test |
 
 Trusted and not re-checked: the Lean kernel, Comparator, lean4export, landrun, Docker's boundary.
 A crafted `.olean` could in principle mislead `HoleCheck.lean`, which loads the submission's build;
@@ -92,7 +95,7 @@ witnesses, duplicates, too many listed, random challenges) as Harbor tasks; run 
 oracle agent after any change to the grader. `CARD.md` is the dataset card in the form Hugging
 Face expects, should the maintainers publish there.
 
-## Status, 2026-10-11
+## Status, 2026-10-15
 
 - Count tasks, through `harbor run` in Docker: the one-pair oracle certified exactly 3n/8 + 1 on all
   three sizes (97, 193 and 385 at n = 256, 512 and 1024; grading 1 s, 5 s and 19 s); the four-pair
@@ -107,8 +110,15 @@ Face expects, should the maintainers publish there.
   Every challenge template elaborates against the pinned file with only `sorry` warnings. The
   verifier flow itself ran natively on four controls (`controls/`): a real proof accepted with its
   constant read as closed form, `sorry` and a changed statement refused by Comparator, a constant
-  set by choice accepted by Comparator and refused by the hole check. The image recipe is written
-  and not yet built: the Docker VM on the development machine is too small.
+  set by choice accepted by Comparator and refused by the hole check.
+- Lean tasks, through `harbor run` in Docker on a 16-core, 64 GB Linux host (15 October; Harbor
+  0.24.0, Docker 29): the image builds in 31 minutes. The first grade ended in a grading error, as
+  designed: Harbor's Docker no-network mode shares a sidecar's network namespace and gives the
+  verifier no `NET_ADMIN`, so the grader's iptables rule could not be installed. With
+  `tests/docker-compose.yaml`, the negative control on `lean-t3-goal` scores 0 (Comparator:
+  `sorryAx`, 41 s of grading), and the controls, run as Harbor tasks with the sandbox, the grader
+  user and the rule in place, match the native results: `ok` 1 with `HOLES OK` (121 s), `choice` 0
+  with `DENIED: [Classical.choose]` (122 s), `weak` 0, statement mismatch (42 s).
 - `MCAChallenge.T3Goal` and `T3Goal_of_T3` compile against the pinned ArkLib (45 s, no warnings).
 - An outside reviewer rebuilt the four-pair construction independently and checked 2,852
   certificates at n = 32 to 1,024 (52, 100, 388, 772, 1,540), confirming the three baselines and
