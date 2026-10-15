@@ -30,7 +30,7 @@ Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface
 | Task | Reward | Known |
 |---|---|---|
 | `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded terminal reward; the uncapped count and the flags over the public baseline and over 16 n are reported too | public floor 9n/4 from a participant's six codeword pairs (reward 0.14); the four-pair oracle 3n/2 + 4 (reward 0.095); the challenge's first goal says at most 16 n |
-| `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 (binary) | all open; expect 0; recipes until the container is built and attacked |
+| `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 (binary) | all open; expect 0; the container verifier passes four controls and has not been attacked |
 
 ## How a task works
 
@@ -77,8 +77,9 @@ Count tasks need a small Python image; Lean tasks build a 13 GB image and need a
   challenges) score 0 or the floor, each with the intended reason.
 - The verifier agrees with the kit's pure-Python checker on every instance in the test suite.
 - The Lean grader is FineEnvs/openai-math's, adapted; the closed-form check was run on six sample
-  constants and the whole verifier flow natively on four controls. The Lean image recipe is written
-  and not yet built; those tasks are recipes until a container has been built and attacked.
+  constants and the whole verifier flow on four controls, natively and again in Docker with the
+  sandbox, the unprivileged grader and its network block (a real proof scores 1; `sorry`, a changed
+  statement and a constant set by choice score 0). The container has not been attacked.
 - An outside reviewer rebuilt the four-pair baseline independently and checked 2,852 certificates
   at n = 32 to 1,024.
 

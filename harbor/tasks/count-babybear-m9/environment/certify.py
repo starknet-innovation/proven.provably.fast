@@ -11,6 +11,10 @@ most k points (indices) that determine P; more would allow a degree k or above. 
 |S| >= A, checks the joint interpolability on S, and reports distinct bad z. Exit code 1 if any
 listed challenge fails.
 
+For large n, list each distinct witness once in "witness_sets" and give a challenge's witness as
+its index there (the bulletin's proven/BadChallengeInstance@2): at n = 1024 that is tens of KiB
+instead of megabytes. Both forms certify the same way.
+
 Cost: interpolation is O(k^2) through the master product prod (X - x_j) and one synthetic
 division per point, and a witness shared by many challenges is interpolated once (P = F + z G,
 with F and G the interpolants of f and g on it), so an instance with n = 256 and hundreds of
@@ -99,8 +103,11 @@ def check(inst):
     witnesses = {}
     # Per agreement set: whether f and g are each interpolable on it, shared between challenges.
     explained = {}
+    sets = inst.get("witness_sets")
     for ch in inst["challenges"]:
         z, witness = ch["z"] % p, ch["witness"]
+        if isinstance(witness, int) and not isinstance(witness, bool):
+            witness = sets[witness] if sets is not None and 0 <= witness < len(sets) else []
         if not 0 < len(witness) <= k or len(set(witness)) != len(witness):
             failures.append((z, "the witness must be at most k distinct indices"))
             continue
