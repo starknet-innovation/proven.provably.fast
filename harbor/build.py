@@ -51,12 +51,23 @@ def copy_tree(src: Path, dst: Path) -> None:
         path.chmod(0o755)
 
 
+# The public floor of each task: the best count certified at its size, from the core-anchored towers
+# of 14 October 2026 (record M-0014, thread bt1_afa60af3, certified independently): ten pairs at
+# n = 256 and eleven at n = 512 on the subgroup itself, eleven lifted from order 512 at n = 1,024.
+FLOORS = {
+    8: (720, "45n/16", "ten codeword pairs in a tower over this subgroup"),
+    9: (1488, "93n/32", "eleven codeword pairs in a tower over this subgroup"),
+    10: (2992, "187n/64", "eleven codeword pairs in a tower over the subgroup of order 512, lifted to this one"),
+}
+
+
 def count_task(cfg: dict, out: Path) -> dict:
     m = cfg["m"]
     n = 1 << m
     k, A = n // 2, 5 * n // 8
-    floor = 9 * n // 4   # the public floor: six codeword pairs lifted from the subgroup of order 16 (thread bt1_772dc68e)
-    params = dict(m=m, n=n, k=k, A=A, p=BABYBEAR, floor=floor, goal=GOAL_PER_N * n, goal_per_n=GOAL_PER_N,
+    floor, floor_rule, floor_how = FLOORS[m]
+    params = dict(m=m, n=n, k=k, A=A, p=BABYBEAR, floor=floor, floor_rule=floor_rule, floor_how=floor_how,
+                  floor_reward=f"{floor / (GOAL_PER_N * n):.2f}", goal=GOAL_PER_N * n, goal_per_n=GOAL_PER_N,
                   max_listed=24 * n, verifier_timeout=cfg["verifier_timeout"], kit_minutes=cfg["kit_minutes"])
     task = out / f"count-babybear-m{m}"
     src = TEMPLATES / "count"

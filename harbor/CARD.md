@@ -29,7 +29,7 @@ Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface
 
 | Task | Reward | Known |
 |---|---|---|
-| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded terminal reward; the uncapped count and the flags over the public baseline and over 16 n are reported too | public floor 9n/4 from a participant's six codeword pairs (reward 0.14); the four-pair oracle 3n/2 + 4 (reward 0.095); the challenge's first goal says at most 16 n |
+| `count-babybear-m8`, `-m9`, `-m10`: find a line (two words) on the subgroup of order 2^m in BabyBear with as many bad challenges as possible at rate 1/2 and gap 1/8, and list a witness per challenge | certified distinct bad challenges / (16 n), a graded terminal reward; the uncapped count and the flags over the public baseline and over 16 n are reported too | public floor from participants' towers of codeword pairs: 720, 1,488 and 2,992 at n = 256, 512 and 1,024 (reward about 0.18); the four-pair oracle 3n/2 + 4 (reward 0.095); the challenge's first goal says at most 16 n |
 | `lean-t3-goal`, `lean-t3`, `lean-t3-exponent`, `lean-t1-uniform`, `lean-t1`, `lean-t2`: prove one pinned statement in Lean 4 against ArkLib, supplying its constants in closed form | 1 if Comparator accepts the proof and every constant is a closed form, else 0 (binary) | all open; expect 0; the container verifier passes four controls and has not been attacked |
 
 ## How a task works
@@ -70,8 +70,8 @@ Count tasks need a small Python image; Lean tasks build a 13 GB image and need a
 ## Validation
 
 - The oracle (the four-pair line) scores 0.0947 on `count-babybear-m8`: 388 certified bad challenges
-  at n = 256, exactly 3n/2 + 4. The public floor, a participant's six-pair line, certifies 576 there
-  (reward 0.1406) and was reproduced independently three times.
+  at n = 256, exactly 3n/2 + 4. The public floor there, a ten-pair tower from a participant's agent,
+  certifies 720 (reward 0.1758), certified independently.
 - Nine reward-hacking probes (`probes.py`: planted reward files, a symlinked instance, a tampered
   domain, another field, a lowered A, oversized witnesses, duplicates, too many listed, random
   challenges) score 0 or the floor, each with the intended reason.
