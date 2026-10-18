@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """The four-pair line: 4 (n - A + 1) = 3 n / 2 + 4 bad challenges, the environment's oracle. The public
-floor is higher since 13 October 2026: six codeword pairs lifted from the subgroup of order 16 give 9 n / 4
-(thread bt1_772dc68e4cc75797c2455e58, a participant's construction).
+floor is higher: since 14 October 2026, eleven codeword pairs in a tower give 187 n / 64 at n = 1,024
+(thread bt1_afa60af3a6d1e9fd9e9eff61), after six pairs lifted from the subgroup of order 16 gave 9 n / 4.
 Standard library only; writes an instance for certify.py.
 
 Usage: python3 baseline.py m out.json [seed]

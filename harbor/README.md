@@ -27,8 +27,9 @@ experiment has been run; the results here came from agent-assisted research.
 
 The count tasks' oracle is the four-pair line (3n/2 + 4 bad challenges,
 `templates/count/environment/baseline.py`): it scores about 0.095 and `beats_floor = 0`, which
-validates the pipeline, not the task. The public floor is a participant's six-pair line, 9n/4 (reward
-about 0.14), posted on 13 October 2026 with certified instances and reproduced three times. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
+validates the pipeline, not the task. The public floor is the best count certified at each size, from
+participants' towers of codeword pairs (14 October 2026): 720, 1,488 and 2,992 at n = 256, 512 and
+1,024 (reward about 0.18), certified independently. A line with more than 16 n certified bad challenges would score 1; at a fixed n that is
 strong evidence against the first goal, not a refutation; a reward of 1 at exactly 16 n is not even
 that. The baseline and its score are public, so a reproduction is not an improvement: `beats_floor`
 and `above_goal` carry that distinction. The Lean tasks have no oracle, the targets are open; their

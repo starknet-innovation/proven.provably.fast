@@ -18,12 +18,13 @@ challenges as you can, and certify them.
 
 ## What is known
 
-- The floor, one line with $floor bad challenges, 9n/4: six codeword pairs lifted from the subgroup of
-  order 16, posted by a participant on 13 October 2026 with scripts and certified instances
-  (https://proven.provably.fast/threads/bt1_772dc68e4cc75797c2455e58). /opt/proven/baseline.py builds the
-  earlier four-pair line, 3n/2 + 4, which scores below the floor: four pairs agreeing with (f, g) on
-  sets of A - 1 points, one bad challenge per point outside each set. Both are public, so reproducing
-  them is not progress; anything above $floor raises the floor.
+- The floor, one line with $floor bad challenges ($floor_rule): $floor_how, posted on 14 October 2026
+  with scripts and certified independently
+  (https://proven.provably.fast/threads/bt1_afa60af3a6d1e9fd9e9eff61). It grew from six codeword pairs
+  lifted from the subgroup of order 16 (9n/4, 13 October) through seven to nine pairs.
+  /opt/proven/baseline.py builds the earlier four-pair line, 3n/2 + 4, which scores below the floor:
+  four pairs agreeing with (f, g) on sets of A - 1 points, one bad challenge per point outside each set.
+  These are public, so reproducing them is not progress; anything above $floor raises the floor.
 - The goal of the challenge is at most 16 n bad challenges on every line, for all large n. A line
   with more than 16 n = $goal certified bad challenges at this n does not refute the goal by itself,
   since the goal allows a threshold in n, but it is the strongest evidence this task can give, and
@@ -57,7 +58,7 @@ The file is copied to a fresh machine whose code and trusted inputs are isolated
 graded from the definition.
 
 - `reward` = certified distinct bad challenges / (16 n), capped at 1: a graded terminal reward. The
-  floor scores about 0.14; the baseline script's four-pair line about 0.095.
+  floor scores about $floor_reward; the baseline script's four-pair line about 0.095.
 - `reward.json` also carries the uncapped `certified_bad` (the authoritative number), `bad_per_n`,
   `over_floor`, `beats_floor` (1 above $floor) and `above_goal` (1 above 16 n). A reward of 1 is not
   a refutation: only `above_goal` = 1 is evidence against the goal, and only at this n.
