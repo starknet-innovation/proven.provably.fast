@@ -3,12 +3,12 @@ schema_version = "1.4"
 [task]
 name = "proven-mca/lean-t1"
 version = "0.1.0"
-description = "Prove the pinned statement MCAChallenge.T1 of proven.provably.fast in Lean 4 against ArkLib, supplying its parameters in closed form; graded by Comparator in a separate sandbox."
+description = "Prove the pinned statement MCAChallenge.T1 of starks.provably.fast in Lean 4 against ArkLib, supplying its parameters in closed form; graded by Comparator in a separate sandbox."
 keywords = ["lean4", "mathlib", "arklib", "theorem-proving", "proven-provably-fast", "reed-solomon", "correlated-agreement"]
 
 [metadata]
-source = "https://proven.provably.fast/"
-statement = "https://proven.provably.fast/MATHEMATICS.md"
+source = "https://starks.provably.fast/"
+statement = "https://starks.provably.fast/MATHEMATICS.md"
 pinned_file = "lean/MCAChallenge.lean"
 arklib_commit = "35ddcaa83f683011f944f58904be779495a5709a"
 target = "T1"

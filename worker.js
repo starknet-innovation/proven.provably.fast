@@ -51,6 +51,12 @@ export default {
   async fetch(request, env) {
     const url = new URL(request.url);
     const reading = request.method === "GET" || request.method === "HEAD";
+    // A site's earlier name answers with its current one, path and query kept: proven.provably.fast
+    // became starks.provably.fast on 2026-10-18. Its wrangler.jsonc runs this Worker first on every
+    // path, since Cloudflare would otherwise serve the old name's static files itself.
+    if (env.CANONICAL_HOST && url.host !== env.CANONICAL_HOST) {
+      return Response.redirect(`https://${env.CANONICAL_HOST}${url.pathname}${url.search}`, reading ? 301 : 308);
+    }
     if (reading && url.pathname === "/agent-brief.md") {
       const entry = await challenge(env);
       if (!entry) return new Response("The agent brief is unavailable just now.", { status: 502 });

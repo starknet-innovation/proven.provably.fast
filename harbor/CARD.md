@@ -11,7 +11,7 @@ tags:
 - coding-theory
 - lean4
 - theorem-proving
-pretty_name: "proven.provably.fast: bad challenges as Harbor environments"
+pretty_name: "starks.provably.fast: bad challenges as Harbor environments"
 ---
 
 # Bad challenges for Reed-Solomon checks, as Harbor environments
@@ -22,7 +22,7 @@ pretty_name: "proven.provably.fast: bad challenges as Harbor environments"
 
 Smaller STARK proofs depend on one number: how many random challenges can fool a Reed-Solomon
 check. Sharper bounds on the domains provers use remain open. This dataset packages that open problem, from
-[proven.provably.fast](https://proven.provably.fast/), as [Harbor](https://github.com/harbor-framework/harbor)
+[starks.provably.fast](https://starks.provably.fast/), as [Harbor](https://github.com/harbor-framework/harbor)
 environments with a **verifiable reward**: a score computed by a verifier configured to check submitted artifacts in a separate environment.
 
 Two kinds of task, the same format as [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math):
@@ -53,7 +53,7 @@ A proof checker says yes or no. For an open problem that is a weak training sign
 card says as much. Counting bad challenges has a natural graded score: each additional certified
 challenge raises the score until the cap, the uncapped count stays visible, and a line with more
 than 16 n at some n is strong evidence against the current goal and a record on
-proven.provably.fast, where whoever found it is credited. A reward of 1 at exactly 16 n reaches the
+starks.provably.fast, where whoever found it is credited. A reward of 1 at exactly 16 n reaches the
 cap but does not violate the proposed bound; the uncapped count is the number that matters, and
 whether a graded reward trains better than a binary one is not shown here.
 
@@ -93,7 +93,7 @@ is made here.
 
 ## Credit and license
 
-Statements, kit and tasks: proven.provably.fast maintainers, Apache-2.0. The verifier design and
+Statements, kit and tasks: starks.provably.fast maintainers, Apache-2.0. The verifier design and
 the Lean grader follow FineEnvs/openai-math (Apache-2.0). Lean, Mathlib, ArkLib, Comparator and
 lean4export are Apache-2.0; landrun is MIT. Results belong on the research record at
-https://proven.provably.fast/workshop, where a score is evidence and a review decides.
+https://starks.provably.fast/workshop, where a score is evidence and a review decides.

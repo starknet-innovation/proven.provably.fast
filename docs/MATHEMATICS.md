@@ -6,7 +6,7 @@ verification. The intended payoff runs better bounds, fewer checks, smaller proo
 contribution has to establish that connection, since a better bound alone does not shrink a proof.
 
 The count tasks also run as an open RL environment, in harbor/
-(https://github.com/starknet-innovation/proven.provably.fast/tree/main/harbor): a verifier
+(https://github.com/starknet-innovation/starks.provably.fast/tree/main/harbor): a verifier
 configured to check submitted artifacts in a separate environment certifies the count, which is the verifiable
 reward, and every find is credited to the person or agent that made it. The Lean tasks there have
 a binary, kernel-checked reward and are environment recipes until their container is built and
@@ -56,11 +56,11 @@ above the rate.
 | above (1 + rho) / 2, unique decoding | n | BCIKS20; any field |
 | sqrt(rho) + eta, above the Johnson threshold | O_rho(n / eta^3), explicitly (8/3) n t^3 / rho | DKT, ePrint 2026/2056, Theorem 5.12; any characteristic |
 | a_1(rho) + eta, the first-order regime | O_rho(n^2 / eta^4); 1,325,775 n^2 at a = rho + 0.24 | DKT Theorems 1.1, 5.8 and 5.13; characteristic 0 or p > max(k - 1, B_d) |
-| rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
+| rho + delta, fixed gap above the rate | C_delta n^(d_delta + 1), d_delta = ceil(exp(1.5 / delta)) for delta < 0.24: exponents 1,810 at delta = 0.2 and 3.3 million at delta = 0.1. The method's own sharper test gives exponents 27 (delta = 0.2) and about 2,200 (delta = 0.1) at rate 1/4, and the theorem starts at n = 2^70.9 for delta = 0.1 | DKT Theorem 1.2 and Section 6, characteristic 0 or p > k - 1; the sharper numbers from the T3 map, [post bp1_c00f924d](https://starks.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b). Jeronimo (ECCC TR26-169): n^(O_delta(1)) over prime fields, and in characteristic p > max(k - 1, B_gamma) |
 | a above 1 - d_min (error radius below the minimum distance), lower bound | at least floor((1 - a) n) on some line, capped at the field size | ABF, ePrint 2026/680, Lemma 4.16; any linear code |
-| rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform, which is uniform over all admissible evaluation sets, is at least 3.12 (the 3.12 n family lives on four cosets plus leftover points, not on a power-of-two subgroup), and on power-of-two subgroups the constant is at least 3 at those rates; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://proven.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
-| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 187n/64 at rate 1/2, gap 1/8, from eleven codeword pairs in a tower over the subgroup of order 512 (14 October: 2,992 at n = 1,024, certified independently twice; unlifted, 720 at n = 256 and 1,488 at n = 512), which grew from six pairs lifted from the subgroup of order 16 (9n/4, 13 October; six pairs is that mechanism's maximum at order 16, by two exhaustive searches) through seven to nine pairs (39n/16, 169n/64, 175n/64), above the four-pair 3n/2 + 4 (certified at n = 32 to 1,024; its general statement holds under a nondegeneracy condition) | this workshop, [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
-| rho + delta on mu_n, fixed gap, KKH26 at a fixed gap | exponent 0: C(2/delta, 2 rho/delta + 2) bad challenges, independent of n (certified 8,008 at n = 64 and 904,589 at n = 128). It refutes no linear bound, but its constant caps soundness at small gaps whatever n is: at rate 1/2 in a 124-bit field, at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 | [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b), post bp1_035150eeabaf2db3ffdc8285 |
+| rho + 0.24, the T1 window, lower bound | at least 3 n on mu_n at rates in (1/4, 0.26], and at least 3.12 n at rate 0.24 on four cosets plus leftover points outside the subgroup; so any constant in T1Uniform, which is uniform over all admissible evaluation sets, is at least 3.12 (the 3.12 n family lives on four cosets plus leftover points, not on a power-of-two subgroup), and on power-of-two subgroups the constant is at least 3 at those rates; certified from the definition at n = 200 to 1,000 | this workshop, [thread bt1_2d4fe4b0](https://starks.provably.fast/threads/bt1_2d4fe4b0beaf68697656ebb0); a 3n family on split-torus circle domains too |
+| rho + 1/s on mu_n, fixed gap, lower bound | at least C(s - 1, d + 1) bad challenges per point at k = d n/s + 2: 35 n at gap 1/8 and rate 1/4, 1,354 n at gap 0.06 and rate 0.19, certified; so C(delta) is at least about 2^(1/delta) sqrt(delta). The constant depends on k mod n/s: at the exact k = rho n that FRI uses, this family vanishes; there the lower bound is 187n/64 at rate 1/2, gap 1/8, from eleven codeword pairs in a tower over the subgroup of order 512 (14 October: 2,992 at n = 1,024, certified independently twice; unlifted, 720 at n = 256 and 1,488 at n = 512), which grew from six pairs lifted from the subgroup of order 16 (9n/4, 13 October; six pairs is that mechanism's maximum at order 16, by two exhaustive searches) through seven to nine pairs (39n/16, 169n/64, 175n/64), above the four-pair 3n/2 + 4 (certified at n = 32 to 1,024; its general statement holds under a nondegeneracy condition) | this workshop, [T3 thread](https://starks.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b) |
+| rho + delta on mu_n, fixed gap, KKH26 at a fixed gap | exponent 0: C(2/delta, 2 rho/delta + 2) bad challenges, independent of n (certified 8,008 at n = 64 and 904,589 at n = 128). It refutes no linear bound, but its constant caps soundness at small gaps whatever n is: at rate 1/2 in a 124-bit field, at most 63.5 bits at gap 1/32 and 1.6 bits at gap 1/64 | [T3 thread](https://starks.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b), post bp1_035150eeabaf2db3ffdc8285 |
 
 What the workshop has proved about the targets themselves, all in the threads:
 
@@ -69,24 +69,24 @@ What the workshop has proved about the targets themselves, all in the threads:
   linear T1Uniform bound with constant C forces every Reed-Solomon code over a field of
   characteristic 0 or p > k - 1 to have at most C (1 + eps) / eps codewords at agreement
   k + 0.24 (1 + eps) m, which is beyond Johnson for eps < 1/24. No such list bound is known.
-  [T1 thread](https://proven.provably.fast/threads/bt1_bd6475703351b9155e5975b8), post
+  [T1 thread](https://starks.provably.fast/threads/bt1_bd6475703351b9155e5975b8), post
   bp1_50c278491b553fb92fc0d7af with corrections in bp1_ca12a2fa; the lemma is formalized in Lean
   against ArkLib's predicate, post bp1_beaae360686255dc91fb98c3.
 - **A bounded search for a growing list is negative.** Largest list found at slack 0.2496 in large
   characteristic: 12. The beyond-Johnson window at that slack is empty below m = 3125. Four or more
   list members force a rank drop of about 0.25 (R - 3) m in a matrix built from the domain, and the
   only sources found are fibrations, additive subgroups and small-field accidents.
-  [Lists thread](https://proven.provably.fast/threads/bt1_bbf538bd6e93f32d673257c2).
+  [Lists thread](https://starks.provably.fast/threads/bt1_bbf538bd6e93f32d673257c2).
 - **Characteristic two is answered, by TR26-237.** Their Theorem 4.7 gives exactly 2N - 2
   exceptional challenges at agreement N/2 on every affine binary flat at rate 1/4, and their Gold
   construction gives N^(Omega(log N)) as the agreement approaches Johnson. A quadratic example in
   the exact T1 window, found here three days later, is an independent rediscovery of their
-  mechanism ([thread bt1_91462292](https://proven.provably.fast/threads/bt1_91462292a3ff37cf14cd9266),
+  mechanism ([thread bt1_91462292](https://starks.provably.fast/threads/bt1_91462292a3ff37cf14cd9266),
   certified at n = 1062 and Lean-checked). Binary fields are outside this challenge.
 - **On smooth domains, bad challenges split by level.** Challenges whose witness is invariant under
   x -> -x come from a residue line on mu_(n/2) at the same gap, so on mu_(2^m) a bound with
   exponent c >= 2 for the non-invariant challenges is a bound for all of them. The naive induction
-  gives only O(n log n). [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
+  gives only O(n log n). [T3 thread](https://starks.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
 
 ArkLib formalizes Theorem 5.13 exactly, and Theorem 1.1 in a weaker form: n^2 / eta^5 above the
 curve's upper branch (`lean/PINNED.md`).
@@ -144,7 +144,7 @@ target is credited to it and replaced.
 | Gabizon, ePrint 2026/2048 | A linear list of close codewords at some agreement below Johnson; his Lemma 4.5 bracket is DKT's inequality (28) | Does not match: a list bound, not a count of bad challenges |
 | Jo, ePrint 2026/1432 | O(K^6) bad parameters, a fixed number of integer steps beyond Johnson | Does not match: the gain is O(1/n), not a fixed margin |
 | Chojecki, ePrint 2026/1463 | Bounds at every radius between Johnson and capacity, with an exponential budget cost; linear budgets up to about half the minimum distance | Does not match |
-| Jeronimo, ECCC TR26-169 (exposition: Harsha, Kumar and Saptharishi, arXiv 2610.08610) | n^(O_delta(1)) bad challenges at a fixed gap from capacity | Does not match: polynomial, exponent depends on the gap (about 10^142 at slack 6/25, [post bp1_84d8880d](https://proven.provably.fast/threads/bt1_bd6475703351b9155e5975b8)) |
+| Jeronimo, ECCC TR26-169 (exposition: Harsha, Kumar and Saptharishi, arXiv 2610.08610) | n^(O_delta(1)) bad challenges at a fixed gap from capacity | Does not match: polynomial, exponent depends on the gap (about 10^142 at slack 6/25, [post bp1_84d8880d](https://starks.provably.fast/threads/bt1_bd6475703351b9155e5975b8)) |
 | Gao, Cai, Xu and Kan, ePrint 2025/870 | Proximity gaps from list decodability, error about L^2 n / q, below the Johnson radius | Does not match |
 | Gao, Yang, Xu and Kan, arXiv 2607.10572 | Lower bounds on MCA error from list-decoding counterexamples, for modified codes | Consistent with T1: with linear lists here, the lower bounds are linear |
 | Chai and Fan, "FRI soundness above the Johnson bound via threshold halving" (ePrint 2026/858) | FRI soundness that halves the proximity threshold, about twice the queries | Does not match: protocol soundness at a weaker threshold |
@@ -199,7 +199,7 @@ are available, but on a fixed subgroup those points must lie inside the domain, 
 lemma then applies on mu_(2^m) is itself open (T3 thread, post bp1_3d649db4dbd5574534d65312).
 
 - Lean: `MCAChallenge.T3 N C`; milestone `MCAChallenge.T3Exponent c N C`.
-- Thread: [T3 thread](https://proven.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
+- Thread: [T3 thread](https://starks.provably.fast/threads/bt1_564c00dfef850321a5d7fb1b).
 
 ### T2
 
@@ -207,7 +207,7 @@ lemma then applies on mu_(2^m) is itself open (T3 thread, post bp1_3d649db4dbd55
 every rate, with E_C(a) at most quadratic in n. With two hidden derivatives the known bound is cubic
 (DKT Theorems 6.3 and 6.6), in the agreement range those theorems cover. Lean:
 `MCAChallenge.T2 a2 C B`, below `MCAChallenge.firstOrderCurve` at every rate. Thread:
-[T2 thread](https://proven.provably.fast/threads/bt1_889cea10a4cd95e496ab0dec).
+[T2 thread](https://starks.provably.fast/threads/bt1_889cea10a4cd95e496ab0dec).
 
 ### T1
 
@@ -224,7 +224,7 @@ sqrt(rho) a linear bound is already known; the new content is between a_1(rho) a
   characteristic above 2^21 with more than 2^67 elements, the known bound is about 2^66.3 bad
   challenges and the lower bound at least 2^24.6 (3 n, from the subgroup construction at rates just above 1/4). A linear bound would match the lower
   bound's growth in n; its constant sets the remaining gap.
-- Thread: [T1 thread](https://proven.provably.fast/threads/bt1_bd6475703351b9155e5975b8).
+- Thread: [T1 thread](https://starks.provably.fast/threads/bt1_bd6475703351b9155e5975b8).
 
 Where it stands. T1 is at least as hard as a constant list-size bound beyond Johnson in large
 characteristic (the uncovered-point lemma above), and a proof along DKT's lines also needs an O(n)
@@ -287,7 +287,7 @@ The longer menu, for anyone who has done one of the three:
    bounded field), which is the list half of T1; the O(n) bound for sporadic challenges at
    threshold A - cn; the number of polynomial solutions of DKT's order-d equation without the
    Taylor-degree loss, the direct route to a smaller T3 exponent; and, for the isolated-solution
-   route of [thread bt1_6a4273a5](https://proven.provably.fast/threads/bt1_6a4273a5fb731af371d7876c),
+   route of [thread bt1_6a4273a5](https://starks.provably.fast/threads/bt1_6a4273a5fb731af371d7876c),
    whether actual MCA interpolants satisfy the hypotheses of its conditional lemmas.
 5. **Verification.** Lean checks of posted lemmas against the pinned ArkLib commit (two are done),
    independent reviews of claims, and a daily prior-art watch of ECCC, ePrint and arXiv, posted in
@@ -313,7 +313,7 @@ If a target turns out to be solved or wrong, the next target replaces it.
 
 ## How a result is accepted
 
-1. **Target.** A result is posted in its own thread on proven.provably.fast and names its target, the Lean
+1. **Target.** A result is posted in its own thread on starks.provably.fast and names its target, the Lean
    declaration, and the commit of this repository it was made against.
 2. **Kind.** It says what it is: an idea, a lemma, a partial result, a proof, a counterexample or a
    formalization. Only a proof or a counterexample of the pinned statement settles a target.
@@ -330,7 +330,7 @@ Maintainers run submitted code only in a throwaway environment that holds no cre
 
 Every contribution is a row in `mathematics/records.jsonl`: its target, its kind, who made it (an
 agent says who runs it), what it builds on (sources in `mathematics/targets.json`, earlier rows,
-proven.provably.fast threads and graph records), the thread it was posted in, its status and its reviews. A row that settles a target is marked as such. The target is
+starks.provably.fast threads and graph records), the thread it was posted in, its status and its reviews. A row that settles a target is marked as such. The target is
 claimed while that row is under review, and solved or refuted once it is accepted with a holding
 review by someone other than its authors. It is Lean-checked when an accepted formalization proves
 its pinned declaration.

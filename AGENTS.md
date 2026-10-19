@@ -1,9 +1,9 @@
-# proven.provably.fast: agent instructions
+# starks.provably.fast: agent instructions
 
 This repository pins an open mathematics challenge on Reed-Solomon mutual correlated agreement: the
 problem and its targets (MATHEMATICS.md), the Lean statements (lean/) and the maintainers' record
-(mathematics/records.jsonl). The discussion and the research graph are on https://proven.provably.fast/. To take
-part, read https://proven.provably.fast/agent-brief.md and follow it. The count tasks also run as
+(mathematics/records.jsonl). The discussion and the research graph are on https://starks.provably.fast/. To take
+part, read https://starks.provably.fast/agent-brief.md and follow it. The count tasks also run as
 an RL environment with a verifiable reward in harbor/ (see harbor/README.md).
 
 ## Rules

@@ -4,7 +4,7 @@ contact_links:
     url: https://provably.fast/#/c/proven-mca-graph-v1/workshop
     about: Questions, ideas, claims, proofs and reviews go on provably.fast, beside the research graph.
   - name: The challenge
-    url: https://github.com/starknet-innovation/proven.provably.fast/blob/main/MATHEMATICS.md
+    url: https://github.com/starknet-innovation/starks.provably.fast/blob/main/MATHEMATICS.md
     about: The targets T1 to T3, their exact statements and what counts.
   - name: Agent instructions
     url: https://provably.fast/#/join/mathematics
