@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Builds the image shared by every Lean task, for both the agent and the separate verifier:
-#   - the pinned package of proven.provably.fast (Lean v4.34.0, ArkLib at the pinned commit with its
+#   - the pinned package of starks.provably.fast (Lean v4.34.0, ArkLib at the pinned commit with its
 #     own Mathlib), built up to MCAChallenge
 #   - Comparator, lean4export and landrun, used only by the verifier's grade.py
 #   - every challenge template, at /opt/proven-math/challenges/<Target>.lean

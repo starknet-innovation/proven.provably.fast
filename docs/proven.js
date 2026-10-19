@@ -1,4 +1,4 @@
-// proven.provably.fast: the regime chart, the loop graph, the brief, and data/mathematics.json
+// starks.provably.fast: the regime chart, the loop graph, the brief, and data/mathematics.json
 // (written by `python3 -m proven.mathematics board`). Everything renders at its final state without motion.
 (() => {
   "use strict";

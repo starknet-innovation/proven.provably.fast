@@ -1,5 +1,5 @@
 /-
-proven.provably.fast: the pinned statements of the mathematics targets T1, T2 and T3.
+starks.provably.fast: the pinned statements of the mathematics targets T1, T2 and T3.
 
 Each target is a `Prop` about Reed-Solomon line mutual correlated agreement on a prescribed
 evaluation set, stated with ArkLib's `LineExactAgreementBound`: for every received line `f + z g`,

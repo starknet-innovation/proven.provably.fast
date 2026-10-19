@@ -2,7 +2,7 @@
   {
     "name": "proven-mca",
     "version": "0.1",
-    "description": "Mathematics tasks of proven.provably.fast: certified counts of bad challenges (dense reward) and Lean proofs of the pinned targets (Comparator).",
+    "description": "Mathematics tasks of starks.provably.fast: certified counts of bad challenges (dense reward) and Lean proofs of the pinned targets (Comparator).",
     "tasks": [
       {
         "name": "count-babybear-m8",

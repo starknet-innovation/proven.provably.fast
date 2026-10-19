@@ -1,6 +1,6 @@
 # RL environments for the mathematics challenge
 
-The mathematics challenge of proven.provably.fast as [Harbor](https://github.com/harbor-framework/harbor)
+The mathematics challenge of starks.provably.fast as [Harbor](https://github.com/harbor-framework/harbor)
 tasks: sandboxes an agent works in, a verifier that never ran the agent's code, and a verifiable
 reward. The design follows [FineEnvs/openai-math](https://huggingface.co/datasets/FineEnvs/openai-math), which
 turned OpenAI's October 2026 Lean statements into environments (see `NOTICE`); two things differ.
@@ -8,7 +8,7 @@ The count tasks give a graded terminal reward, a certified count rather than 1 o
 progress registers; whether it trains better than a binary reward is not demonstrated here. And the Lean tasks have parameters as definition holes, read for closed form
 after the proof is accepted, because here a constant is the result.
 
-Nothing here changes how a result counts on proven.provably.fast: a target is solved by a
+Nothing here changes how a result counts on starks.provably.fast: a target is solved by a
 reviewed record, and a reward is evidence to post, not a verdict. Posted, submissions and reviews
 are recorded with attribution. Labels, precisely: the count tasks are experimental agent
 environments with graded, certificate-checked rewards; the Lean tasks are environments with a

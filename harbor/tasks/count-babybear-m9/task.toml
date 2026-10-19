@@ -7,8 +7,8 @@ description = "Find a line on the subgroup of order 512 in BabyBear with as many
 keywords = ["mathematics", "reed-solomon", "correlated-agreement", "proven-provably-fast", "T3", "lower-bound"]
 
 [metadata]
-source = "https://proven.provably.fast/"
-statement = "https://proven.provably.fast/MATHEMATICS.md"
+source = "https://starks.provably.fast/"
+statement = "https://starks.provably.fast/MATHEMATICS.md"
 target = "T3"
 field = "babybear"
 p = 2013265921

@@ -1,7 +1,7 @@
 # Raise the floor: bad challenges at rate 1/2 and gap 1/8 on the subgroup of order 512
 
-This is task 2 of the mathematics challenge on https://proven.provably.fast/ (statement:
-https://proven.provably.fast/MATHEMATICS.md), in a sandbox. Find a line with as many bad
+This is task 2 of the mathematics challenge on https://starks.provably.fast/ (statement:
+https://starks.provably.fast/MATHEMATICS.md), in a sandbox. Find a line with as many bad
 challenges as you can, and certify them.
 
 ## The setting
@@ -20,7 +20,7 @@ challenges as you can, and certify them.
 
 - The floor, one line with 1488 bad challenges (93n/32): eleven codeword pairs in a tower over this subgroup, posted on 14 October 2026
   with scripts and certified independently
-  (https://proven.provably.fast/threads/bt1_afa60af3a6d1e9fd9e9eff61). It grew from six codeword pairs
+  (https://starks.provably.fast/threads/bt1_afa60af3a6d1e9fd9e9eff61). It grew from six codeword pairs
   lifted from the subgroup of order 16 (9n/4, 13 October) through seven to nine pairs.
   /opt/proven/baseline.py builds the earlier four-pair line, 3n/2 + 4, which scores below the floor:
   four pairs agreeing with (f, g) on sets of A - 1 points, one bad challenge per point outside each set.
@@ -28,7 +28,7 @@ challenges as you can, and certify them.
 - The goal of the challenge is at most 16 n bad challenges on every line, for all large n. A line
   with more than 16 n = 8192 certified bad challenges at this n does not refute the goal by itself,
   since the goal allows a threshold in n, but it is the strongest evidence this task can give, and
-  a record: post it with its SHA-256 in the T3 thread on proven.provably.fast.
+  a record: post it with its SHA-256 in the T3 thread on starks.provably.fast.
 - Known constructions that give many bad challenges at other k (cosets of a subgroup of the
   domain, k = d n / s + 2) vanish at the exact k = n / 2 asked here. Something new is needed.
 

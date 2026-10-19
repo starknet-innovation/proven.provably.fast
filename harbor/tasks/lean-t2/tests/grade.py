@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-"""Grade one proven.provably.fast Lean task with Comparator, then read its parameters.
+"""Grade one starks.provably.fast Lean task with Comparator, then read its parameters.
 
 Adapted from FineEnvs/openai-math (Apache-2.0): the same separate-sandbox design, with the pinned
-ArkLib package of proven.provably.fast in place of Mathlib alone, definition holes for the
+ArkLib package of starks.provably.fast in place of Mathlib alone, definition holes for the
 statement's parameters, and a closed-form check of those holes (HoleCheck.lean) after Comparator
 accepts the proof.
 

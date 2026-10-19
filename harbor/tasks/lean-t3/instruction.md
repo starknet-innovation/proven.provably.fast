@@ -1,8 +1,8 @@
-# proven.provably.fast: prove `MCAChallenge.T3`
+# starks.provably.fast: prove `MCAChallenge.T3`
 
-Prove one pinned statement of the mathematics challenge on https://proven.provably.fast/ in Lean 4
+Prove one pinned statement of the mathematics challenge on https://starks.provably.fast/ in Lean 4
 against the pinned ArkLib commit, with a proof the Lean kernel accepts. The problem in words, what
-is known and the discussion are at https://proven.provably.fast/MATHEMATICS.md; this task is
+is known and the discussion are at https://starks.provably.fast/MATHEMATICS.md; this task is
 headline target.
 
 The pinned statement, from `lean/MCAChallenge.lean` (installed and prebuilt here):
@@ -73,4 +73,4 @@ When you finish, `Submission.lean` and `Submission/**.lean` are copied to a fres
 checked with [Comparator](https://github.com/leanprover/comparator), the Lean FRO's proof checker,
 then the parameters are read for closed form. The reward is 1 if both pass and 0 otherwise. A
 partial proof scores 0. The targets are open problems: a reward of 1 is a result, and the file
-should also be posted on proven.provably.fast for review and credit.
+should also be posted on starks.provably.fast for review and credit.

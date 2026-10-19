@@ -134,7 +134,7 @@ def generate(out: Path) -> None:
     rows += [lean_task(name, spec, index, tasks_dir) for name, spec in index["targets"].items()]
     (out / "registry.json").write_text(json.dumps([{
         "name": DATASET, "version": VERSION,
-        "description": "Mathematics tasks of proven.provably.fast: certified counts of bad challenges "
+        "description": "Mathematics tasks of starks.provably.fast: certified counts of bad challenges "
                        "(dense reward) and Lean proofs of the pinned targets (Comparator).",
         "tasks": [{"name": r["task"], "path": f"tasks/{r['task']}"} for r in rows]}], indent=2) + "\n")
     (out / "manifest.json").write_text(json.dumps({"dataset": DATASET, "version": VERSION, "tasks": rows},

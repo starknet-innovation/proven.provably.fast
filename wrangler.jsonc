@@ -1,21 +1,29 @@
 {
-  // proven.provably.fast: the landing page in docs/ and worker.js, the challenge-site Worker every
-  // challenge shares (exported from research/discovery/site-host/worker.js). `npx wrangler deploy`
-  // from the repository root publishes both; the custom domain is created with the deploy.
+  // starks.provably.fast (proven.provably.fast until 2026-10-18): the landing page in docs/ and
+  // worker.js, the challenge-site Worker every challenge shares (exported from
+  // research/discovery/site-host/worker.js). `npx wrangler deploy` from the repository root
+  // publishes both, with their routes.
   "name": "proven-provably-fast",
   "main": "worker.js",
   "compatibility_date": "2026-10-01",
-  // Static files are served without running the Worker, except the site's own /data files: the
-  // Worker adds the CORS header provably.fast's front page reads them with.
-  "assets": { "directory": "./docs", "binding": "ASSETS", "run_worker_first": ["/data/*"] },
+  // The Worker runs first on every path: the old name answers 301 to the new one, which Cloudflare's
+  // own static serving would skip. On the new name it serves docs/ (env.ASSETS), adding to /data/*
+  // the CORS header provably.fast's front page reads them with.
+  "assets": { "directory": "./docs", "binding": "ASSETS", "run_worker_first": true },
   // The provably.fast platform Worker (services/auth), which serves the participation API, and the
   // thread pages every board shares (research/discovery/thread-pages).
   "services": [
     { "binding": "PLATFORM", "service": "provably-fast-auth" },
     { "binding": "THREADS", "service": "provably-fast-threads" }
   ],
-  // The challenge this site is, by its registry entry (research/discovery/site/data/campaigns.json).
-  "vars": { "SITE_CAMPAIGN": "proven-mca-graph-v1" },
-  "routes": [{ "pattern": "proven.provably.fast", "custom_domain": true }],
+  // The challenge this site is, by its registry entry (research/discovery/site/data/campaigns.json),
+  // and the name every other one redirects to.
+  "vars": { "SITE_CAMPAIGN": "proven-mca-graph-v1", "CANONICAL_HOST": "starks.provably.fast" },
+  // starks.provably.fast is a zone route: its host already had a DNS record (the old redirect's),
+  // which a custom domain may not take over.
+  "routes": [
+    { "pattern": "starks.provably.fast/*", "zone_name": "provably.fast" },
+    { "pattern": "proven.provably.fast", "custom_domain": true }
+  ],
   "workers_dev": false
 }
