@@ -444,8 +444,29 @@ path.board-line { fill: none; stroke: var(--accent); stroke-width: 2.4; stroke-l
 .reveal { opacity: 0; transform: translateY(16px); transition: opacity .6s ease, transform 1s var(--spring-soft); }
 .reveal.is-in { opacity: 1; transform: none; }
 
+/* The mascot's other poses, as on provably.fast's front page: it lounges beside "How a theorem gets made" and naps
+   on the footer. Decoration only: hidden from assistive technology, still under reduced motion. */
+.chapter.how { position: relative; }
+.lounge { position: absolute; right: var(--gutter); top: clamp(48px, 6vw, 96px); width: clamp(104px, 8.5vw, 136px); transform-origin: 50% 96%; }
+.nap-spot { position: absolute; right: var(--gutter); top: 0; width: clamp(120px, 10vw, 160px); transform: translateY(-86%); }
+.nap-spot .mascot { transform-origin: 60% 88%; }
+.nap-z { position: absolute; left: 44%; top: 4%; color: var(--platform); font: 800 26px/1 var(--sans); opacity: 0; }
+.nap-z:nth-of-type(2) { font-size: 20px; }
+.nap-z:nth-of-type(3) { font-size: 15px; }
+@media (prefers-reduced-motion: no-preference) {
+  .lounge { animation: rock 5.5s ease-in-out infinite; }
+  .nap-spot .mascot { animation: breathe 3.8s ease-in-out infinite; }
+  .nap-z { animation: float-z 3.9s ease-out infinite; }
+  .nap-z:nth-of-type(2) { animation-delay: 1.3s; }
+  .nap-z:nth-of-type(3) { animation-delay: 2.6s; }
+}
+@keyframes rock { 0%, 100% { transform: rotate(-1.4deg); } 50% { transform: rotate(1.4deg); } }
+@keyframes breathe { 0%, 100% { transform: scale(1, 1); } 45% { transform: scale(1.012, 1.03); } }
+@keyframes float-z { 0% { opacity: 0; transform: translate(0, 0) scale(.7); } 18% { opacity: .95; } 100% { opacity: 0; transform: translate(30px, -54px) scale(1.1); } }
+@media (max-width: 900px) { .lounge { display: none; } .nap-spot { width: 110px; } }
+
 /* Foot */
-.foot { display: grid; grid-template-columns: 2fr repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; max-width: var(--max); margin: 112px auto 0; padding: 48px var(--gutter) 40px; border-top: 1px solid var(--line); color: var(--muted); }
+.foot { position: relative; display: grid; grid-template-columns: 2fr repeat(3, minmax(0, 1fr)); gap: 32px; align-items: start; max-width: var(--max); margin: 112px auto 0; padding: 48px var(--gutter) 40px; border-top: 1px solid var(--line); color: var(--muted); }
 .foot-lead { display: grid; gap: 12px; align-content: start; }
 .foot-mark { display: inline-flex; align-items: center; gap: 10px; color: var(--ink); font: 600 17px var(--display); letter-spacing: -.01em; }
 .foot-mark .brand-mark { width: 24px; height: 24px; }
